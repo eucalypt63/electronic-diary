@@ -1,7 +1,9 @@
 package com.example.postgresql.controller;
 
 import com.example.postgresql.model.Admin;
+import com.example.postgresql.model.ScAdmin;
 import com.example.postgresql.service.AdminService;
+import com.example.postgresql.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,9 @@ public class AuthorizationControl {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private AuthService authService;
 
     //временно
     @GetMapping("/createAdmin")
@@ -42,9 +47,29 @@ public class AuthorizationControl {
         return "login";
     }
 
+    @PostMapping("/login")
+    public String postAuthorization(@ModelAttribute("username") String username,
+                                    @ModelAttribute("password") String password,
+                                    Model model){
+        Admin admin = authService.checkAuthAdmin(username, password);
+        ScAdmin scAdmin = authService.checkAuthScAdmin(username, password);
+
+        if (admin != null) {
+            System.out.println("Администратор: " + admin.getLogin() + ", Роль: " + admin.getRole());
+            return "login";//
+        }
+        else if (scAdmin != null){
+            System.out.println("школьный Администратор: " + scAdmin.getLogin() + ", Роль: " + scAdmin.getRole());
+            return "login";//
+        }
+        else {
+            System.out.println("Не найден");//
+            return "login";
+        }
+    }
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate();
         return "redirect:/login";
     }
 

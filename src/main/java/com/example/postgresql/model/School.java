@@ -8,21 +8,16 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ED_admin")
+@Table(name = "ED_school")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Admin {
+public class School {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
-    private String login;
+    private String name;
 
-    @NonNull
-    private String password;
-
-    @NonNull
-    private String role;
 }
