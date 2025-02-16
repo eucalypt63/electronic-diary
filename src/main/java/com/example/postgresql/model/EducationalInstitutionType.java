@@ -1,6 +1,5 @@
 package com.example.postgresql.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -9,27 +8,16 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ED_ScAdmin")
+@Table(name = "ELD_EDUCATIONAL_INSTITUTIONS_TYPE")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ScAdmin {
+public class EducationalInstitutionType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     @NonNull
-    private String login;
-
-    @NonNull
-    private String password;
-
-    @NonNull
-    private String role;
-
-    @NonNull
-    @ManyToOne
-    @JoinColumn(name = "school_id")
-    @JsonManagedReference
-    private School school;
+    private String name;
 }

@@ -8,16 +8,16 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ED_school")
+@Table(name = "ELD_USERS_TYPES")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class School {
+public class UserType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     @NonNull
     private String name;
-
 }

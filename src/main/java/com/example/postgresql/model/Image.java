@@ -8,21 +8,21 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ED_admin")
+@Table(name = "ELD_IMAGES")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Admin {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     @NonNull
-    private String login;
+    private String pathImages;
 
     @NonNull
-    private String password;
-
-    @NonNull
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "i_ei_id", nullable = false, foreignKey = @ForeignKey(name = "i_ei_id"))
+    private EducationalInstitution educationalInstitution;
 }
