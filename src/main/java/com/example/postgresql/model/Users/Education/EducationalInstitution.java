@@ -1,4 +1,4 @@
-package com.example.postgresql.model;
+package com.example.postgresql.model.Users.Education;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,9 +27,6 @@ public class EducationalInstitution {
 
     private String pathImage;
     private String email;
-
-    @Column(nullable = false)
-    @NonNull
     private String phoneNumber;
 
     @NonNull

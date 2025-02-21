@@ -1,4 +1,4 @@
-package com.example.postgresql.model;
+package com.example.postgresql.model.Users.Education;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ELD_EDUCATIONAL_INSTITUTIONS_TYPE")
+@Table(name = "ELD_EDUCATIONAL_INSTITUTIONS_TYPES")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor

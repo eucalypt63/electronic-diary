@@ -1,7 +1,9 @@
 package com.example.postgresql.service;
 
-import com.example.postgresql.model.User;
-import com.example.postgresql.repository.UserRepository;
+import com.example.postgresql.model.Users.User.User;
+import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.repository.Users.User.UserRepository;
+import com.example.postgresql.repository.Users.User.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,16 @@ public class LoginService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserTypeRepository userTypeRepository;
+
     public boolean authenticate(User user, String password) {
         byte[] hashedPassword = hashPassword(password, user.getSalt());
-        return Arrays.equals(hashedPassword, user.getHash());
+
+        return Arrays.equals(Arrays.toString(hashedPassword).toCharArray(), Arrays.toString(user.getHash()).toCharArray());
     }
 
-    private byte[] hashPassword(String password, byte[] salt) {
+    public  byte[] hashPassword(String password, byte[] salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salt);
@@ -34,6 +40,10 @@ public class LoginService {
 
 
     public User findUserByLogin(String login){ return userRepository.findUserByLogin(login); }
+
+    public UserType findUserTypeById(Long id){ return userTypeRepository.findUserTypeById(id); }
+
+    public void saveUser(User user) {userRepository.save(user);}
 
     public List<User> getAllUsers() {
         return userRepository.findAll();

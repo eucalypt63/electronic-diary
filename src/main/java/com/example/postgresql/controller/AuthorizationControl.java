@@ -1,15 +1,13 @@
 package com.example.postgresql.controller;
 
-import com.example.postgresql.model.User;
+import com.example.postgresql.model.Users.User.User;
+import com.example.postgresql.model.Users.User.UserType;
 import com.example.postgresql.service.LoginService;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 
 import javax.servlet.http.HttpSession;
 import java.nio.charset.StandardCharsets;
@@ -38,23 +36,62 @@ public class AuthorizationControl {
     }
 
     @PostMapping("/login")
-    public String postAuthorization(@ModelAttribute("login") String login,
-                                    @ModelAttribute("password") String password,
-                                    Model model) {
+    public String postAuthorization(@RequestParam("login") String login,
+                                    @RequestParam("password") String password,
+                                    Model model, HttpSession session) {
         User user = loginService.findUserByLogin(login);
+
         if (user != null && loginService.authenticate(user, password)) {
-            Subject currentUser = SecurityUtils.getSubject();
-            currentUser.login(new UsernamePasswordToken(login, password, true));
-            return "redirect:/home";
+            UserType userType = user.getUserType();
+            session.setAttribute("user", user);
+            session.setAttribute("role", userType.getName());
+
+            //Прописывать логику получения таблицы конкретной сущности и хранить в сесии
+
+            if (userType.getName().equals("Main admin")) {
+                return "redirect:/adminSettings";
+            } else {
+                return "login";//
+            }
         }
         model.addAttribute("error", "Неверный логин или пароль");
         return "login";
     }
 
-    @RequiresAuthentication
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        session.invalidate();
         return "redirect:/login";
+    }
+
+    @GetMapping("/adminSettings")
+    public String adminSettings(Model model, HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        System.out.println(role);
+        if ("Main admin".equals(role)) {
+            return "adminSettings";
+        }
+        System.out.println("Неверная роль");
+        return "redirect:/login";
+    }
+
+
+    //временно
+    @GetMapping("/reg")
+    public String postRegistration(Model model) {
+        byte[] salt = generateSalt();
+        byte[] hashedPassword = loginService.hashPassword("koroley3", salt);
+
+        User newUser = new User("admin3", hashedPassword, salt, loginService.findUserTypeById(Long.valueOf(1)));
+        loginService.saveUser(newUser);
+
+        model.addAttribute("success", "Пользователь успешно зарегистрирован");
+        return "login";
+    }
+
+    private byte[] generateSalt() {
+        byte[] salt = new byte[]{52, 102, 53, 103, 54, 104, 55, 106, 56, 107, 57, 108, 48, 109, 49, 110}; // 16 байт соли
+        return salt;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.postgresql.model;
+package com.example.postgresql.model.Users.User;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
