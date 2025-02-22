@@ -1,7 +1,9 @@
 package com.example.postgresql.service;
 
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.repository.Users.Education.EducationalInstitutionRepository;
 import com.example.postgresql.repository.Users.User.UserRepository;
 import com.example.postgresql.repository.Users.User.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class LoginService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EducationalInstitutionRepository educationalInstitutionRepository;
 
     @Autowired
     private UserTypeRepository userTypeRepository;
@@ -47,5 +52,8 @@ public class LoginService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+    public List<EducationalInstitution> getAllEducationalInstitution() {
+        return educationalInstitutionRepository.findAll();
     }
 }

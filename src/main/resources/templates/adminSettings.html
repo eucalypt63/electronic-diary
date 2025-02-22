@@ -1,10 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/adminSettingsStyle.css}">
 </head>
 <body>
 
+<header>
+    <div>Админ</div>
+    <button class="logout-button">Выйти</button>
+</header>
+
+<div class="container">
+    <div class="column">
+        <div class="header-div">Школы</div>
+        <div class="educationColumn" id="educationColumn">
+
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="selector">
+            <div onclick="updateHeader('Объект 1')">Адинистрация</div>
+            <div onclick="updateHeader('Объект 2')">Классы</div>
+            <div onclick="updateHeader('Объект 3')">Учителя</div>
+            <div onclick="updateHeader('Объект 4')">Ученики</div>
+        </div>
+        <div class="header-div" id="secondColumnHeader">Выберите объект</div>
+    </div>
+    <div class="column">
+        <div class="header-div">Столбец 3</div>
+    </div>
+</div>
+<script>
+    function updateHeader(content) {
+        document.getElementById('secondColumnHeader').innerText = content;
+    }
+
+
+    fetch('/getSchools')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Сетевая ошибка');
+            }
+            return response.json();
+        })
+        .then(institutions => {
+            const educationColumn = document.getElementById('educationColumn');
+            institutions.forEach(institution => {
+                const schoolDiv = document.createElement('div');
+                schoolDiv.innerText = institution.name; // Используем поле name
+                educationColumn.appendChild(schoolDiv); // Добавляем внутрь EducationColumn
+            });
+        })
+        .catch(error => console.error('Ошибка при получении данных:', error));
+
+
+
+    const educationColumn = document.getElementById('educationColumn');
+    educationColumn.addEventListener('click', function(event) {
+        if (event.target.tagName === 'DIV') {
+            const divs = educationColumn.querySelectorAll('div');
+            divs.forEach(div => div.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    });
+
+
+    const selector = document.querySelector('.selector');
+    selector.addEventListener('click', function(event) {
+    if (event.target.tagName === 'DIV') {
+        const divs = selector.querySelectorAll('div');
+        divs.forEach(div => div.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+});
+</script>
 </body>
 </html>

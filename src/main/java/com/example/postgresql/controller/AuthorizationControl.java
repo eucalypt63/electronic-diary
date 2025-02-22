@@ -1,31 +1,21 @@
 package com.example.postgresql.controller;
 
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
 import com.example.postgresql.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.servlet.http.HttpSession;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 @Controller
 public class AuthorizationControl {
-
-    private byte[] hashPassword(String password, byte[] salt) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
-            return md.digest(password.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Ошибка хеширования пароля", e);
-        }
-    }
 
     @Autowired
     private LoginService loginService;
@@ -36,9 +26,10 @@ public class AuthorizationControl {
     }
 
     @PostMapping("/login")
-    public String postAuthorization(@RequestParam("login") String login,
-                                    @RequestParam("password") String password,
-                                    Model model, HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<String> postAuthorization(@RequestParam("login") String login,
+                                                    @RequestParam("password") String password,
+                                                    HttpSession session) {
         User user = loginService.findUserByLogin(login);
 
         if (user != null && loginService.authenticate(user, password)) {
@@ -46,22 +37,35 @@ public class AuthorizationControl {
             session.setAttribute("user", user);
             session.setAttribute("role", userType.getName());
 
-            //Прописывать логику получения таблицы конкретной сущности и хранить в сесии
-
-            if (userType.getName().equals("Main admin")) {
-                return "redirect:/adminSettings";
-            } else {
-                return "login";//
-            }
+            return ResponseEntity.ok(userType.getName());
         }
-        model.addAttribute("error", "Неверный логин или пароль");
-        return "login";
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Неверный логин или пароль");
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    @GetMapping("getSchools")
+    @ResponseBody
+    public ResponseEntity<List<EducationalInstitution>> getSchools() {
+        List<EducationalInstitution> institutions = loginService.getAllEducationalInstitution();
+
+        if (institutions.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(institutions);
+        }
+
+        return ResponseEntity.ok(institutions);
+    }
+
+    @PostMapping("/getRole")
+    @ResponseBody
+    public ResponseEntity<String> getRole(HttpSession session) {
+        return ResponseEntity.ok((String) session.getAttribute("role"));
     }
 
     @GetMapping("/adminSettings")

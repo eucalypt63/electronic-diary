@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Шапка */
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-div {
+    background-color: #e0e0e0;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.logout-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+
+
+/* Столбцы */
+.container {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.column {
+    background: white;
+    border: 1px solid #ccc;
+    width: 40%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+
+
+/* Кнопки */
+.selector {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    padding-top: 20px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -50px;
+}
+
+.selector div {
+    background: white;
+    color: black;
+    padding: 5px;
+    cursor: pointer;
+    text-align: center;
+    flex: 1;
+    border: 1px solid #ccc;
+}
+
+.selector div:hover {
+    background: #e0e0e0;
+}
+
+.selector div.active {
+    background: #eeeeee;
+}
+
+
+
+/* Поля школ */
+.educationColumn div {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.educationColumn div:hover {
+    background: #e0e0e0;
+}
+
+.educationColumn div:active {
+    background: #c4c2c2;
+}
+
+.educationColumn div.active {
+    background: #eeeeee;
+}
