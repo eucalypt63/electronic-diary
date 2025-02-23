@@ -22,14 +22,10 @@ public class LoginService {
     private UserRepository userRepository;
 
     @Autowired
-    private EducationalInstitutionRepository educationalInstitutionRepository;
-
-    @Autowired
     private UserTypeRepository userTypeRepository;
 
     public boolean authenticate(User user, String password) {
         byte[] hashedPassword = hashPassword(password, user.getSalt());
-
         return Arrays.equals(Arrays.toString(hashedPassword).toCharArray(), Arrays.toString(user.getHash()).toCharArray());
     }
 
@@ -48,12 +44,12 @@ public class LoginService {
 
     public UserType findUserTypeById(Long id){ return userTypeRepository.findUserTypeById(id); }
 
+
+    //Временно
     public void saveUser(User user) {userRepository.save(user);}
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-    public List<EducationalInstitution> getAllEducationalInstitution() {
-        return educationalInstitutionRepository.findAll();
-    }
+
 }

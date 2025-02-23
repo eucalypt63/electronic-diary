@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Classes {
+public class Class {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

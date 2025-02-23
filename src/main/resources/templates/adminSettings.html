@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" th:href="@{/style/adminSettingsStyle.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/adminSettingsModalsStyle.css}">
 </head>
 <body>
 
@@ -18,6 +19,10 @@
         <div class="educationColumn" id="educationColumn">
 
         </div>
+        <div class="button-container">
+            <button id="addSchoolButton" class="add">Добавить школу</button>
+            <button id="deleteSchoolButton" class="delete">Удалить школу</button>
+        </div>
     </div>
 
     <div class="column">
@@ -28,54 +33,43 @@
             <div onclick="updateHeader('Объект 4')">Ученики</div>
         </div>
         <div class="header-div" id="secondColumnHeader">Выберите объект</div>
+        <div class="button-container">
+            <button id="addObjectButton" class="add">Добавить объект</button>
+            <button id="deleteObjectButton" class="delete">Удалить объект</button>
+        </div>
     </div>
     <div class="column">
         <div class="header-div">Столбец 3</div>
+        <div class="button-container">
+            <button id="addObjectButtonС3" class="add">Добавить объект</button>
+            <button id="deleteObjectButtonС3" class="delete">Удалить объект</button>
+        </div>
     </div>
 </div>
-<script>
-    function updateHeader(content) {
-        document.getElementById('secondColumnHeader').innerText = content;
-    }
 
+<div id="modulAddEducation" class="modal addEducation-modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Добавить школу</h2>
 
-    fetch('/getSchools')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Сетевая ошибка');
-            }
-            return response.json();
-        })
-        .then(institutions => {
-            const educationColumn = document.getElementById('educationColumn');
-            institutions.forEach(institution => {
-                const schoolDiv = document.createElement('div');
-                schoolDiv.innerText = institution.name; // Используем поле name
-                educationColumn.appendChild(schoolDiv); // Добавляем внутрь EducationColumn
-            });
-        })
-        .catch(error => console.error('Ошибка при получении данных:', error));
+        <label for="schoolName">Название школы</label>
+        <input type="text" id="schoolName" placeholder="Название школы" required>
 
+        <label for="schoolAddress">Адрес</label>
+        <input type="text" id="schoolAddress" placeholder="Адрес" required>
 
+        <label for="schoolEmail">Email</label>
+        <input type="text" id="schoolEmail" placeholder="Email">
 
-    const educationColumn = document.getElementById('educationColumn');
-    educationColumn.addEventListener('click', function(event) {
-        if (event.target.tagName === 'DIV') {
-            const divs = educationColumn.querySelectorAll('div');
-            divs.forEach(div => div.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-    });
+        <label for="schoolPhoneNumber">Телефон</label>
+        <input type="text" id="schoolPhoneNumber" placeholder="Телефон">
 
+        <button id="submitSchoolButton">Подтвердить</button>
+    </div>
+</div>
 
-    const selector = document.querySelector('.selector');
-    selector.addEventListener('click', function(event) {
-    if (event.target.tagName === 'DIV') {
-        const divs = selector.querySelectorAll('div');
-        divs.forEach(div => div.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-});
-</script>
+<script src="/scripts/adminSettings/Start.js" defer></script>
+<script src="/scripts/adminSettings/ModuleAddEducation.js" defer></script>
+
 </body>
 </html>

@@ -50,17 +50,7 @@ public class AuthorizationControl {
         return "redirect:/login";
     }
 
-    @GetMapping("getSchools")
-    @ResponseBody
-    public ResponseEntity<List<EducationalInstitution>> getSchools() {
-        List<EducationalInstitution> institutions = loginService.getAllEducationalInstitution();
 
-        if (institutions.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(institutions);
-        }
-
-        return ResponseEntity.ok(institutions);
-    }
 
     @PostMapping("/getRole")
     @ResponseBody

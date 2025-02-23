@@ -1,7 +1,6 @@
 package com.example.postgresql.model;
 
 import javax.persistence.*;
-import javax.security.auth.Subject;
 
 import com.example.postgresql.model.Users.Teacher;
 import lombok.Data;
@@ -32,5 +31,5 @@ public class TeacherAssignment {
     @NonNull
     @ManyToOne
     @JoinColumn(name = "ta_c_id", nullable = false, foreignKey = @ForeignKey(name = "ta_c_id"))
-    private Classes classRoom;
+    private Class classRoom;
 }

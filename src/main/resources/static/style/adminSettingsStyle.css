@@ -48,6 +48,11 @@ header {
 }
 
 .column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 88vh;
+
     background: white;
     border: 1px solid #ccc;
     width: 40%;
@@ -91,7 +96,7 @@ header {
 
 /* Поля школ */
 .educationColumn div {
-    padding: 10px;
+    padding:5px;
     border-bottom: 1px solid #ccc;
     cursor: pointer;
 }
@@ -106,4 +111,60 @@ header {
 
 .educationColumn div.active {
     background: #eeeeee;
+}
+
+.educationColumn {
+    overflow-y: auto;
+    background-color: white;
+}
+
+
+/* Контейнер для кнопок */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: auto;
+}
+
+.button-container button {
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.button-container button:last-child {
+    margin-right: 0;
+}
+
+.button-container button.add {
+    background-color: #28a745;
+}
+
+.button-container button.add:hover {
+    background-color: #00a025;
+}
+
+.button-container button.add:active {
+    background: #009021;
+}
+
+.button-container button.delete {
+    background-color: #dc3545;
+}
+
+.button-container button.delete:hover {
+    background-color: #c82333;
+}
+
+.button-container button.delete:active {
+    background: #b80012;
 }

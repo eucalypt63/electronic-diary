@@ -1,9 +1,9 @@
 package com.example.postgresql.repository;
 
-import com.example.postgresql.model.Classes;
+import com.example.postgresql.model.Class;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClassesRepository extends JpaRepository<Classes, Long> {
+public interface ClassesRepository extends JpaRepository<Class, Long> {
 }

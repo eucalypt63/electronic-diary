@@ -2,7 +2,7 @@ package com.example.postgresql.model.Users.Student;
 
 import javax.persistence.*;
 
-import com.example.postgresql.model.Classes;
+import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class SchoolStudent {
     @NonNull
     @ManyToOne
     @JoinColumn(name = "sst_c_id", nullable = false, foreignKey = @ForeignKey(name = "sst_c_id"))
-    private Classes classRoom;
+    private Class classRoom;
 
     @ManyToOne
     @JoinColumn(name = "sst_p_father_id", foreignKey = @ForeignKey(name = "sst_p_father_id"))
