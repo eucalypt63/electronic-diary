@@ -1,19 +1,12 @@
 // Модуль добавления школы
 document.getElementById('addSchoolButton').addEventListener('click', function() {
-    // Показываем модальное окно при нажатии на кнопку
-    const modal = document.getElementById('modulAddEducation');
+    const modal = document.getElementById('moduleAddEducation');
     modal.style.display = 'block';
-});
-
-// Закрытие модального окна при нажатии на кнопку закрытия
-document.querySelector('.close-button').addEventListener('click', function() {
-    const modal = document.getElementById('modulAddEducation');
-    modal.style.display = 'none';
 });
 
 // Закрытие модального окна при клике за его пределами
 window.addEventListener('click', function(event) {
-    const modal = document.getElementById('modulAddEducation');
+    const modal = document.getElementById('moduleAddEducation');
     if (event.target === modal) {
         modal.style.display = 'none';
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -29,10 +30,14 @@ public class AuthorizationControl {
     @ResponseBody
     public ResponseEntity<String> postAuthorization(@RequestParam("login") String login,
                                                     @RequestParam("password") String password,
-                                                    HttpSession session) {
+                                                    HttpSession session,
+                                                    HttpServletRequest request) {
         User user = loginService.findUserByLogin(login);
 
         if (user != null && loginService.authenticate(user, password)) {
+            session.invalidate();
+            session = request.getSession(true);
+
             UserType userType = user.getUserType();
             session.setAttribute("user", user);
             session.setAttribute("role", userType.getName());

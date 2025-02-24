@@ -1,5 +1,7 @@
 package com.example.postgresql.controller;
 
+import com.example.postgresql.DTO.AdministratorDTO;
+import com.example.postgresql.DTO.TeacherDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class AdminSettingsControl {
@@ -45,6 +48,8 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(institution);
     }
 
+
+
     @PostMapping("/addEducationalInstitution")
     @ResponseBody
     public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitution institution) {
@@ -65,8 +70,11 @@ public class AdminSettingsControl {
 
     @GetMapping("/getSchoolStudents")
     @ResponseBody
-    public ResponseEntity<List<SchoolStudent>> getSchoolStudents() {
-        List<SchoolStudent> schoolStudents = adminSettingsService.getAllSchoolStudent();
+    public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
+        List<SchoolStudent> schoolStudents = adminSettingsService.getAllSchoolStudent()
+                .stream()
+                .filter(student -> student.getUser().getEducationalInstitution().getId().equals(schoolId))
+                .collect(Collectors.toList());
 
         if (schoolStudents.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);
@@ -77,8 +85,11 @@ public class AdminSettingsControl {
 
     @GetMapping("/getAdministrators")
     @ResponseBody
-    public ResponseEntity<List<Administrator>> getAdministrators() {
-        List<Administrator> administrators = adminSettingsService.getAllAdministrator();
+    public ResponseEntity<List<Administrator>> getAdministrators(@RequestParam Long schoolId) {
+        List<Administrator> administrators = adminSettingsService.getAllAdministrator()
+                .stream()
+                .filter(admin -> admin.getUser().getEducationalInstitution().getId().equals(schoolId))
+                .collect(Collectors.toList());
 
         if (administrators.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(administrators);
@@ -87,10 +98,21 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(administrators);
     }
 
+    @PostMapping("/addAdministrator")
+    @ResponseBody
+    public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administrator) {
+        System.out.println("Данные администратора: " + administrator);
+
+        return ResponseEntity.ok("{\"message\": \"Администратор успешно добавлен\"}");
+    }
+
     @GetMapping("/getTeachers")
     @ResponseBody
-    public ResponseEntity<List<Teacher>> getTeachers() {
-        List<Teacher> teachers = adminSettingsService.getAllTeacher();
+    public ResponseEntity<List<Teacher>> getTeachers(@RequestParam(required = false) Long schoolId) {
+        List<Teacher> teachers = adminSettingsService.getAllTeacher()
+                .stream()
+                .filter(teacher -> teacher.getUser().getEducationalInstitution().getId().equals(schoolId))
+                .collect(Collectors.toList());
 
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
@@ -99,15 +121,26 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(teachers);
     }
 
+    @PostMapping("/addTeacher")
+    @ResponseBody
+    public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacher) {
+        System.out.println("Данные учителя: " + teacher);
+
+        return ResponseEntity.ok("{\"message\": \"Учитель успешно добавлен\"}");
+    }
+
     @GetMapping("/getClasses")
     @ResponseBody
-    public ResponseEntity<List<Class>> getClasses() {
-        List<Class> Classes = adminSettingsService.getAllClasses();
+    public ResponseEntity<List<Class>> getClasses(@RequestParam(required = false) Long schoolId) {
+        List<Class> classes = adminSettingsService.getAllClasses()
+                .stream()
+                .filter(cl -> cl.getTeacher().getUser().getEducationalInstitution().getId().equals(schoolId))
+                .collect(Collectors.toList());
 
-        if (Classes.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Classes);
+        if (classes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(classes);
         }
 
-        return ResponseEntity.ok(Classes);
+        return ResponseEntity.ok(classes);
     }
 }

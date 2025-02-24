@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" th:href="@{/style/adminSettingsStyle.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/style/adminSettingsModalsStyle.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/Style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/ModuleAdd.css}">
 </head>
 <body>
 
@@ -27,12 +27,15 @@
 
     <div class="column">
         <div class="selector">
-            <div onclick="updateHeader('Объект 1')">Адинистрация</div>
-            <div onclick="updateHeader('Объект 2')">Классы</div>
-            <div onclick="updateHeader('Объект 3')">Учителя</div>
-            <div onclick="updateHeader('Объект 4')">Ученики</div>
+            <div id="administrationSelector" onclick="updateHeader('Администрация')">Адинистрация</div>
+            <div id="classSelector" onclick="updateHeader('Классы')">Классы</div>
+            <div id="teachersSelector" onclick="updateHeader('Учителя')">Учителя</div>
+            <div id="studentsSelector" onclick="updateHeader('Ученики')">Ученики</div>
         </div>
         <div class="header-div" id="secondColumnHeader">Выберите объект</div>
+        <div class="objectColumn" id="objectColumn">
+
+        </div>
         <div class="button-container">
             <button id="addObjectButton" class="add">Добавить объект</button>
             <button id="deleteObjectButton" class="delete">Удалить объект</button>
@@ -47,9 +50,9 @@
     </div>
 </div>
 
-<div id="modulAddEducation" class="modal addEducation-modal">
+<div id="moduleAddEducation" class="modal">
     <div class="modal-content">
-        <span class="close-button">&times;</span>
+        <span class="close-button" onclick="closeAllModules()">&times;</span>
         <h2>Добавить школу</h2>
 
         <label for="schoolName">Название школы</label>
@@ -68,8 +71,87 @@
     </div>
 </div>
 
+<div id="moduleAddAdministrator" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAllModules()">&times;</span>
+        <h2>Добавить Администратора</h2>
+
+        <label for="adminFirstName">Имя</label>
+        <input type="text" id="adminFirstName" placeholder="Имя" required>
+
+        <label for="adminLastName">Фамилия</label>
+        <input type="text" id="adminLastName" placeholder="Фамилия" required>
+
+        <label for="adminPatronymic">Отчество</label>
+        <input type="text" id="adminPatronymic" placeholder="Отчество">
+
+        <label for="adminLogin">Логин</label>
+        <input type="text" id="adminLogin" placeholder="Логин" required>
+
+        <label for="adminPassword">Пароль</label>
+        <input type="password" id="adminPassword" placeholder="Пароль" required>
+
+        <label for="adminEmail">Email</label>
+        <input type="email" id="adminEmail" placeholder="Email">
+
+        <label for="adminPhoneNumber">Телефон</label>
+        <input type="text" id="adminPhoneNumber" placeholder="Телефон">
+
+        <button id="submitAdminButton">Подтвердить</button>
+    </div>
+</div>
+
+<div id="moduleAddTeacher" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAllModules()">&times;</span>
+        <h2>Добавить Учителя</h2>
+
+        <label for="teacherFirstName">Имя</label>
+        <input type="text" id="teacherFirstName" placeholder="Имя" required>
+
+        <label for="teacherLastName">Фамилия</label>
+        <input type="text" id="teacherLastName" placeholder="Фамилия" required>
+
+        <label for="teacherPatronymic">Отчество</label>
+        <input type="text" id="teacherPatronymic" placeholder="Отчество">
+
+        <label for="teacherLogin">Логин</label>
+        <input type="text" id="teacherLogin" placeholder="Логин" required>
+
+        <label for="teacherPassword">Пароль</label>
+        <input type="password" id="teacherPassword" placeholder="Пароль" required>
+
+        <label for="teacherEmail">Email</label>
+        <input type="email" id="teacherEmail" placeholder="Email">
+
+        <label for="teacherPhoneNumber">Телефон</label>
+        <input type="text" id="teacherPhoneNumber" placeholder="Телефон">
+
+        <button id="submitTeacherButton">Подтвердить</button>
+    </div>
+</div>
+
+<div id="moduleAddClass" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAllModules()">&times;</span>
+        <h2>Добавить класс</h2>
+
+        <label for="className">Название класса</label>
+        <input type="text" id="className" placeholder="Название класса" required>
+
+        <label for="teacherSelect">Выберите учителя:</label>
+        <select id="teacherSelect" required></select>
+
+        <button id="submitClassButton">Подтвердить</button>
+    </div>
+</div>
+
+<script src="/scripts/adminSettings/ModuleAddObj.js" defer></script>
 <script src="/scripts/adminSettings/Start.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddEducation.js" defer></script>
+<script src="/scripts/adminSettings/ModuleAddClass.js" defer></script>
+<script src="/scripts/adminSettings/ModuleAddAdministrator.js" defer></script>
+<script src="/scripts/adminSettings/ModuleAddTeacher.js" defer></script>
 
 </body>
 </html>

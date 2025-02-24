@@ -1,4 +1,4 @@
-.addEducation-modal {
+.modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -10,7 +10,7 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.addEducation-modal .modal-content {
+.modal .modal-content {
     background-color: white;
     margin: 15% auto;
     padding: 20px;
@@ -19,26 +19,27 @@
     border-radius: 8px;
 }
 
-.addEducation-modal .close-button {
+.modal .close-button {
     color: #aaa;
     float: right;
     font-size: 28px;
     font-weight: bold;
 }
 
-.addEducation-modal .close-button:hover,
-.addEducation-modal .close-button:focus {
+.modal .close-button:hover,
+.modal .close-button:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
 }
 
-.addEducation-modal label {
+.modal label {
     margin-top: 10px;
     display: block;
 }
 
-.addEducation-modal input[type="text"] {
+.modal input[type="text"],
+.modal input[type="email"] {
     width: 93%;
     padding: 10px;
     margin: 5px 0;
@@ -46,7 +47,7 @@
     border-radius: 4px;
 }
 
-.addEducation-modal button {
+.modal button {
     background-color: #4CAF50;
     color: white;
     padding: 10px;
@@ -57,6 +58,6 @@
     margin-top: 10px;
 }
 
-.addEducation-modal button:hover {
+.modal button:hover {
     background-color: #45a049;
 }

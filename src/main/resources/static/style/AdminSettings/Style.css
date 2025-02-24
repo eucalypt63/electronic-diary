@@ -119,6 +119,31 @@ header {
 }
 
 
+/* Поля объектов */
+.objectColumn div {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.objectColumn div:hover {
+    background: #e0e0e0;
+}
+
+.objectColumn div:active {
+    background: #c4c2c2;
+}
+
+.objectColumn div.active {
+    background: #eeeeee;
+}
+
+.objectColumn {
+    overflow-y: auto;
+    background-color: white;
+}
+
+
 /* Контейнер для кнопок */
 .button-container {
     display: flex;
