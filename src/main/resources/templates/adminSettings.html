@@ -146,12 +146,48 @@
     </div>
 </div>
 
+<div id="moduleAddStudent" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAllModules()">&times;</span>
+        <h2>Добавить Студента</h2>
+
+        <label for="studentFirstName">Имя</label>
+        <input type="text" id="studentFirstName" placeholder="Имя" required>
+
+        <label for="studentLastName">Фамилия</label>
+        <input type="text" id="studentLastName" placeholder="Фамилия" required>
+
+        <label for="studentPatronymic">Отчество</label>
+        <input type="text" id="studentPatronymic" placeholder="Отчество">
+
+        <label for="studentEmail">Email</label>
+        <input type="email" id="studentEmail" placeholder="Email">
+
+        <label for="studentPhoneNumber">Телефон</label>
+        <input type="text" id="studentPhoneNumber" placeholder="Телефон">
+
+        <label for="studentLogin">Логин</label>
+        <input type="text" id="studentLogin" placeholder="Логин" required>
+
+        <label for="studentPassword">Пароль</label>
+        <input type="password" id="studentPassword" placeholder="Пароль" required>
+
+        <label for="classSelect">Выберите класс</label>
+        <select id="classSelect" required>
+
+        </select>
+
+        <button id="submitStudentButton">Подтвердить</button>
+    </div>
+</div>
+
 <script src="/scripts/adminSettings/ModuleAddObj.js" defer></script>
 <script src="/scripts/adminSettings/Start.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddEducation.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddClass.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddAdministrator.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddTeacher.js" defer></script>
+<script src="/scripts/adminSettings/ModuleAddSchoolStudent.js" defer></script>
 
 </body>
 </html>

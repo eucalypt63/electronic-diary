@@ -19,7 +19,6 @@ public class SchoolStudent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     @JoinColumn(name = "sst_u_id", nullable = false, foreignKey = @ForeignKey(name = "sst_u_id"))
     private User user;
@@ -28,14 +27,6 @@ public class SchoolStudent {
     @ManyToOne
     @JoinColumn(name = "sst_c_id", nullable = false, foreignKey = @ForeignKey(name = "sst_c_id"))
     private Class classRoom;
-
-    @ManyToOne
-    @JoinColumn(name = "sst_p_father_id", foreignKey = @ForeignKey(name = "sst_p_father_id"))
-    private Parent father;
-
-    @ManyToOne
-    @JoinColumn(name = "sst_p_mother_id", foreignKey = @ForeignKey(name = "sst_p_mother_id"))
-    private Parent mother;
 
     @Column(nullable = false)
     @NonNull

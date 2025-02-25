@@ -36,19 +36,17 @@ function updateObjectList() {
                 const objectDiv = document.createElement('div');
                 let displayText;
 
-                // Формируем текст для отображения в зависимости от типа объекта
                 if (selectedModule === 'classSelector') {
-                    displayText = object.name; // Имя для классов
+                    displayText = object.name;
                 } else {
-                    // ФИО для остальных объектов
-                    displayText = `${object.firstName} ${object.lastName}`;
+                    displayText = `${object.lastName} ${object.firstName}`;
                     if (object.patronymic) {
-                        displayText += ` ${object.patronymic}`; // Добавляем отчество, если оно есть
+                        displayText += ` ${object.patronymic}`;
                     }
                 }
 
-                objectDiv.innerText = displayText; // Устанавливаем текст для отображения
-                objectDiv.id = object.id; // Предполагается, что у объекта есть поле id
+                objectDiv.innerText = displayText;
+                objectDiv.id = object.id;
                 objectColumn.appendChild(objectDiv);
             });
         })
@@ -56,3 +54,49 @@ function updateObjectList() {
            console.log('Нет доступных данных:', error);
        });
 }
+
+const deleteObjectButton = document.getElementById('deleteObjectButton');
+deleteObjectButton.addEventListener('click', function() {
+    if (selectedObjectId) {
+        let url = '';
+
+        switch (selectedModule) {
+            case 'classSelector':
+                url = '/deleteClass';
+                break;
+            case 'teachersSelector':
+                url = '/deleteTeacher';
+                break;
+            case 'studentsSelector':
+                url = '/deleteSchoolStudent';
+                break;
+            case 'administrationSelector':
+                url = '/deleteAdministrator';
+                break;
+            default:
+                return;
+        }
+
+        if (selectedElementId) {
+            url += `?id=${selectedObjectId}`;
+        }
+
+        fetch(url, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                updateObjectList();
+                selectedObjectId = null;
+            } else {
+                throw new Error('Ошибка при удалении');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Не удалось удалить элемент.');
+        });
+    } else {
+        alert('Пожалуйста, выберите элемент для удаления.');
+    }
+});

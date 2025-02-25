@@ -18,7 +18,6 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     @JoinColumn(name = "t_u_id", nullable = false, foreignKey = @ForeignKey(name = "t_u_id"))
     private User user;

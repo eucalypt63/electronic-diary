@@ -18,10 +18,9 @@ public class Parent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @OneToOne
     @JoinColumn(name = "p_u_id", nullable = false, foreignKey = @ForeignKey(name = "p_u_id"))
-    private User p_U_id;
+    private User user;
 
     @Column(nullable = false)
     @NonNull

@@ -81,6 +81,8 @@ if (event.target.tagName === 'DIV') {
 const selector = document.querySelector('.selector');
 selector.addEventListener('click', function(event) {
     if (event.target.tagName === 'DIV') {
+        selectedObjectId = null
+
         const divs = selector.querySelectorAll('div');
         divs.forEach(div => div.classList.remove('active'));
         event.target.classList.add('active');
@@ -88,7 +90,6 @@ selector.addEventListener('click', function(event) {
         const newModule = event.target.id;
 
         selectedModule = newModule;
-
         if(selectedElementId !== null){
             updateObjectList();
         }
@@ -103,6 +104,7 @@ function closeAllModules() {
     document.getElementById('moduleAddTeacher').style.display = 'none';
     document.getElementById('moduleAddEducation').style.display = 'none';
     document.getElementById('moduleAddClass').style.display = 'none';
+    document.getElementById('moduleAddStudent').style.display = 'none';
 }
 
 const teacherSelect = document.getElementById('teacherSelect');
@@ -123,6 +125,14 @@ document.getElementById('addObjectButton').addEventListener('click', function() 
             .then(response => response.json())
             .then(teachers => {
                 teacherSelect.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Выберите учителя';
+                teacherSelect.appendChild(defaultOption);
+
                 teachers.forEach(teacher => {
                     const option = document.createElement('option');
                     option.value = teacher.id;
@@ -132,6 +142,34 @@ document.getElementById('addObjectButton').addEventListener('click', function() 
                     teacherSelect.appendChild(option);
                 });
             });
+        const teacherSelect = document.getElementById('teacherSelect');
+        teacherSelect.selectedIndex = 0;
         document.getElementById('moduleAddClass').style.display = 'block';
+    } else if (selectedModule === 'studentsSelector'){
+        const schoolId = selectedElementId;
+        fetch(`/getClasses?schoolId=${schoolId}`)
+            .then(response => response.json())
+            .then(classes => {
+                classSelect.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Выберите класс';
+                classSelect.appendChild(defaultOption);
+
+                classes.forEach(cl => {
+                    const option = document.createElement('option');
+                    option.value = cl.id;
+                    option.textContent = cl.name;
+                    classSelect.appendChild(option);
+                });
+            });
+
+        const teacherSelect = document.getElementById('classSelect');
+        teacherSelect.selectedIndex = 0;
+        document.getElementById('moduleAddStudent').style.display = 'block';
     }
+
 });

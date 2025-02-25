@@ -3,16 +3,14 @@ package com.example.postgresql.model.Users;
 import javax.persistence.*;
 
 import com.example.postgresql.model.Users.User.User;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "ELD_ADMINISTRATORS")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class Administrator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,20 +1,24 @@
 package com.example.postgresql.controller;
 
-import com.example.postgresql.DTO.AdministratorDTO;
-import com.example.postgresql.DTO.TeacherDTO;
+import com.example.postgresql.DTO.*;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
+import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Teacher;
+import com.example.postgresql.model.Users.User.User;
+import com.example.postgresql.model.Users.User.UserType;
 import com.example.postgresql.service.AdminSettingsService;
+import com.example.postgresql.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,8 @@ public class AdminSettingsControl {
 
     @Autowired
     private AdminSettingsService adminSettingsService;
+    @Autowired
+    private LoginService loginService;
 
     @GetMapping("/getSchools")
     @ResponseBody
@@ -49,21 +55,20 @@ public class AdminSettingsControl {
     }
 
 
-
+    // Школа
     @PostMapping("/addEducationalInstitution")
     @ResponseBody
     public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitution institution) {
         EducationalInstitutionType type = adminSettingsService.findEducationalInstitutionTypeById(1L);
         institution.setEducationalInstitutionType(type);
 
-        adminSettingsService.saveEducationalInstitutionsave(institution);
+        adminSettingsService.saveEducationalInstitutional(institution);
         return ResponseEntity.ok("{\"message\": \"Школа успешно добавлена\"}");
     }
 
     @DeleteMapping("/deleteEducationalInstitution")
     public ResponseEntity<Void> deleteEducationalInstitution(@RequestParam("id") Long id) {
-        adminSettingsService.delateEducationalInstitutionById(id);
-
+        adminSettingsService.deleteEducationalInstitutionById(id);
         return ResponseEntity.ok().build();
     }
 
@@ -83,6 +88,30 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(schoolStudents);
     }
 
+    @PostMapping("/addSchoolStudent")
+    @ResponseBody
+    public ResponseEntity<String> addSchoolStudents(@RequestBody SchoolStudentDTO schoolStudentDTO) {
+        byte[] salt = adminSettingsService.generateSalt();
+        byte[] hash = loginService.hashPassword(schoolStudentDTO.getPassword(), salt);
+        UserType userType = adminSettingsService.findUserTypeById(23L);
+        Class cl = adminSettingsService.findClassById(schoolStudentDTO.getClassRoomId());
+
+        User user = new User(schoolStudentDTO.getLogin(), hash, salt, userType);
+        user.setEducationalInstitution(cl.getTeacher().getUser().getEducationalInstitution());
+        loginService.saveUser(user);
+
+        SchoolStudent schoolStudent = new SchoolStudent(cl, schoolStudentDTO.getFirstName(), schoolStudentDTO.getLastName());
+        schoolStudent.setPatronymic(schoolStudentDTO.getPatronymic());
+        schoolStudent.setEmail(schoolStudentDTO.getEmail());
+        schoolStudent.setPhoneNumber(schoolStudentDTO.getPhoneNumber());
+        schoolStudent.setUser(user);
+        adminSettingsService.saveSchoolStudent(schoolStudent);
+
+        return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
+    }
+
+
+    // Администрация
     @GetMapping("/getAdministrators")
     @ResponseBody
     public ResponseEntity<List<Administrator>> getAdministrators(@RequestParam Long schoolId) {
@@ -100,12 +129,33 @@ public class AdminSettingsControl {
 
     @PostMapping("/addAdministrator")
     @ResponseBody
-    public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administrator) {
-        System.out.println("Данные администратора: " + administrator);
+    public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administratorDTO) {
+        byte[] salt = adminSettingsService.generateSalt();
+        byte[] hash = loginService.hashPassword(administratorDTO.getPassword(), salt);
+        UserType userType = adminSettingsService.findUserTypeById(22L);
+        EducationalInstitution educationalInstitution = adminSettingsService.
+                                                        getEducationalInstitutionById(administratorDTO.getUniversityId());
+        User user = new User(administratorDTO.getLogin(), hash, salt, userType);
+        user.setEducationalInstitution(educationalInstitution);
+        loginService.saveUser(user);
+
+        Administrator administrator = new Administrator(administratorDTO.getFirstName(), administratorDTO.getLastName());
+        administrator.setPatronymic(administratorDTO.getPatronymic());
+        administrator.setEmail(administratorDTO.getEmail());
+        administrator.setPhoneNumber(administratorDTO.getPhoneNumber());
+        administrator.setUser(user);
+        adminSettingsService.saveAdministrator(administrator);
 
         return ResponseEntity.ok("{\"message\": \"Администратор успешно добавлен\"}");
     }
 
+    @DeleteMapping("/deleteAdministrator")
+    public ResponseEntity<Void> deleteAdministrator(@RequestParam("id") Long id) {
+        adminSettingsService.deleteAdministratorById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // Учителя
     @GetMapping("/getTeachers")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachers(@RequestParam(required = false) Long schoolId) {
@@ -123,12 +173,34 @@ public class AdminSettingsControl {
 
     @PostMapping("/addTeacher")
     @ResponseBody
-    public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacher) {
-        System.out.println("Данные учителя: " + teacher);
+    public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacherDTO) {
+        byte[] salt = adminSettingsService.generateSalt();
+        byte[] hash = loginService.hashPassword(teacherDTO.getPassword(), salt);
+        UserType userType = adminSettingsService.findUserTypeById(21L);
+        EducationalInstitution educationalInstitution = adminSettingsService.
+                getEducationalInstitutionById(teacherDTO.getUniversityId());
+        User user = new User(teacherDTO.getLogin(), hash, salt, userType);
+        user.setEducationalInstitution(educationalInstitution);
+        loginService.saveUser(user);
+
+        Teacher teacher = new Teacher(teacherDTO.getFirstName(), teacherDTO.getLastName());
+        teacher.setPatronymic(teacherDTO.getPatronymic());
+        teacher.setEmail(teacherDTO.getEmail());
+        teacher.setPhoneNumber(teacherDTO.getPhoneNumber());
+        teacher.setUser(user);
+        adminSettingsService.saveTeacher(teacher);
 
         return ResponseEntity.ok("{\"message\": \"Учитель успешно добавлен\"}");
     }
 
+    @DeleteMapping("/deleteTeacher")
+    public ResponseEntity<Void> deleteTeacher(@RequestParam("id") Long id) {
+        adminSettingsService.deleteTeacherById(id);
+        return ResponseEntity.ok().build();
+    }
+
+
+    // Классы
     @GetMapping("/getClasses")
     @ResponseBody
     public ResponseEntity<List<Class>> getClasses(@RequestParam(required = false) Long schoolId) {
@@ -142,5 +214,65 @@ public class AdminSettingsControl {
         }
 
         return ResponseEntity.ok(classes);
+    }
+
+    @PostMapping("/addClass")
+    @ResponseBody
+    public ResponseEntity<String> addClass(@RequestBody ClassDTO classDTO) {
+        System.out.println("Данные учителя: " + classDTO);
+        Teacher teacher = adminSettingsService.findTeacherById(classDTO.getTeacherId());
+        Class cl = new Class(classDTO.getName(), teacher);
+
+        adminSettingsService.saveClass(cl);
+        return ResponseEntity.ok("{\"message\": \"Класс успешно добавлен\"}");
+    }
+
+    @DeleteMapping("/deleteClass")
+    public ResponseEntity<Void> deleteClass(@RequestParam("id") Long id) {
+        adminSettingsService.deleteClassById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // Родители
+    @GetMapping("/getStudentParents")
+    @ResponseBody
+    public ResponseEntity<List<Parent>> getParents(@RequestParam(required = false) Long SchoolStudentId) {
+        SchoolStudent schoolStudent = adminSettingsService.findSchoolStudentById(SchoolStudentId);
+        List<Parent> parents = new ArrayList<>();
+        //!!!!!!!!!!!!
+
+        if (parents.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parents);
+    }
+
+    @PostMapping("/addParents")
+    @ResponseBody
+    public ResponseEntity<String> addParents(@RequestBody ParentDTO parentDTO) {
+        byte[] salt = adminSettingsService.generateSalt();
+        byte[] hash = loginService.hashPassword(parentDTO.getPassword(), salt);
+        UserType userType = adminSettingsService.findUserTypeById(24L);
+        SchoolStudent schoolStudent = adminSettingsService.findSchoolStudentById(parentDTO.getSchoolStudentId());
+        EducationalInstitution educationalInstitution = schoolStudent.getClassRoom().getTeacher().getUser().getEducationalInstitution();
+        User user = new User(parentDTO.getLogin(), hash, salt, userType);
+        user.setEducationalInstitution(educationalInstitution);
+        loginService.saveUser(user);
+
+        Parent studentParents = new Parent(parentDTO.getFirstName(), parentDTO.getLastName());
+        studentParents.setPatronymic(parentDTO.getPatronymic());
+        studentParents.setEmail(parentDTO.getEmail());
+        studentParents.setPhoneNumber(parentDTO.getPhoneNumber());
+        studentParents.setUser(user);
+        adminSettingsService.saveParent(studentParents);
+
+        return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
+    }
+
+    @DeleteMapping("/deleteParent")
+    public ResponseEntity<Void> deleteParent(@RequestParam("id") Long id) {
+        adminSettingsService.deleteParentById(id);
+        return ResponseEntity.ok().build();
     }
 }

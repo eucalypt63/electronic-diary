@@ -60,8 +60,8 @@ document.getElementById('submitSchoolButton').addEventListener('click', function
 });
 
 
-const deleteButton = document.getElementById('deleteSchoolButton');
-deleteButton.addEventListener('click', function() {
+const deleteSchoolButton = document.getElementById('deleteSchoolButton');
+deleteSchoolButton.addEventListener('click', function() {
     if (selectedElementId) {
         const elementToDelete = document.getElementById(selectedElementId);
         if (elementToDelete) {
