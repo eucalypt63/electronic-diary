@@ -2,16 +2,14 @@ package com.example.postgresql.service;
 
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Administrator;
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
-import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
+import com.example.postgresql.model.Users.Education.*;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.model.Users.User.UserType;
 import com.example.postgresql.repository.ClassesRepository;
 import com.example.postgresql.repository.Users.AdministratorRepository;
-import com.example.postgresql.repository.Users.Education.EducationalInstitutionRepository;
-import com.example.postgresql.repository.Users.Education.EducationalInstitutionTypeRepository;
+import com.example.postgresql.repository.Users.Education.*;
 import com.example.postgresql.repository.Users.Student.ParentRepository;
 import com.example.postgresql.repository.Users.Student.SchoolStudentRepository;
 import com.example.postgresql.repository.Users.TeacherRepository;
@@ -29,6 +27,16 @@ public class AdminSettingsService {
     private EducationalInstitutionRepository educationalInstitutionRepository;
     @Autowired
     private EducationalInstitutionTypeRepository educationalInstitutionTypeRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private SettlementRepository settlementRepository;
+
     @Autowired
     private SchoolStudentRepository schoolStudentRepository;
     @Autowired
@@ -47,7 +55,7 @@ public class AdminSettingsService {
         return educationalInstitutionRepository.findAll();
     }
     public EducationalInstitution getEducationalInstitutionById(Long id) {
-        return educationalInstitutionRepository.findEducationalInstitutionById(id);
+        return educationalInstitutionRepository.findById(id).orElse(null);
     }
 
     public EducationalInstitutionType findEducationalInstitutionTypeById(Long id) {
@@ -60,6 +68,20 @@ public class AdminSettingsService {
 
     public void deleteEducationalInstitutionById(Long id) {
         educationalInstitutionRepository.deleteById(id);
+    }
+
+    public Settlement findSettlementById(Long id) {
+        return settlementRepository.findById(id).orElse(null);
+    }
+
+    public List<Region> getAllRegion() {
+        return regionRepository.findAll();
+    }
+    public List<Group> getAllGroup() {
+        return groupRepository.findAll();
+    }
+    public List<Settlement> getAllSettlement() {
+        return settlementRepository.findAll();
     }
 
     public List<SchoolStudent> getAllSchoolStudent() {

@@ -5,6 +5,8 @@ import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
+import com.example.postgresql.model.Users.Education.Region;
+import com.example.postgresql.model.Users.Education.Settlement;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Teacher;
@@ -58,11 +60,17 @@ public class AdminSettingsControl {
     // Школа
     @PostMapping("/addEducationalInstitution")
     @ResponseBody
-    public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitution institution) {
+    public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitutionDTO institutionDTO) {
         EducationalInstitutionType type = adminSettingsService.findEducationalInstitutionTypeById(1L);
-        institution.setEducationalInstitutionType(type);
+        Settlement settlement = adminSettingsService.findSettlementById(institutionDTO.getSettlementId());
+        EducationalInstitution educationalInstitution = new EducationalInstitution(institutionDTO.getName(),
+                                                                                    institutionDTO.getAddress(),
+                                                                                    type,
+                                                                                    settlement);
+        educationalInstitution.setEmail(institutionDTO.getEmail());
+        educationalInstitution.setPhoneNumber(institutionDTO.getPhoneNumber());
 
-        adminSettingsService.saveEducationalInstitutional(institution);
+        adminSettingsService.saveEducationalInstitutional(educationalInstitution);
         return ResponseEntity.ok("{\"message\": \"Школа успешно добавлена\"}");
     }
 
@@ -73,6 +81,7 @@ public class AdminSettingsControl {
     }
 
 
+    // Ученики
     @GetMapping("/getSchoolStudents")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
@@ -110,6 +119,34 @@ public class AdminSettingsControl {
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
     }
 
+    //Регионы
+    @GetMapping("/getRegions")
+    @ResponseBody
+    public ResponseEntity<List<Region>> getRegions() {
+        List<Region> regions = adminSettingsService.getAllRegion();
+
+        if (regions.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(regions);
+        }
+
+        return ResponseEntity.ok(regions);
+    }
+
+    //Районы
+    @GetMapping("/getSettlements")
+    @ResponseBody
+    public ResponseEntity<List<Settlement>> getSettlements(@RequestParam Long region) {
+        List<Settlement> settlements = adminSettingsService.getAllSettlement()
+                .stream()
+                .filter(settlement -> settlement.getRegion().getId().equals(region))
+                .collect(Collectors.toList());
+
+        if (settlements.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(settlements);
+        }
+
+        return ResponseEntity.ok(settlements);
+    }
 
     // Администрация
     @GetMapping("/getAdministrators")

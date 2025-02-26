@@ -67,6 +67,15 @@
         <label for="schoolPhoneNumber">Телефон</label>
         <input type="text" id="schoolPhoneNumber" placeholder="Телефон">
 
+        <label for="regionSelect">Регион</label>
+        <select id="regionSelect" onchange="fetchSettlements(this.value)">
+        </select>
+
+        <label for="settlementSelect">Поселение</label>
+        <select id="settlementSelect">
+            <option value="">Сначала выберите регион</option>
+        </select>
+
         <button id="submitSchoolButton">Подтвердить</button>
     </div>
 </div>
