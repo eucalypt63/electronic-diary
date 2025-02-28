@@ -30,7 +30,6 @@
             <div id="administrationSelector" onclick="updateHeader('Администрация')">Адинистрация</div>
             <div id="classSelector" onclick="updateHeader('Классы')">Классы</div>
             <div id="teachersSelector" onclick="updateHeader('Учителя')">Учителя</div>
-            <div id="studentsSelector" onclick="updateHeader('Ученики')">Ученики</div>
         </div>
         <div class="header-div" id="secondColumnHeader">Выберите объект</div>
         <div class="objectColumn" id="objectColumn">
@@ -43,7 +42,7 @@
     </div>
 
     <div class="column">
-        <div class="header-div">Столбец 3</div>
+        <div class="header-div" id="thirdColumnHeader">Выберите объект</div>
         <div class="objectColumnThree" id="objectColumnThree">
 
         </div>
@@ -54,6 +53,7 @@
     </div>
 </div>
 
+<!-- Модули -->
 <div id="moduleAddEducation" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeAllModules()">&times;</span>
@@ -83,7 +83,6 @@
         <button id="submitSchoolButton">Подтвердить</button>
     </div>
 </div>
-
 <div id="moduleAddAdministrator" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeAllModules()">&times;</span>
@@ -143,7 +142,6 @@
         <button id="submitTeacherButton">Подтвердить</button>
     </div>
 </div>
-
 <div id="moduleAddClass" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeAllModules()">&times;</span>
@@ -158,7 +156,6 @@
         <button id="submitClassButton">Подтвердить</button>
     </div>
 </div>
-
 <div id="moduleAddStudent" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeAllModules()">&times;</span>
@@ -185,9 +182,6 @@
         <label for="studentPassword">Пароль</label>
         <input type="password" id="studentPassword" placeholder="Пароль" required>
 
-        <label for="classSelect">Выберите класс</label>
-        <select id="classSelect" required>
-
         </select>
 
         <button id="submitStudentButton">Подтвердить</button>
@@ -197,9 +191,11 @@
 <script src="/scripts/adminSettings/ModuleAddObj.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddObjColumnThree.js" defer></script>
 <script src="/scripts/adminSettings/Start.js" defer></script>
+
 <script src="/scripts/adminSettings/ModuleAddEducation.js" defer></script>
-<script src="/scripts/adminSettings/ModuleAddClass.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddAdministrator.js" defer></script>
+
+<script src="/scripts/adminSettings/ModuleAddClass.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddTeacher.js" defer></script>
 <script src="/scripts/adminSettings/ModuleAddSchoolStudent.js" defer></script>
 

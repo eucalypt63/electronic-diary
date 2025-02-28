@@ -1,32 +1,36 @@
 // Модуль добавления школы
 document.getElementById('addSchoolButton').addEventListener('click', function() {
-    const modal = document.getElementById('moduleAddEducation');
-    fetch('/getRegions')
-        .then(response => response.json())
-        .then(regions => {
-            const regionSelect = document.getElementById('regionSelect');
-            regionSelect.innerHTML = '';
+    if (userRole == "Main admin"){
+        const modal = document.getElementById('moduleAddEducation');
+        fetch('/getRegions')
+            .then(response => response.json())
+            .then(regions => {
+                const regionSelect = document.getElementById('regionSelect');
+                regionSelect.innerHTML = '';
 
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            defaultOption.textContent = 'Выберите регион';
-            regionSelect.appendChild(defaultOption);
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Выберите регион';
+                regionSelect.appendChild(defaultOption);
 
-            regions.forEach(region => {
-                const option = document.createElement('option');
-                option.value = region.id;
-                option.textContent = region.name;
-                regionSelect.appendChild(option);
+                regions.forEach(region => {
+                    const option = document.createElement('option');
+                    option.value = region.id;
+                    option.textContent = region.name;
+                    regionSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при получении регионов:', error);
+                const regionSelect = document.getElementById('regionSelect');
+                regionSelect.innerHTML = '<option value="">Ошибка загрузки регионов</option>';
             });
-        })
-        .catch(error => {
-            console.error('Ошибка при получении регионов:', error);
-            const regionSelect = document.getElementById('regionSelect');
-            regionSelect.innerHTML = '<option value="">Ошибка загрузки регионов</option>';
-        });
-    modal.style.display = 'block';
+        modal.style.display = 'block';
+    } else {
+        alert('Доступ ограничен');
+    }
 });
 
 function fetchSettlements(region) {
@@ -34,21 +38,20 @@ function fetchSettlements(region) {
         document.getElementById('settlementSelect').innerHTML = '<option value="">Сначала выберите регион</option>';
         return;
     }
+    //
+    const settlementSelect = document.getElementById('settlementSelect');
+    settlementSelect.innerHTML = '';
 
-    // Замените на ваш фактический schoolId
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    defaultOption.textContent = 'Выберите поселение';
+    settlementSelect.appendChild(defaultOption);
+
     fetch(`/getSettlements?region=${region}`)
         .then(response => response.json())
         .then(settlements => {
-            const settlementSelect = document.getElementById('settlementSelect');
-            settlementSelect.innerHTML = '';
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            defaultOption.textContent = 'Выберите поселение';
-            settlementSelect.appendChild(defaultOption);
-
             settlements.forEach(settlement => {
                 const option = document.createElement('option');
                 option.value = settlement.id;
@@ -80,73 +83,77 @@ document.getElementById('submitSchoolButton').addEventListener('click', function
     const settlementId = document.getElementById('settlementSelect').value
 
     if (schoolName && schoolAddress && regionId && settlementId) {
-                const data = {
-                    name: schoolName,
-                    address: schoolAddress,
-                    email: schoolEmail,
-                    phoneNumber: schoolPhoneNumber,
-                    regionId: regionId, // Добавляем регион
-                    settlementId: settlementId // Добавляем поселение
-                };
+            const data = {
+                name: schoolName,
+                address: schoolAddress,
+                email: schoolEmail,
+                phoneNumber: schoolPhoneNumber,
+                regionId: regionId, // Добавляем регион
+                settlementId: settlementId // Добавляем поселение
+            };
 
-                fetch('/addEducationalInstitution', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Ошибка при добавлении');
-                })
-                .then(data => {
-                    const modal = document.getElementById('moduleAddEducation');
-                    modal.style.display = 'none';
-                    document.getElementById('schoolName').value = '';
-                    document.getElementById('schoolAddress').value = '';
-                    document.getElementById('schoolEmail').value = '';
-                    document.getElementById('schoolPhoneNumber').value = '';
-                    document.getElementById('regionSelect').selectedIndex = 0;
-                    document.getElementById('settlementSelect').innerHTML = '<option value="">Сначала выберите регион</option>';
+            fetch('/addEducationalInstitution', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Ошибка при добавлении');
+            })
+            .then(data => {
+                const modal = document.getElementById('moduleAddEducation');
+                modal.style.display = 'none';
+                document.getElementById('schoolName').value = '';
+                document.getElementById('schoolAddress').value = '';
+                document.getElementById('schoolEmail').value = '';
+                document.getElementById('schoolPhoneNumber').value = '';
+                document.getElementById('regionSelect').selectedIndex = 0;
+                document.getElementById('settlementSelect').innerHTML = '<option value="">Сначала выберите регион</option>';
 
-                    updateSchoolList();
-                })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                    alert('Не удалось добавить школу');
-                });
-            } else {
-                alert('Пожалуйста, заполните обязательные поля.');
-            }
-        });
+                updateSchoolList();
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Не удалось добавить школу');
+            });
+        } else {
+            alert('Пожалуйста, заполните обязательные поля.');
+        }
+    });
 
 
 const deleteSchoolButton = document.getElementById('deleteSchoolButton');
 deleteSchoolButton.addEventListener('click', function() {
-    if (selectedElementId) {
-        const elementToDelete = document.getElementById(selectedElementId);
-        if (elementToDelete) {
-            fetch(`/deleteEducationalInstitution?id=${selectedElementId}`, {
-                method: 'DELETE',
-            })
-            .then(response => {
-                if (response.ok) {
-                    updateSchoolList();
-                } else {
-                    throw new Error('Ошибка при удалении');
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                alert('Не удалось удалить элемент.');
-            });
+    if (userRole == "Main admin"){
+        if (selectedElementId) {
+            const elementToDelete = document.getElementById(selectedElementId);
+            if (elementToDelete) {
+                fetch(`/deleteEducationalInstitution?id=${selectedElementId}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        updateSchoolList();
+                    } else {
+                        throw new Error('Ошибка при удалении');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось удалить элемент.');
+                });
+            } else {
+                alert('Элемент не найден.');
+            }
         } else {
-            alert('Элемент не найден.');
+            alert('Пожалуйста, выберите элемент для удаления.');
         }
     } else {
-        alert('Пожалуйста, выберите элемент для удаления.');
+        alert('Доступ ограничен');
     }
 });

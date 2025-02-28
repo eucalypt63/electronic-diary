@@ -23,7 +23,7 @@ public class Class {
     private String name;
 
     @NonNull
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "c_t_id", nullable = false, foreignKey = @ForeignKey(name = "c_t_id"))
     private Teacher teacher;
 }

@@ -5,13 +5,13 @@ async function submitLoginForm(event) {
         method: 'POST',
         body: formData
     });
-
+    //----------
     if (response.ok) {
         const userRole = await response.text();
         if (userRole === "Main admin") {
             window.location.href = '/adminSettings';
-        } else { //----------
-            window.location.href = '/home'; //----------
+        } else if (userRole === "Local admin" ){
+            window.location.href = '/adminSettings';
         }
     } else {
         const errorMessage = await response.text();

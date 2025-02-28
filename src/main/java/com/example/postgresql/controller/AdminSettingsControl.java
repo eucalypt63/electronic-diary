@@ -21,8 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -45,16 +47,16 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(institutions);
     }
 
-    @GetMapping("/getSchoolsById")
+    @GetMapping("/getSchoolById")
     @ResponseBody
-    public ResponseEntity<EducationalInstitution> getSchoolsById(@RequestParam("id") Long id) {
-        EducationalInstitution institution = adminSettingsService.getEducationalInstitutionById(id);
-
-        if (institution == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(institution);
-        }
-
-        return ResponseEntity.ok(institution);
+    public ResponseEntity<List<EducationalInstitution>> getSchoolById(HttpSession session) {
+        Administrator administrator = (Administrator) session.getAttribute("user");
+        EducationalInstitution institution = adminSettingsService.getEducationalInstitutionById(administrator.getUser()
+                                                                        .getEducationalInstitution()
+                                                                        .getId());
+        List<EducationalInstitution> institutions = new ArrayList<>();
+        institutions.add(institution);
+        return ResponseEntity.ok(institutions);
     }
 
 
@@ -76,14 +78,14 @@ public class AdminSettingsControl {
     }
 
     @DeleteMapping("/deleteEducationalInstitution")
-    public ResponseEntity<Void> deleteEducationalInstitution(@RequestParam("id") Long id) {
+    public ResponseEntity<Void> deleteEducationalInstitution(@RequestParam Long id) {
         adminSettingsService.deleteEducationalInstitutionById(id);
         return ResponseEntity.ok().build();
     }
 
 
     // Ученики
-    @GetMapping("/getSchoolStudents")
+    @GetMapping("/getSchoolStudents")// мб не нужно
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
         List<SchoolStudent> schoolStudents = adminSettingsService.getAllSchoolStudent()
@@ -135,6 +137,11 @@ public class AdminSettingsControl {
         return ResponseEntity.ok(schoolStudents);
     }
 
+    @DeleteMapping("/deleteSchoolStudent")
+    public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id) {
+        adminSettingsService.deleteSchoolStudentById(id);
+        return ResponseEntity.ok().build();
+    }
 
     //Регионы
     @GetMapping("/getRegions")
@@ -220,6 +227,27 @@ public class AdminSettingsControl {
 
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
+        }
+
+        return ResponseEntity.ok(teachers);
+    }
+
+    @GetMapping("/getTeachersToClass")
+    @ResponseBody
+    public ResponseEntity<List<Teacher>> getTeachersToClass(@RequestParam Long schoolId) {
+        List<Class> classes = adminSettingsService.getAllClasses();
+        Set<Long> assignedTeacherIds = classes.stream()
+                .map(classEntity -> classEntity.getTeacher().getId())
+                .collect(Collectors.toSet());
+
+        List<Teacher> teachers = adminSettingsService.getAllTeacher()
+                .stream()
+                .filter(teacher -> teacher.getUser().getEducationalInstitution().getId().equals(schoolId))
+                .filter(teacher -> !assignedTeacherIds.contains(teacher.getId()))
+                .collect(Collectors.toList());
+
+        if (teachers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
         return ResponseEntity.ok(teachers);

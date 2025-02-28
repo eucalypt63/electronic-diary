@@ -1,58 +1,63 @@
 function updateObjectList() {
-    let url = '';
     const objectColumn = document.getElementById('objectColumn');
     objectColumn.innerHTML = '';
 
-    switch (selectedModule) {
-        case 'classSelector':
-            url = '/getClasses';
-            break;
-        case 'teachersSelector':
-            url = '/getTeachers';
-            break;
-        case 'studentsSelector':
-            url = '/getSchoolStudents';
-            break;
-        case 'administrationSelector':
-            url = '/getAdministrators';
-            break;
-        default:
-            return;
-    }
+    const objectColumn3 = document.getElementById('objectColumnThree');
+    objectColumn3.innerHTML = '';
+
+    document.getElementById('thirdColumnHeader').innerText = "Выберите объект";
 
     if (selectedElementId) {
+        let url = '';
+
+        switch (selectedModule) {
+            case 'classSelector':
+                url = '/getClasses';
+                break;
+            case 'teachersSelector':
+                url = '/getTeachers';
+                break;
+            case 'administrationSelector':
+                url = '/getAdministrators';
+                break;
+            default:
+                return;
+        }
+
+
         url += `?schoolId=${selectedElementId}`;
-    }
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Сетевая ошибка');
-            }
-            return response.json();
-        })
-        .then(objects => {
-            objects.forEach(object => {
-                const objectDiv = document.createElement('div');
-                let displayText;
 
-                if (selectedModule === 'classSelector') {
-                    displayText = object.name;
-                } else {
-                    displayText = `${object.lastName} ${object.firstName}`;
-                    if (object.patronymic) {
-                        displayText += ` ${object.patronymic}`;
-                    }
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Сетевая ошибка');
                 }
+                return response.json();
+            })
+            .then(objects => {
+                objects.forEach(object => {
+                    const objectDiv = document.createElement('div');
+                    let displayText;
 
-                objectDiv.innerText = displayText;
-                objectDiv.id = object.id;
-                objectColumn.appendChild(objectDiv);
-            });
-        })
+                    if (selectedModule === 'classSelector') {
+                        displayText = object.name;
+                    } else {
+                        displayText = `${object.lastName} ${object.firstName}`;
+                        if (object.patronymic) {
+                            displayText += ` ${object.patronymic}`;
+                        }
+                    }
+
+                    objectDiv.innerText = displayText;
+                    objectDiv.id = object.id;
+                    objectColumn.appendChild(objectDiv);
+                });
+            })
        .catch(error => {
            console.log('Нет доступных данных:', error);
        });
+    }
 }
 
 const deleteObjectButton = document.getElementById('deleteObjectButton');
@@ -71,15 +76,18 @@ deleteObjectButton.addEventListener('click', function() {
                 url = '/deleteSchoolStudent';
                 break;
             case 'administrationSelector':
-                url = '/deleteAdministrator';
+                if (userRole == "Main admin"){
+                    url = '/deleteAdministrator';
+                } else {
+                    alert('Доступ ограничен');
+                    return;
+                }
                 break;
             default:
                 return;
         }
 
-        if (selectedElementId) {
-            url += `?id=${selectedObjectId}`;
-        }
+        url += `?id=${selectedObjectId}`;
 
         fetch(url, {
             method: 'DELETE',

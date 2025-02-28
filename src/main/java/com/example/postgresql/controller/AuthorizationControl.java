@@ -1,5 +1,6 @@
 package com.example.postgresql.controller;
 
+import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class AuthorizationControl {
@@ -39,9 +41,18 @@ public class AuthorizationControl {
             session = request.getSession(true);
 
             UserType userType = user.getUserType();
-            session.setAttribute("user", user);
+            if (userType.getName().equals("Main admin")) {
+                session.setAttribute("user", user);
+            } else if (userType.getName().equals("Local admin"))
+            {
+                List<Administrator> administrators = loginService.getAllAdministrators()
+                        .stream()
+                        .filter(admin -> admin.getUser().equals(user))
+                        .toList();
+                Administrator administrator = administrators.get(0);
+                session.setAttribute("user", administrator);
+            }
             session.setAttribute("role", userType.getName());
-
             return ResponseEntity.ok(userType.getName());
         }
 
@@ -55,8 +66,6 @@ public class AuthorizationControl {
         return "redirect:/login";
     }
 
-
-
     @PostMapping("/getRole")
     @ResponseBody
     public ResponseEntity<String> getRole(HttpSession session) {
@@ -67,7 +76,7 @@ public class AuthorizationControl {
     public String adminSettings(Model model, HttpSession session) {
         String role = (String) session.getAttribute("role");
         System.out.println(role);
-        if ("Main admin".equals(role)) {
+        if ("Main admin".equals(role) || "Local admin".equals(role)) {
             return "adminSettings";
         }
         System.out.println("Неверная роль");

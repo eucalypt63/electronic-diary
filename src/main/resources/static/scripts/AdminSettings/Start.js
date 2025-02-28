@@ -1,22 +1,21 @@
-function updateHeader(content) {
-    document.getElementById('secondColumnHeader').innerText = content;
-}
-
-document.querySelector('.logout-button').addEventListener('click', function() {
-    fetch('/logout', {
-        method: 'GET',
-        credentials: 'include'
-    })
-    .then(response => {
-        if (response.redirected) {
-            window.location.href = response.url;
-        }
-    })
-    .catch(error => console.error('Ошибка при выходе:', error));
+let userRole = null;
+document.addEventListener("DOMContentLoaded", function () {
+    updateSchoolList();
 });
 
 function updateSchoolList() {
-    fetch('/getSchools')
+    fetch('/getRole', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.text())
+        .then(role => {
+            userRole = role;
+            const endpoint = (role === "Main admin") ? '/getSchools' : '/getSchoolById';
+            return fetch(endpoint);
+        })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Сетевая ошибка');
@@ -41,14 +40,30 @@ function updateSchoolList() {
         })
         .catch(error => console.error('Ошибка при получении данных:', error));
 }
-updateSchoolList();
 
+function updateHeader(content) {
+    document.getElementById('secondColumnHeader').innerText = content;
+}
 
+document.querySelector('.logout-button').addEventListener('click', function() {
+    fetch('/logout', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    })
+    .catch(error => console.error('Ошибка при выходе:', error));
+});
 
+let selectedElementId = null;
 let selectedModule = null;
+let selectedObjectId = null;
+let selectedObjectColumnThreeId = null;
 
 // Обработка нажатия на школу
-let selectedElementId = null;
 const educationColumn = document.getElementById('educationColumn');
 educationColumn.addEventListener('click', function(event) {
     if (event.target.tagName === 'DIV') {
@@ -58,6 +73,9 @@ educationColumn.addEventListener('click', function(event) {
 
         selectedElementId = event.target.id;
 
+        selectedObjectColumnThreeId = null;
+        selectedObjectId = null;
+
         if (selectedModule !== null){
             updateObjectList();
         }
@@ -65,7 +83,6 @@ educationColumn.addEventListener('click', function(event) {
 });
 
 // Обработка нажатия на объект столбца 2
-let selectedObjectId = null;
 const objectColumn = document.getElementById('objectColumn');
 objectColumn.addEventListener('click', function(event) {
 if (event.target.tagName === 'DIV') {
@@ -75,6 +92,8 @@ if (event.target.tagName === 'DIV') {
 
         selectedObjectId = event.target.id;
 
+        selectedObjectColumnThreeId = null;
+
         if (selectedModule == "classSelector" || selectedModule == "studentsSelector")
         {
             updateColumnThreeList();
@@ -83,7 +102,6 @@ if (event.target.tagName === 'DIV') {
 });
 
 // Обработка нажатия на объект столбца 3
-let selectedObjectColumnThreeId = null;
 const objectColumnThree = document.getElementById('objectColumnThree');
 objectColumnThree.addEventListener('click', function(event) {
 if (event.target.tagName === 'DIV') {
@@ -110,16 +128,15 @@ selector.addEventListener('click', function(event) {
         divs.forEach(div => div.classList.remove('active'));
         event.target.classList.add('active');
 
-        const newModule = event.target.id;
+        selectedObjectColumnThreeId = null;
+        selectedObjectId = null;
 
-        selectedModule = newModule;
+        selectedModule = event.target.id;
         if(selectedElementId !== null){
             updateObjectList();
         }
     }
 });
-
-
 
 // Обработка логики отображения модулей столбца 2
 function closeAllModules() {
@@ -130,7 +147,6 @@ function closeAllModules() {
     document.getElementById('moduleAddStudent').style.display = 'none';
 }
 
-const teacherSelect = document.getElementById('teacherSelect');
 document.getElementById('addObjectButton').addEventListener('click', function() {
     if (!selectedModule) {
         alert('Пожалуйста, выберите объект для добавления.');
@@ -139,60 +155,53 @@ document.getElementById('addObjectButton').addEventListener('click', function() 
 
     closeAllModules();
     if (selectedModule === 'administrationSelector') {
-        document.getElementById('moduleAddAdministrator').style.display = 'block';
+        if (userRole == "Main admin"){
+            document.getElementById('moduleAddAdministrator').style.display = 'block';
+        } else {
+            alert('Доступ ограничен');
+        }
     } else if (selectedModule === 'teachersSelector') {
         document.getElementById('moduleAddTeacher').style.display = 'block';
     } else if (selectedModule === 'classSelector') {
         const schoolId = selectedElementId;
-        fetch(`/getTeachers?schoolId=${schoolId}`)
+        const teacherSelect = document.getElementById('teacherSelect');
+
+        teacherSelect.innerHTML = '';
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        defaultOption.textContent = 'Выберите учителя';
+        teacherSelect.appendChild(defaultOption);
+
+        fetch(`/getTeachersToClass?schoolId=${schoolId}`)
             .then(response => response.json())
             .then(teachers => {
-                teacherSelect.innerHTML = '';
-
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.disabled = true;
-                defaultOption.selected = true;
-                defaultOption.textContent = 'Выберите учителя';
-                teacherSelect.appendChild(defaultOption);
-
-                teachers.forEach(teacher => {
-                    const option = document.createElement('option');
-                    option.value = teacher.id;
-                    const fullName = `${teacher.firstName} ${teacher.lastName}` +
-                                                 (teacher.patronymic ? ` ${teacher.patronymic}` : '');
-                    option.textContent = fullName.trim();
-                    teacherSelect.appendChild(option);
-                });
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.id;
+                const fullName = `${teacher.firstName} ${teacher.lastName}` +
+                    (teacher.patronymic ? ` ${teacher.patronymic}` : '');
+                option.textContent = fullName.trim();
+                teacherSelect.appendChild(option);
             });
-        const teacherSelect = document.getElementById('teacherSelect');
+            teacherSelect.disabled = false;
+
+            });
         teacherSelect.selectedIndex = 0;
         document.getElementById('moduleAddClass').style.display = 'block';
-    } else if (selectedModule === 'studentsSelector'){
-        const schoolId = selectedElementId;
-        fetch(`/getClasses?schoolId=${schoolId}`)
-            .then(response => response.json())
-            .then(classes => {
-                classSelect.innerHTML = '';
+    }
+});
 
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.disabled = true;
-                defaultOption.selected = true;
-                defaultOption.textContent = 'Выберите класс';
-                classSelect.appendChild(defaultOption);
-
-                classes.forEach(cl => {
-                    const option = document.createElement('option');
-                    option.value = cl.id;
-                    option.textContent = cl.name;
-                    classSelect.appendChild(option);
-                });
-            });
-
-        const teacherSelect = document.getElementById('classSelect');
-        teacherSelect.selectedIndex = 0;
-        document.getElementById('moduleAddStudent').style.display = 'block';
+document.getElementById('addObjectButtonС3').addEventListener('click', function() {
+    if (!selectedObjectId) {
+        alert('Пожалуйста, выберите объект для добавления.');
+        return;
     }
 
+    closeAllModules();
+    if (selectedModule === 'classSelector') {
+        document.getElementById('moduleAddStudent').style.display = 'block';
+    }
 });

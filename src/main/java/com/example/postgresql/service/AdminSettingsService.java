@@ -99,6 +99,10 @@ public class AdminSettingsService {
         return schoolStudentRepository.findById(id).orElse(null);
     }
 
+    public void deleteSchoolStudentById(Long id) {
+        schoolStudentRepository.deleteById(id);
+    }
+
     public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
 
     public List<Administrator> getAllAdministrator() {

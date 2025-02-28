@@ -13,10 +13,8 @@ document.getElementById('submitStudentButton').addEventListener('click', functio
     const phoneNumber = document.getElementById('studentPhoneNumber').value;
     const login = document.getElementById('studentLogin').value;
     const password = document.getElementById('studentPassword').value;
-    const classSelect = document.getElementById('classSelect');
-    const selectedClassId = classSelect.options[classSelect.selectedIndex].value;
 
-    if (firstName && lastName && selectedClassId && login && password) {
+    if (firstName && lastName && login && password) {
         const data = {
             firstName,
             lastName,
@@ -25,10 +23,10 @@ document.getElementById('submitStudentButton').addEventListener('click', functio
             phoneNumber,
             login,
             password,
-            classRoomId: selectedClassId
+            classRoomId: selectedObjectId
         };
 
-        fetch('/addSchoolStudent', { // Замените на соответствующий URL
+        fetch('/addSchoolStudent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -51,9 +49,8 @@ document.getElementById('submitStudentButton').addEventListener('click', functio
             document.getElementById('studentPhoneNumber').value = '';
             document.getElementById('studentLogin').value = '';
             document.getElementById('studentPassword').value = '';
-            classSelect.selectedIndex = 0;
 
-            updateObjectList();
+            updateColumnThreeList();
         })
         .catch(error => {
             console.error('Ошибка:', error);

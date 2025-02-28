@@ -6,9 +6,11 @@ function updateColumnThreeList() {
     switch (selectedModule) {
         case 'classSelector':
             url = '/getStudentsOfClass';
+            document.getElementById('thirdColumnHeader').innerText = "Ученики";
             break;
         case 'studentsSelector':
             url = '/getStudentParents';
+            document.getElementById('thirdColumnHeader').innerText = "Родители";
             break;
         default:
             return;
@@ -54,37 +56,30 @@ function updateColumnThreeList() {
 
 const deleteObjectButtonC3 = document.getElementById('deleteObjectButtonС3');
 deleteObjectButtonC3.addEventListener('click', function() {
-    if (selectedObjectId) {
+    if (selectedObjectColumnThreeId) {
         let url = '';
 
         switch (selectedModule) {
             case 'classSelector':
-                url = '/deleteClass';
-                break;
-            case 'teachersSelector':
-                url = '/deleteTeacher';
-                break;
-            case 'studentsSelector':
                 url = '/deleteSchoolStudent';
                 break;
-            case 'administrationSelector':
-                url = '/deleteAdministrator';
+            case 'studentsSelector':
+                url = '/deleteStudentParents';
                 break;
             default:
                 return;
         }
 
-        if (selectedElementId) {
-            url += `?id=${selectedObjectId}`;
-        }
+        url += `?id=${selectedObjectColumnThreeId}`;
+
 
         fetch(url, {
             method: 'DELETE',
         })
         .then(response => {
             if (response.ok) {
-                updateObjectList();
-                selectedObjectId = null;
+                updateColumnThreeList();
+                selectedObjectColumnThreeId = null;
             } else {
                 throw new Error('Ошибка при удалении');
             }
