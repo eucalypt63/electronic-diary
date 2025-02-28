@@ -64,7 +64,7 @@ educationColumn.addEventListener('click', function(event) {
     }
 });
 
-// Обработка нажатия на объект
+// Обработка нажатия на объект столбца 2
 let selectedObjectId = null;
 const objectColumn = document.getElementById('objectColumn');
 objectColumn.addEventListener('click', function(event) {
@@ -74,6 +74,29 @@ if (event.target.tagName === 'DIV') {
         event.target.classList.add('active');
 
         selectedObjectId = event.target.id;
+
+        if (selectedModule == "classSelector" || selectedModule == "studentsSelector")
+        {
+            updateColumnThreeList();
+        }
+    }
+});
+
+// Обработка нажатия на объект столбца 3
+let selectedObjectColumnThreeId = null;
+const objectColumnThree = document.getElementById('objectColumnThree');
+objectColumnThree.addEventListener('click', function(event) {
+if (event.target.tagName === 'DIV') {
+        const divs = objectColumnThree.querySelectorAll('div');
+        divs.forEach(div => div.classList.remove('active'));
+        event.target.classList.add('active');
+
+        selectedObjectColumnThreeId = event.target.id;
+
+        if (selectedModule == "classSelector" || selectedModule == "studentsSelector")
+        {
+            //updateColumnThreeList();
+        }
     }
 });
 

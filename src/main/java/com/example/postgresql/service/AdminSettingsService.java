@@ -5,6 +5,7 @@ import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.*;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.model.Users.User.UserType;
 import com.example.postgresql.repository.ClassesRepository;
@@ -12,6 +13,7 @@ import com.example.postgresql.repository.Users.AdministratorRepository;
 import com.example.postgresql.repository.Users.Education.*;
 import com.example.postgresql.repository.Users.Student.ParentRepository;
 import com.example.postgresql.repository.Users.Student.SchoolStudentRepository;
+import com.example.postgresql.repository.Users.Student.StudentParentRepository;
 import com.example.postgresql.repository.Users.TeacherRepository;
 import com.example.postgresql.repository.Users.User.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,8 @@ public class AdminSettingsService {
     private UserTypeRepository userTypeRepository;
     @Autowired
     private ParentRepository parentRepository;
+    @Autowired
+    private StudentParentRepository studentParentRepository;
 
 
     public List<EducationalInstitution> getAllEducationalInstitution() {
@@ -95,6 +99,7 @@ public class AdminSettingsService {
         return schoolStudentRepository.findById(id).orElse(null);
     }
 
+    public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
 
     public List<Administrator> getAllAdministrator() {
         return administratorRepository.findAll();

@@ -143,6 +143,30 @@ header {
     background-color: white;
 }
 
+/* Поля объектов колонки 3 */
+.objectColumnThree div {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.objectColumnThree div:hover {
+    background: #e0e0e0;
+}
+
+.objectColumnThree div:active {
+    background: #c4c2c2;
+}
+
+.objectColumnThree div.active {
+    background: #eeeeee;
+}
+
+.objectColumnThree {
+    overflow-y: auto;
+    background-color: white;
+}
+
 
 /* Контейнер для кнопок */
 .button-container {

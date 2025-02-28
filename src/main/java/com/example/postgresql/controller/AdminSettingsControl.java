@@ -9,6 +9,7 @@ import com.example.postgresql.model.Users.Education.Region;
 import com.example.postgresql.model.Users.Education.Settlement;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
@@ -119,6 +120,22 @@ public class AdminSettingsControl {
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
     }
 
+    @GetMapping("/getStudentsOfClass")
+    @ResponseBody
+    public ResponseEntity<List<SchoolStudent>> getStudentsOfClass(@RequestParam Long ObjectId) {
+        List<SchoolStudent> schoolStudents = adminSettingsService.getAllSchoolStudent()
+                .stream()
+                .filter(student -> student.getClassRoom().getId().equals(ObjectId))
+                .collect(Collectors.toList());
+
+        if (schoolStudents.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);
+        }
+
+        return ResponseEntity.ok(schoolStudents);
+    }
+
+
     //Регионы
     @GetMapping("/getRegions")
     @ResponseBody
@@ -195,7 +212,7 @@ public class AdminSettingsControl {
     // Учителя
     @GetMapping("/getTeachers")
     @ResponseBody
-    public ResponseEntity<List<Teacher>> getTeachers(@RequestParam(required = false) Long schoolId) {
+    public ResponseEntity<List<Teacher>> getTeachers(@RequestParam Long schoolId) {
         List<Teacher> teachers = adminSettingsService.getAllTeacher()
                 .stream()
                 .filter(teacher -> teacher.getUser().getEducationalInstitution().getId().equals(schoolId))
@@ -240,7 +257,7 @@ public class AdminSettingsControl {
     // Классы
     @GetMapping("/getClasses")
     @ResponseBody
-    public ResponseEntity<List<Class>> getClasses(@RequestParam(required = false) Long schoolId) {
+    public ResponseEntity<List<Class>> getClasses(@RequestParam Long schoolId) {
         List<Class> classes = adminSettingsService.getAllClasses()
                 .stream()
                 .filter(cl -> cl.getTeacher().getUser().getEducationalInstitution().getId().equals(schoolId))
@@ -273,10 +290,11 @@ public class AdminSettingsControl {
     // Родители
     @GetMapping("/getStudentParents")
     @ResponseBody
-    public ResponseEntity<List<Parent>> getParents(@RequestParam(required = false) Long SchoolStudentId) {
-        SchoolStudent schoolStudent = adminSettingsService.findSchoolStudentById(SchoolStudentId);
-        List<Parent> parents = new ArrayList<>();
-        //!!!!!!!!!!!!
+    public ResponseEntity<List<Parent>> getStudentParents(@RequestParam Long ObjectId) {
+        List<Parent> parents = adminSettingsService.getAllStudentParent().stream()
+                .filter(student -> student.getSchoolStudent().getId().equals(ObjectId))
+                .map(StudentParent::getParent)
+                .collect(Collectors.toList());
 
         if (parents.isEmpty()) {
             return ResponseEntity.noContent().build();
