@@ -1,0 +1,40 @@
+package com.example.postgresql.service.Education;
+
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
+import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
+import com.example.postgresql.repository.Users.Education.EducationalInstitutionRepository;
+import com.example.postgresql.repository.Users.Education.EducationalInstitutionTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EducationalInstitutionService {
+    @Autowired
+    private EducationalInstitutionRepository educationalInstitutionRepository;
+
+    @Autowired
+    private EducationalInstitutionTypeRepository educationalInstitutionTypeRepository;
+
+    public List<EducationalInstitution> getAllEducationalInstitution() {
+        return educationalInstitutionRepository.findAll();
+    }
+    public EducationalInstitution getEducationalInstitutionById(Long id) {
+        return educationalInstitutionRepository.findById(id).orElse(null);
+    }
+
+    public void saveEducationalInstitutional(EducationalInstitution institution) {
+        educationalInstitutionRepository.save(institution);
+    }
+
+    public void deleteEducationalInstitutionById(Long id) {
+        educationalInstitutionRepository.deleteById(id);
+    }
+
+
+    // Type
+    public EducationalInstitutionType findEducationalInstitutionTypeById(Long id) {
+        return educationalInstitutionTypeRepository.findById(id).orElse(null);
+    }
+}

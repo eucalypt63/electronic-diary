@@ -1,10 +1,9 @@
 package com.example.postgresql.controller;
 
 import com.example.postgresql.model.Users.Administrator;
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
-import com.example.postgresql.service.LoginService;
+import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class AuthorizationControl {
 
     @Autowired
-    private LoginService loginService;
+    private UserService userService;
 
     @GetMapping("/login")
     public String getAuthorization(Model model) {
@@ -34,9 +32,9 @@ public class AuthorizationControl {
                                                     @RequestParam("password") String password,
                                                     HttpSession session,
                                                     HttpServletRequest request) {
-        User user = loginService.findUserByLogin(login);
+        User user = userService.findUserByLogin(login);
 
-        if (user != null && loginService.authenticate(user, password)) {
+        if (user != null && userService.authenticate(user, password)) {
             session.invalidate();
             session = request.getSession(true);
 
@@ -45,7 +43,7 @@ public class AuthorizationControl {
                 session.setAttribute("user", user);
             } else if (userType.getName().equals("Local admin"))
             {
-                List<Administrator> administrators = loginService.getAllAdministrators()
+                List<Administrator> administrators = userService.getAllAdministrators()
                         .stream()
                         .filter(admin -> admin.getUser().equals(user))
                         .toList();
@@ -87,19 +85,13 @@ public class AuthorizationControl {
     //временно
     @GetMapping("/reg")
     public String postRegistration(Model model) {
-        byte[] salt = generateSalt();
-        byte[] hashedPassword = loginService.hashPassword("koroley3", salt);
+        byte[] salt = {52, 102, 53, 103, 54, 104, 55, 106, 56, 107, 57, 108, 48, 109, 49, 110};
+        byte[] hashedPassword = userService.hashPassword("koroley", salt);
 
-        User newUser = new User("admin3", hashedPassword, salt, loginService.findUserTypeById(Long.valueOf(1)));
-        loginService.saveUser(newUser);
+        User newUser = new User("admin", hashedPassword, salt, userService.findUserTypeById(2L));
+        userService.saveUser(newUser);
 
         model.addAttribute("success", "Пользователь успешно зарегистрирован");
         return "login";
     }
-
-    private byte[] generateSalt() {
-        byte[] salt = new byte[]{52, 102, 53, 103, 54, 104, 55, 106, 56, 107, 57, 108, 48, 109, 49, 110}; // 16 байт соли
-        return salt;
-    }
-
 }

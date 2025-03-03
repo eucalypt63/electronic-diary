@@ -1,0 +1,89 @@
+package com.example.postgresql.controller.Users;
+
+
+import com.example.postgresql.DTO.SchoolStudentDTO;
+import com.example.postgresql.model.Class;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.User.User;
+import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.service.Education.ClassService;
+import com.example.postgresql.service.Users.SchoolStudentService;
+import com.example.postgresql.service.Users.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Controller
+public class SchoolStudentControl {
+    @Autowired
+    private SchoolStudentService schoolStudentService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private ClassService classService;
+
+
+
+    @GetMapping("/getSchoolStudents")
+    @ResponseBody
+    public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
+        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudent()
+                .stream()
+                .filter(student -> student.getUser().getEducationalInstitution().getId().equals(schoolId))
+                .collect(Collectors.toList());
+
+        if (schoolStudents.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);
+        }
+
+        return ResponseEntity.ok(schoolStudents);
+    }
+
+    @PostMapping("/addSchoolStudent")
+    @ResponseBody
+    public ResponseEntity<String> addSchoolStudents(@RequestBody SchoolStudentDTO schoolStudentDTO) {
+        byte[] salt = userService.generateSalt();
+        byte[] hash = userService.hashPassword(schoolStudentDTO.getPassword(), salt);
+        UserType userType = userService.findUserTypeById(23L);
+        Class cl = classService.findClassById(schoolStudentDTO.getClassRoomId());
+
+        User user = new User(schoolStudentDTO.getLogin(), hash, salt, userType);
+        user.setEducationalInstitution(cl.getTeacher().getUser().getEducationalInstitution());
+        userService.saveUser(user);
+
+        SchoolStudent schoolStudent = new SchoolStudent(cl, schoolStudentDTO.getFirstName(), schoolStudentDTO.getLastName());
+        schoolStudent.setPatronymic(schoolStudentDTO.getPatronymic());
+        schoolStudent.setEmail(schoolStudentDTO.getEmail());
+        schoolStudent.setPhoneNumber(schoolStudentDTO.getPhoneNumber());
+        schoolStudent.setUser(user);
+        schoolStudentService.saveSchoolStudent(schoolStudent);
+
+        return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
+    }
+
+    @GetMapping("/getStudentsOfClass")
+    @ResponseBody
+    public ResponseEntity<List<SchoolStudent>> getStudentsOfClass(@RequestParam Long ObjectId) {
+        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudent()
+                .stream()
+                .filter(student -> student.getClassRoom().getId().equals(ObjectId))
+                .collect(Collectors.toList());
+
+        if (schoolStudents.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);
+        }
+
+        return ResponseEntity.ok(schoolStudents);
+    }
+
+    @DeleteMapping("/deleteSchoolStudent")
+    public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id) {
+        schoolStudentService.deleteSchoolStudentById(id);
+        return ResponseEntity.ok().build();
+    }
+}

@@ -13,6 +13,17 @@ function updateSchoolList() {
         .then(response => response.text())
         .then(role => {
             userRole = role;
+            if (role !== "Main admin") {
+                const educationModule = document.getElementById("moduleAddEducation");
+                if (educationModule) {
+                    educationModule.remove();
+                }
+
+                const administratorModule = document.getElementById("moduleAddAdministrator");
+                if (administratorModule) {
+                    administratorModule.remove();
+                }
+            }
             const endpoint = (role === "Main admin") ? '/getSchools' : '/getSchoolById';
             return fetch(endpoint);
         })
