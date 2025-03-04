@@ -43,6 +43,31 @@ public class AdministrationControl {
         return ResponseEntity.ok(administrators);
     }
 
+    @GetMapping("/findAdministratorById")
+    @ResponseBody
+    public ResponseEntity<Administrator> findAdministratorById(@RequestParam Long id) {
+        Administrator administrator = administratorService.findAdministratorById(id);
+
+        if (administrator == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(administrator);
+    }
+
+    @GetMapping("/findSchoolByAdministratorId")
+    @ResponseBody
+    public ResponseEntity<EducationalInstitution> findSchoolByAdministratorId(@RequestParam Long id) {
+        Administrator administrator = administratorService.findAdministratorById(id);
+        EducationalInstitution educationalInstitution = administrator.getUser().getEducationalInstitution();
+
+        if (educationalInstitution == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(educationalInstitution);
+    }
+
     @PostMapping("/addAdministrator")
     @ResponseBody
     public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administratorDTO) {

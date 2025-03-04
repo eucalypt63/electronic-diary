@@ -6,8 +6,11 @@ import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
 import com.example.postgresql.model.Users.Education.Settlement;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
+import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +28,6 @@ public class EducationalInstitutionControl {
 
     @Autowired
     private AddressService addressService;
-
 
     @GetMapping("/getSchools")
     @ResponseBody

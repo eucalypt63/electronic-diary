@@ -3,6 +3,7 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.SchoolStudentDTO;
 import com.example.postgresql.model.Class;
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
@@ -42,6 +43,27 @@ public class SchoolStudentControl {
         }
 
         return ResponseEntity.ok(schoolStudents);
+    }
+
+    @GetMapping("/findSchoolStudentById")
+    @ResponseBody
+    public ResponseEntity<SchoolStudent> findSchoolStudentById(@RequestParam Long id) {
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
+
+        if (schoolStudent == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(schoolStudent);
+    }
+
+    @GetMapping("/findSchoolBySchoolStudentId")
+    @ResponseBody
+    public ResponseEntity<EducationalInstitution> findSchoolBySchoolStudentId(@RequestParam Long id) {
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
+        EducationalInstitution educationalInstitution = schoolStudent.getUser().getEducationalInstitution();
+
+        return ResponseEntity.ok(educationalInstitution);
     }
 
     @PostMapping("/addSchoolStudent")

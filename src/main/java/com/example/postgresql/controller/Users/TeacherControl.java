@@ -49,6 +49,27 @@ public class TeacherControl {
         return ResponseEntity.ok(teachers);
     }
 
+    @GetMapping("/findTeacherById")
+    @ResponseBody
+    public ResponseEntity<Teacher> findTeacherById(@RequestParam Long id) {
+        Teacher teacher = teacherService.findTeacherById(id);
+
+        if (teacher == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(teacher);
+    }
+
+    @GetMapping("/findSchoolByTeacherId")
+    @ResponseBody
+    public ResponseEntity<EducationalInstitution> findSchoolByTeacherId(@RequestParam Long id) {
+        Teacher teacher = teacherService.findTeacherById(id);
+        EducationalInstitution educationalInstitution = teacher.getUser().getEducationalInstitution();
+
+        return ResponseEntity.ok(educationalInstitution);
+    }
+
     @GetMapping("/getTeachersToClass")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachersToClass(@RequestParam Long schoolId) {

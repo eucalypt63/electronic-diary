@@ -51,6 +51,25 @@ function updateObjectList() {
 
                     objectDiv.innerText = displayText;
                     objectDiv.id = object.id;
+
+                    objectDiv.addEventListener('dblclick', () => {
+                        let url;
+                        switch (selectedModule) {
+                            case 'classSelector':
+                                url = 'classPage';
+                                break;
+                            case 'teachersSelector':
+                                url = 'profileTeacher';
+                                break;
+                            case 'administrationSelector':
+                                url = 'profileAdministrator';
+                                break;
+                            default:
+                                return;
+                        }
+                        window.location.href = `${url}?id=${object.id}`;
+                    });
+
                     objectColumn.appendChild(objectDiv);
                 });
             })

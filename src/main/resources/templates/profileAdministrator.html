@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/ProfileStyle.css}">
+</head>
+<body>
+
+<header>
+    <div class="school-name">Школа</div>
+    <button class="logout-button">Выйти</button>
+</header>
+
+<div class="profile-header">
+    <div class="profile-picture" id="profile-picture"></div>
+    <h1 id="fullName"></h1>
+</div>
+
+<div class="container">
+    <div class="info">
+        <h2>Общая информация</h2>
+        <div>
+            <label>Школа:</label>
+            <span id="school"></span>
+        </div>
+        <div>
+            <label>Адрес электронной почты:</label>
+            <span id="email"></span>
+        </div>
+        <div>
+            <label>Номер телефона:</label>
+            <span id="phoneNumber"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    if (id) {
+        fetch(`http://localhost:8090/findAdministratorById?id=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 204) {
+                        throw new Error('Нет данных для данного ID');
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const Name = data.patronymic ?
+                    `${data.lastName} ${data.firstName} ${data.patronymic}` :
+                    `${data.lastName} ${data.firstName}`;
+
+                document.getElementById('fullName').innerText = Name;
+                document.getElementById('email').innerText = data.email || 'Не указан';
+                document.getElementById('phoneNumber').innerText = data.phoneNumber || 'Не указан';
+
+                const initials = `${data.lastName.charAt(0)}${data.firstName.charAt(0)}`;
+                document.getElementById('profile-picture').innerText = initials.toUpperCase();
+            })
+            .catch(error => {
+                cconsole.error('There was a problem with the fetch operation:', error);
+            });
+
+            // Найти школу
+            fetch(`http://localhost:8090/findSchoolByAdministratorId?id=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 204) {
+                        throw new Error('Нет данных для данного ID');
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('school').innerText = data.name;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.querySelector('.logout-button').addEventListener('click', function() {
+        fetch('/logout', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    });
+</script>
+
+</body>
+</html>

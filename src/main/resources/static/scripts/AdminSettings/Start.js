@@ -46,6 +46,11 @@ function updateSchoolList() {
                 const schoolDiv = document.createElement('div');
                 schoolDiv.innerText = institution.name;
                 schoolDiv.id = institution.id;
+
+                schoolDiv.addEventListener('dblclick', () => {
+                    window.location.href = `EducationPage?id=${institution.id}`;//
+                });
+
                 educationColumn.appendChild(schoolDiv);
             });
         })

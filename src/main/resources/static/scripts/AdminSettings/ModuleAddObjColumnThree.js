@@ -1,20 +1,9 @@
 function updateColumnThreeList() {
-    let url = '';
     const objectColumn = document.getElementById('objectColumnThree');
     objectColumn.innerHTML = '';
 
-    switch (selectedModule) {
-        case 'classSelector':
-            url = '/getStudentsOfClass';
-            document.getElementById('thirdColumnHeader').innerText = "Ученики";
-            break;
-        case 'studentsSelector':
-            url = '/getStudentParents';
-            document.getElementById('thirdColumnHeader').innerText = "Родители";
-            break;
-        default:
-            return;
-    }
+    let url = 'getStudentsOfClass';
+    document.getElementById('thirdColumnHeader').innerText = "Ученики";
 
     if (selectedObjectId) {
         url += `?ObjectId=${selectedObjectId}`;
@@ -32,20 +21,19 @@ function updateColumnThreeList() {
                 const objectDiv = document.createElement('div');
                 let displayText;
 
-                if (selectedModule === 'classSelector') {
-                    displayText = `${object.lastName} ${object.firstName}`;
-                    if (object.patronymic) {
-                        displayText += ` ${object.patronymic}`; // Инфо о ученике класса
-                    }
-                } else if (selectedModule === 'studentsSelector') {
-                    displayText = `${object.lastName} ${object.firstName}`;
-                    if (object.patronymic) {
-                        displayText += ` ${object.patronymic}`; // Инфо о родителях ученика
-                    }
+                displayText = `${object.lastName} ${object.firstName}`;
+                if (object.patronymic) {
+                    displayText += ` ${object.patronymic}`;
                 }
 
                 objectDiv.innerText = displayText;
                 objectDiv.id = object.id;
+
+                objectDiv.addEventListener('dblclick', () => {
+                    window.location.href = `profileSchoolStudent?id=${object.id}`;
+                });
+
+
                 objectColumn.appendChild(objectDiv);
             });
         })
@@ -57,21 +45,9 @@ function updateColumnThreeList() {
 const deleteObjectButtonC3 = document.getElementById('deleteObjectButtonС3');
 deleteObjectButtonC3.addEventListener('click', function() {
     if (selectedObjectColumnThreeId) {
-        let url = '';
-
-        switch (selectedModule) {
-            case 'classSelector':
-                url = '/deleteSchoolStudent';
-                break;
-            case 'studentsSelector':
-                url = '/deleteStudentParents';
-                break;
-            default:
-                return;
-        }
+        let url = '/deleteSchoolStudent';
 
         url += `?id=${selectedObjectColumnThreeId}`;
-
 
         fetch(url, {
             method: 'DELETE',

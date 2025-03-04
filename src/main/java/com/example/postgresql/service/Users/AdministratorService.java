@@ -19,6 +19,10 @@ public class AdministratorService {
         return administratorRepository.findAll();
     }
 
+    public Administrator findAdministratorById(Long id) {
+        return administratorRepository.findById(id).orElse(null);
+    }
+
     public void saveAdministrator(Administrator administrator) {
         administratorRepository.save(administrator);
     }

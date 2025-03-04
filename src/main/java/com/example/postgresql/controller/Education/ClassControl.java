@@ -38,6 +38,21 @@ public class ClassControl {
         return ResponseEntity.ok(classes);
     }
 
+    @GetMapping("/findClassByTeacherId")
+    @ResponseBody
+    public ResponseEntity<Class> findClassByTeacherId(@RequestParam Long id) {
+        List<Class> classes = classService.getAllClasses()
+                .stream()
+                .filter(cl -> cl.getTeacher().getId().equals(id))
+                .toList();
+
+        if (classes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(classes.get(0));
+    }
+
     @PostMapping("/addClass")
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassDTO classDTO) {
