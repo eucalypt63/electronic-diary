@@ -18,11 +18,16 @@ public class StudentParent {
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ssap_sst_id", nullable = false, foreignKey = @ForeignKey(name = "ssap_sst_id"))
+    @JoinColumn(name = "sstap_sst_id", nullable = false, foreignKey = @ForeignKey(name = "sstap_sst_id"))
     private SchoolStudent schoolStudent;
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ssap_p_id", nullable = false, foreignKey = @ForeignKey(name = "ssap_p_id"))
+    @JoinColumn(name = "sstap_p_id", nullable = false, foreignKey = @ForeignKey(name = "sstap_p_id"))
     private Parent parent;
+
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "sstap_pt_id", nullable = false, foreignKey = @ForeignKey(name = "sstap_pt_id"))
+    private ParentType parentType;
 }

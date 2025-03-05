@@ -13,6 +13,7 @@ public class ParentDTO {
     private String password;
     private String email;
     private String phoneNumber;
-    //???
+
+    private Long parentType;
     private Long schoolStudentId;
 }

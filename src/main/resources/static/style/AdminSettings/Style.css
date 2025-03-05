@@ -7,37 +7,12 @@ body {
     flex-direction: column;
 }
 
-
-/* Шапка */
-header {
-    background-color: #343a40;
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .header-div {
     background-color: #e0e0e0;
     padding: 10px;
     text-align: center;
     font-weight: bold;
 }
-
-.logout-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 8px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.logout-button:hover {
-    background-color: #c82333;
-}
-
-
 
 /* Столбцы */
 .container {

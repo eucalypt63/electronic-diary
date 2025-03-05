@@ -1,8 +1,10 @@
 package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.ParentDTO;
+import com.example.postgresql.DTO.StudentParentDTO;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Student.Parent;
+import com.example.postgresql.model.Users.Student.ParentType;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.model.Users.User.User;
@@ -44,24 +46,42 @@ public class ParentControl {
         return ResponseEntity.ok(parents);
     }
 
-    @PostMapping("/addParents")
+    @PostMapping("/addNewParent")
     @ResponseBody
-    public ResponseEntity<String> addParents(@RequestBody ParentDTO parentDTO) {
+    public ResponseEntity<String> addNewParent(@RequestBody ParentDTO parentDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(parentDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(24L);
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(parentDTO.getSchoolStudentId());
-        EducationalInstitution educationalInstitution = schoolStudent.getClassRoom().getTeacher().getUser().getEducationalInstitution();
+        EducationalInstitution educationalInstitution = schoolStudent.getUser().getEducationalInstitution();
         User user = new User(parentDTO.getLogin(), hash, salt, userType);
         user.setEducationalInstitution(educationalInstitution);
         userService.saveUser(user);
 
-        Parent studentParents = new Parent(parentDTO.getFirstName(), parentDTO.getLastName());
-        studentParents.setPatronymic(parentDTO.getPatronymic());
-        studentParents.setEmail(parentDTO.getEmail());
-        studentParents.setPhoneNumber(parentDTO.getPhoneNumber());
-        studentParents.setUser(user);
-        parentService.saveParent(studentParents);
+        Parent parent = new Parent(parentDTO.getFirstName(), parentDTO.getLastName());
+        parent.setPatronymic(parentDTO.getPatronymic());
+        parent.setEmail(parentDTO.getEmail());
+        parent.setPhoneNumber(parentDTO.getPhoneNumber());
+        parent.setUser(user);
+        parentService.saveParent(parent);
+
+        ParentType parentType = parentService.findParentTypeById(parentDTO.getParentType());
+        StudentParent studentParent = new StudentParent(schoolStudent, parent, parentType);
+        parentService.saveStudentParent(studentParent);
+
+        return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
+    }
+
+    @PostMapping("/addParent")
+    @ResponseBody
+    public ResponseEntity<String> addParent(@RequestBody StudentParentDTO studentParentDTO) {
+
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(studentParentDTO.getSchoolStudentId());
+        Parent parent = parentService.findParentById(studentParentDTO.getParentId());
+        ParentType parentType = parentService.findParentTypeById(studentParentDTO.getParentTypeId());
+
+        StudentParent studentParent = new StudentParent(schoolStudent, parent, parentType);
+        parentService.saveStudentParent(studentParent);
 
         return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
     }
@@ -70,5 +90,17 @@ public class ParentControl {
     public ResponseEntity<Void> deleteParent(@RequestParam("id") Long id) {
         parentService.deleteParentById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/getParentType")
+    @ResponseBody
+    public ResponseEntity<List<ParentType>> getParentType() {
+        List<ParentType> parentTypes = parentService.getAllParentTypes();
+
+        if (parentTypes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parentTypes);
     }
 }

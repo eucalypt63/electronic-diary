@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список родителей</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/ModuleAdd.css}">
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    header {
+        background-color: #343a40;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .school-name {
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .school-name:hover {
+        background-color: #e0e0e0;
+        color: orange;
+    }
+    .logout-button {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        border: none;
+    }
+    .logout-button:hover {
+        background-color: #c82333;
+    }
+    .container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+    }
+    .user-list {
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+        margin-bottom: 20px;
+        max-height: 75vh; /* Установлена высота 75% от высоты экрана */
+    }
+    .user {
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+        cursor: pointer;
+        transition: background-color 0.1s; /* Время перехода 0.1s */
+        padding-left: 5px; /* Сдвиг текста на 5 пикселей */
+    }
+    .user:last-child {
+        border-bottom: none;
+    }
+    .user h3 {
+        margin: 0;
+        font-size: 1.2em;
+    }
+    .user p {
+        margin: 5px 0;
+        color: #555;
+    }
+    .user p strong {
+        font-weight: bold; /* Жирный текст */
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    button {
+        padding: 10px 15px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+    .add-button {
+        background-color: #28a745; /* Зелёный цвет */
+    }
+    .add-button:hover {
+        background-color: #218838;
+    }
+    .existing-button {
+        background-color: #007BFF; /* Синий цвет */
+    }
+    .existing-button:hover {
+        background-color: #0056b3;
+    }
+    .remove-button {
+        background-color: #dc3545; /* Красный цвет */
+    }
+    .remove-button:hover {
+        background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="school-name">Школа</div>
+  <button class="logout-button">Выйти</button>
+</header>
+
+<div class="container">
+  <h1>Список родителей</h1>
+
+  <div class="user-list">
+    <div class="user">
+      <h3>Иванов Иван Иванович</h3>
+      <p><strong>Email:</strong> ivanov@example.com</p>
+      <p><strong>Телефон:</strong> +7 (900) 123-45-67</p>
+      <p><strong>Опекун -</strong> Мать</p>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button class="add-button" id="add-button">Добавить родителя</button>
+    <button class="existing-button" id="existing-button">Добавить уже существующего</button>
+    <button class="remove-button" id="remove-button">Удалить родителя</button>
+  </div>
+</div>
+
+<div id="moduleAddParent" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModule()">&times;</span>
+    <h2>Добавить Родителя</h2>
+
+    <label for="parentFirstName">Имя</label>
+    <input type="text" id="parentFirstName" placeholder="Имя" required>
+
+    <label for="parentLastName">Фамилия</label>
+    <input type="text" id="parentLastName" placeholder="Фамилия" required>
+
+    <label for="parentPatronymic">Отчество</label>
+    <input type="text" id="parentPatronymic" placeholder="Отчество">
+
+    <label for="parentLogin">Логин</label>
+    <input type="text" id="parentLogin" placeholder="Логин" required>
+
+    <label for="parentPassword">Пароль</label>
+    <input type="password" id="parentPassword" placeholder="Пароль" required>
+
+    <label for="parentEmail">Email</label>
+    <input type="email" id="parentEmail" placeholder="Email">
+
+    <label for="parentPhoneNumber">Телефон</label>
+    <input type="text" id="parentPhoneNumber" placeholder="Телефон">
+
+    <label for="parentSelect">Опекунство:</label>
+    <select id="parentSelect" required></select>
+
+    <button id="submitParentButton">Подтвердить</button>
+  </div>
+</div>
+
+<script>
+  const users = document.querySelectorAll('.user');
+  let selectedUser = null;
+
+  users.forEach(user => {
+      user.addEventListener('mouseenter', () => {
+          if (!user.classList.contains('clicked')) {
+              user.style.backgroundColor = 'lightgray'; // Цвет при наведении
+          }
+      });
+
+      user.addEventListener('mouseleave', () => {
+          if (!user.classList.contains('clicked')) {
+              user.style.backgroundColor = ''; // Возврат к стандартному
+          }
+      });
+
+      user.addEventListener('mousedown', () => {
+          user.style.backgroundColor = 'gray'; // Цвет при нажатии
+      });
+
+      user.addEventListener('mouseup', () => {
+          user.style.backgroundColor = 'darkgray'; // Цвет при отпускании
+      });
+
+      user.addEventListener('click', () => {
+          if (selectedUser) {
+              selectedUser.classList.remove('clicked');
+              selectedUser.style.backgroundColor = ''; // Возврат к стандартному
+          }
+          user.classList.add('clicked');
+          selectedUser = user; // Запоминаем последний кликнутый элемент
+          user.style.backgroundColor = 'darkgray'; // Цвет при нажатии
+      });
+  });
+
+  function closeModule() {
+    document.getElementById('moduleAddParent').style.display = 'none';
+  }
+
+  //
+
+  document.getElementById('add-button').addEventListener('click', function() {
+      const modal = document.getElementById('moduleAddParent');
+
+      fetch('/getParentType')
+          .then(response => response.json())
+          .then(parentTypes => {
+              const parentSelect = document.getElementById('parentSelect');
+              parentSelect.innerHTML = '';
+
+              const defaultOption = document.createElement('option');
+              defaultOption.value = '';
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              defaultOption.textContent = 'Выберите роль опекуна';
+              parentSelect.appendChild(defaultOption);
+
+              parentTypes.forEach(parent => {
+                  const option = document.createElement('option');
+                  option.value = parent.id;
+                  option.textContent = parent.name;
+                  parentSelect.appendChild(option);
+              });
+          })
+          .catch(error => {
+              console.error('Ошибка при получении ролей опекунства:', error);
+              const parentSelect = document.getElementById('parentSelect');
+              parentSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+          });
+
+      modal.style.display = 'block';
+  });
+
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('moduleAddParent');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+  });
+
+  document.getElementById('submitParentButton').addEventListener('click', function() {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    const parentFirstName = document.getElementById('parentFirstName').value;
+    const parentLastName = document.getElementById('parentLastName').value;
+    const parentPatronymic = document.getElementById('parentPatronymic').value;
+    const parentLogin = document.getElementById('parentLogin').value;
+    const parentPassword = document.getElementById('parentPassword').value;
+    const parentEmail = document.getElementById('parentEmail').value;
+    const parentPhoneNumber = document.getElementById('parentPhoneNumber').value;
+
+    const selectedParentId = parentSelect.options[parentSelect.selectedIndex].value;
+
+    if (parentFirstName && parentLastName && parentLogin && parentPassword && selectedParentId) {
+        //
+        const data = {
+            firstName: parentFirstName,
+            lastName: parentLastName,
+            patronymic: parentPatronymic,
+            login: parentLogin,
+            password: parentPassword,
+            email: parentEmail,
+            phoneNumber: parentPhoneNumber,
+            parentType: selectedParentId,
+            schoolStudentId: id
+        };
+
+        fetch('/addNewParent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка при добавлении администратора');
+        })
+        .then(data => {
+            const modal = document.getElementById('moduleAddParent');
+            modal.style.display = 'none';
+            document.getElementById('parentFirstName').value = '';
+            document.getElementById('parentLastName').value = '';
+            document.getElementById('parentPatronymic').value = '';
+            document.getElementById('parentLogin').value = '';
+            document.getElementById('parentPassword').value = '';
+            document.getElementById('parentEmail').value = '';
+            document.getElementById('parentPhoneNumber').value = '';
+
+            updateObjectList();
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Не удалось добавить администратора');
+        });
+    } else {
+        alert('Пожалуйста, заполните обязательные поля.');
+    }
+  });
+
+</script>
+
+</body>
+</html>

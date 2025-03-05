@@ -21,4 +21,9 @@ public class PageControl {
     public String getProfileAdministrator(@RequestParam("id") String id) {
         return "profileAdministrator";
     }
+
+    @GetMapping("/parentPage")
+    public String getParentPage(@RequestParam("id") String id) {
+        return "listParents";
+    }
 }
