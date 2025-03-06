@@ -100,16 +100,16 @@
     .add-button:hover {
         background-color: #218838;
     }
-    .existing-button {
+    .add-existing-button {
         background-color: #007BFF; /* Синий цвет */
     }
-    .existing-button:hover {
+    .add-existing-button:hover {
         background-color: #0056b3;
     }
-    .remove-button {
+    .deleteParentButton {
         background-color: #dc3545; /* Красный цвет */
     }
-    .remove-button:hover {
+    .deleteParentButton:hover {
         background-color: #c82333;
     }
   </style>
@@ -125,22 +125,17 @@
   <h1>Список родителей</h1>
 
   <div class="user-list">
-    <div class="user">
-      <h3>Иванов Иван Иванович</h3>
-      <p><strong>Email:</strong> ivanov@example.com</p>
-      <p><strong>Телефон:</strong> +7 (900) 123-45-67</p>
-      <p><strong>Опекун -</strong> Мать</p>
-    </div>
+
   </div>
 
   <div class="button-container">
     <button class="add-button" id="add-button">Добавить родителя</button>
-    <button class="existing-button" id="existing-button">Добавить уже существующего</button>
-    <button class="remove-button" id="remove-button">Удалить родителя</button>
+    <button class="add-existing-button" id="add-existing-button">Добавить уже существующего</button>
+    <button class="deleteParentButton" id="deleteParentButton">Удалить родителя</button>
   </div>
 </div>
 
-<div id="moduleAddParent" class="modal">
+<div id="moduleAddNewParent" class="modal">
   <div class="modal-content">
     <span class="close-button" onclick="closeModule()">&times;</span>
     <h2>Добавить Родителя</h2>
@@ -166,96 +161,178 @@
     <label for="parentPhoneNumber">Телефон</label>
     <input type="text" id="parentPhoneNumber" placeholder="Телефон">
 
-    <label for="parentSelect">Опекунство:</label>
-    <select id="parentSelect" required></select>
+    <label for="parentTypeSelect">Опекунство:</label>
+    <select id="parentTypeSelect" required></select>
 
     <button id="submitParentButton">Подтвердить</button>
   </div>
 </div>
 
+<div id="moduleAddParent" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModule()">&times;</span>
+    <h2>Добавить Родителя</h2>
+
+    <label for="parentSelect">Родитель:</label>
+    <select id="parentSelect" required></select>
+
+    <label for="parentTypeSelect2">Опекунство:</label>
+    <select id="parentTypeSelect2" required></select>
+
+    <button id="submitParentAddButton">Подтвердить</button>
+  </div>
+</div>
+
 <script>
-  const users = document.querySelectorAll('.user');
-  let selectedUser = null;
 
-  users.forEach(user => {
-      user.addEventListener('mouseenter', () => {
-          if (!user.classList.contains('clicked')) {
-              user.style.backgroundColor = 'lightgray'; // Цвет при наведении
-          }
-      });
+  function updateObjectList() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
 
-      user.addEventListener('mouseleave', () => {
-          if (!user.classList.contains('clicked')) {
-              user.style.backgroundColor = ''; // Возврат к стандартному
-          }
-      });
+    fetch(`/getStudentParents?id=${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(parents => {
+        const userList = document.querySelector('.user-list');
+        userList.innerHTML = ''; // Очистить предыдущие данные
 
-      user.addEventListener('mousedown', () => {
-          user.style.backgroundColor = 'gray'; // Цвет при нажатии
-      });
+        parents.forEach(parentEntry => {
+            const { parent, parentType, id } = parentEntry;
+            const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
 
-      user.addEventListener('mouseup', () => {
-          user.style.backgroundColor = 'darkgray'; // Цвет при отпускании
-      });
-
-      user.addEventListener('click', () => {
-          if (selectedUser) {
-              selectedUser.classList.remove('clicked');
-              selectedUser.style.backgroundColor = ''; // Возврат к стандартному
-          }
-          user.classList.add('clicked');
-          selectedUser = user; // Запоминаем последний кликнутый элемент
-          user.style.backgroundColor = 'darkgray'; // Цвет при нажатии
-      });
-  });
-
-  function closeModule() {
-    document.getElementById('moduleAddParent').style.display = 'none';
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user';
+            userDiv.id = id;
+            userDiv.innerHTML = `
+                <h3>${fullName}</h3>
+                <p><strong>Email:</strong> ${parent.email}</p>
+                <p><strong>Телефон:</strong> ${parent.phoneNumber}</p>
+                <p><strong>Опекун -</strong> ${parentType.name}</p>
+            `;
+            userList.appendChild(userDiv);
+        });
+        userSelected();
+    })
+    .catch(error => console.error('Ошибка при получении данных:', error));
   }
+  updateObjectList();
+
+  let selectedUser = null;
+  let selectedUserId = null;
+  function userSelected() {
+    const users = document.querySelectorAll('.user');
+    selectedUser = null;
+    selectedUserId = null;
+
+    users.forEach(user => {
+        user.addEventListener('mouseenter', () => {
+            if (!user.classList.contains('clicked')) {
+                user.style.backgroundColor = 'lightgray'; // Цвет при наведении
+            }
+        });
+
+        user.addEventListener('mouseleave', () => {
+            if (!user.classList.contains('clicked')) {
+                user.style.backgroundColor = ''; // Возврат к стандартному
+            }
+        });
+
+        user.addEventListener('mousedown', () => {
+            user.style.backgroundColor = 'gray'; // Цвет при нажатии
+        });
+
+        user.addEventListener('mouseup', () => {
+            user.style.backgroundColor = 'darkgray'; // Цвет при отпускании
+        });
+
+        user.addEventListener('click', () => {
+            if (selectedUser) {
+                selectedUser.classList.remove('clicked');
+                selectedUser.style.backgroundColor = ''; // Возврат к стандартному
+            }
+            user.classList.add('clicked');
+            selectedUserId = user.id;
+            selectedUser = user;
+            user.style.backgroundColor = 'darkgray'; // Цвет при выборе
+        });
+    });
+  }
+
+  const deleteParentButton = document.getElementById('deleteParentButton');
+  deleteParentButton.addEventListener('click', function() {
+
+    if (selectedUser) {
+
+      fetch(`/deleteStudentParent?id=${selectedUserId}`, {
+          method: 'DELETE',
+      })
+      .then(response => {
+          if (response.ok) {
+              updateObjectList();
+          } else {
+              throw new Error('Ошибка при удалении');
+          }
+      })
+      .catch(error => {
+          console.error('Ошибка:', error);
+          alert('Не удалось удалить элемент.');
+      });
+    } else {
+        alert('Пожалуйста, выберите элемент для удаления.');
+    }
+  });
 
   //
 
+  function closeModule() {
+    document.getElementById('moduleAddNewParent').style.display = 'none';
+    document.getElementById('moduleAddParent').style.display = 'none';
+  }
+
   document.getElementById('add-button').addEventListener('click', function() {
-      const modal = document.getElementById('moduleAddParent');
+      const modal = document.getElementById('moduleAddNewParent');
 
       fetch('/getParentType')
           .then(response => response.json())
           .then(parentTypes => {
-              const parentSelect = document.getElementById('parentSelect');
-              parentSelect.innerHTML = '';
+              const parentTypeSelect = document.getElementById('parentTypeSelect');
+              parentTypeSelect.innerHTML = '';
 
               const defaultOption = document.createElement('option');
               defaultOption.value = '';
               defaultOption.disabled = true;
               defaultOption.selected = true;
               defaultOption.textContent = 'Выберите роль опекуна';
-              parentSelect.appendChild(defaultOption);
+              parentTypeSelect.appendChild(defaultOption);
 
               parentTypes.forEach(parent => {
                   const option = document.createElement('option');
                   option.value = parent.id;
                   option.textContent = parent.name;
-                  parentSelect.appendChild(option);
+                  parentTypeSelect.appendChild(option);
               });
           })
           .catch(error => {
               console.error('Ошибка при получении ролей опекунства:', error);
-              const parentSelect = document.getElementById('parentSelect');
-              parentSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+              const parentTypeSelect = document.getElementById('parentTypeSelect');
+              parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
           });
 
       modal.style.display = 'block';
   });
 
   window.addEventListener('click', function(event) {
-    const modal = document.getElementById('moduleAddParent');
+    const modal = document.getElementById('moduleAddNewParent');
     if (event.target === modal) {
         modal.style.display = 'none';
     }
   });
 
   document.getElementById('submitParentButton').addEventListener('click', function() {
-
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
 
@@ -267,10 +344,9 @@
     const parentEmail = document.getElementById('parentEmail').value;
     const parentPhoneNumber = document.getElementById('parentPhoneNumber').value;
 
-    const selectedParentId = parentSelect.options[parentSelect.selectedIndex].value;
+    const selectedParentId = parentTypeSelect.options[parentTypeSelect.selectedIndex].value;
 
     if (parentFirstName && parentLastName && parentLogin && parentPassword && selectedParentId) {
-        //
         const data = {
             firstName: parentFirstName,
             lastName: parentLastName,
@@ -297,7 +373,7 @@
             throw new Error('Ошибка при добавлении администратора');
         })
         .then(data => {
-            const modal = document.getElementById('moduleAddParent');
+            const modal = document.getElementById('moduleAddNewParent');
             modal.style.display = 'none';
             document.getElementById('parentFirstName').value = '';
             document.getElementById('parentLastName').value = '';
@@ -307,6 +383,119 @@
             document.getElementById('parentEmail').value = '';
             document.getElementById('parentPhoneNumber').value = '';
 
+            updateObjectList();
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Не удалось добавить администратора');
+        });
+    } else {
+        alert('Пожалуйста, заполните обязательные поля.');
+    }
+  });
+
+  //
+
+
+  document.getElementById('add-existing-button').addEventListener('click', function() {
+      const modal = document.getElementById('moduleAddParent');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      fetch(`/getNewParents?id=${id}`)
+        .then(response => response.json())
+        .then(parents => {
+            const parentSelect = document.getElementById('parentSelect');
+            parentSelect.innerHTML = '';
+
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            defaultOption.textContent = 'Выберите опекуна';
+            parentSelect.appendChild(defaultOption);
+
+            parents.forEach(parent => {
+                const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
+                const option = document.createElement('option');
+                option.value = parent.id;
+                option.textContent = fullName;
+                parentSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Ошибка при получении ролей опекунства:', error);
+            const parentTypeSelect = document.getElementById('parentTypeSelect2');
+            parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+        });
+
+      fetch('/getParentType')
+          .then(response => response.json())
+          .then(parentTypes => {
+              const parentTypeSelect = document.getElementById('parentTypeSelect2');
+              parentTypeSelect.innerHTML = '';
+
+              const defaultOption = document.createElement('option');
+              defaultOption.value = '';
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              defaultOption.textContent = 'Выберите роль опекуна';
+              parentTypeSelect.appendChild(defaultOption);
+
+              parentTypes.forEach(parent => {
+                  const option = document.createElement('option');
+                  option.value = parent.id;
+                  option.textContent = parent.name;
+                  parentTypeSelect.appendChild(option);
+              });
+          })
+          .catch(error => {
+              console.error('Ошибка при получении ролей опекунства:', error);
+              const parentTypeSelect = document.getElementById('parentTypeSelect2');
+              parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+          });
+
+      modal.style.display = 'block';
+  });
+
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('moduleAddParent');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+  });
+
+  document.getElementById('submitParentAddButton').addEventListener('click', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    const selectedParentId = parentSelect.options[parentSelect.selectedIndex].value;
+    const selectedParentTypeId = parentTypeSelect2.options[parentTypeSelect2.selectedIndex].value;
+
+    if (selectedParentId && selectedParentTypeId) {
+        const data = {
+            parentId: selectedParentId,
+            parentTypeId: selectedParentTypeId,
+            schoolStudentId: id
+        };
+
+        fetch('/addParent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка при добавлении администратора');
+        })
+        .then(data => {
+            const modal = document.getElementById('moduleAddParent');
+            modal.style.display = 'none';
             updateObjectList();
         })
         .catch(error => {

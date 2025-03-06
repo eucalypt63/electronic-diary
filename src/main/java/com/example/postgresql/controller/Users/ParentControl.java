@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -30,21 +31,44 @@ public class ParentControl {
     @Autowired
     private ParentService parentService;
 
-
     @GetMapping("/getStudentParents")
     @ResponseBody
-    public ResponseEntity<List<Parent>> getStudentParents(@RequestParam Long ObjectId) {
-        List<Parent> parents = parentService.getAllStudentParent().stream()
-                .filter(student -> student.getSchoolStudent().getId().equals(ObjectId))
-                .map(StudentParent::getParent)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<StudentParent>> getStudentParents(@RequestParam Long id) {
+        List<StudentParent> studentParents = parentService.getAllStudentParent().stream()
+                .filter(student -> student.getSchoolStudent().getId().equals(id))
+                .toList();
 
-        if (parents.isEmpty()) {
+        if (studentParents.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(parents);
+        return ResponseEntity.ok(studentParents);
     }
+
+    @GetMapping("/getNewParents")
+    @ResponseBody
+    public ResponseEntity<List<Parent>> getNewParents(@RequestParam Long id) {
+        List<Parent> allParents = parentService.getAllParents();
+
+        List<StudentParent> studentParents = parentService.getAllStudentParent().stream()
+                .filter(parent -> parent.getSchoolStudent().getId().equals(id))
+                .toList();
+
+        Set<Long> excludedParentIds = studentParents.stream()
+                .map(sp -> sp.getParent().getId())
+                .collect(Collectors.toSet());
+
+        List<Parent> filteredParents = allParents.stream()
+                .filter(parent -> !excludedParentIds.contains(parent.getId()))
+                .toList();
+
+        if (filteredParents.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(filteredParents);
+    }
+
 
     @PostMapping("/addNewParent")
     @ResponseBody
@@ -75,7 +99,6 @@ public class ParentControl {
     @PostMapping("/addParent")
     @ResponseBody
     public ResponseEntity<String> addParent(@RequestBody StudentParentDTO studentParentDTO) {
-
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(studentParentDTO.getSchoolStudentId());
         Parent parent = parentService.findParentById(studentParentDTO.getParentId());
         ParentType parentType = parentService.findParentTypeById(studentParentDTO.getParentTypeId());
@@ -89,6 +112,12 @@ public class ParentControl {
     @DeleteMapping("/deleteParent")
     public ResponseEntity<Void> deleteParent(@RequestParam("id") Long id) {
         parentService.deleteParentById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/deleteStudentParent")
+    public ResponseEntity<Void> deleteStudentParent(@RequestParam("id") Long id) {
+        parentService.deleteStudentParentById(id);
         return ResponseEntity.ok().build();
     }
 

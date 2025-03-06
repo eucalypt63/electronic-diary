@@ -26,6 +26,7 @@ public class ParentService {
     private StudentParentRepository studentParentRepository;
 
 
+    public List<Parent> getAllParents() { return parentRepository.findAll(); }
     public Parent findParentById(Long id) { return  parentRepository.findById(id).orElse(null); }
     public void saveParent(Parent parent) {
         parentRepository.save(parent);
@@ -39,6 +40,9 @@ public class ParentService {
     public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
     public void saveStudentParent(StudentParent studentParent) {
         studentParentRepository.save(studentParent);
+    }
+    public void deleteStudentParentById(Long id) {
+        studentParentRepository.deleteById(id);
     }
 
     public ParentType findParentTypeById(Long id) { return  parentTypeRepository.findById(id).orElse(null); }
