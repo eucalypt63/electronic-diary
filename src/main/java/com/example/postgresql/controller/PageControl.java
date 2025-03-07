@@ -26,4 +26,11 @@ public class PageControl {
     public String getParentPage(@RequestParam("id") String id) {
         return "listParents";
     }
+
+    @GetMapping("/classPage")
+    public String getClassPage(@RequestParam("id") String id) {
+        return "classPage";
+    }
+
+
 }

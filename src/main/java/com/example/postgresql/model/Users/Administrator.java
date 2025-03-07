@@ -2,6 +2,7 @@ package com.example.postgresql.model.Users;
 
 import javax.persistence.*;
 
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.*;
 
@@ -19,6 +20,10 @@ public class Administrator {
     @OneToOne
     @JoinColumn(name = "a_u_id", nullable = false, foreignKey = @ForeignKey(name = "a_u_id"))
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "a_ei_id", foreignKey = @ForeignKey(name = "u_ei_id"))
+    private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)
     @NonNull

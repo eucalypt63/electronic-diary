@@ -45,7 +45,7 @@ public class EducationalInstitutionControl {
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolById(HttpSession session) {
         Administrator administrator = (Administrator) session.getAttribute("user");
-        EducationalInstitution institution = educationalInstitutionService.getEducationalInstitutionById(administrator.getUser()
+        EducationalInstitution institution = educationalInstitutionService.getEducationalInstitutionById(administrator
                 .getEducationalInstitution()
                 .getId());
         List<EducationalInstitution> institutions = new ArrayList<>();

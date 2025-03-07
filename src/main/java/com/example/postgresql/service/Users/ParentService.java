@@ -3,6 +3,7 @@ package com.example.postgresql.service.Users;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.ParentType;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.repository.ClassesRepository;
 import com.example.postgresql.repository.Users.Student.ParentRepository;
@@ -38,6 +39,11 @@ public class ParentService {
     public List<ParentType> getAllParentTypes() { return parentTypeRepository.findAll(); }
 
     public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
+
+    public List<StudentParent> findStudentParentBySchoolStudentId(Long id) {
+        return studentParentRepository.findStudentParentBySchoolStudentId(id);
+    }
+
     public void saveStudentParent(StudentParent studentParent) {
         studentParentRepository.save(studentParent);
     }

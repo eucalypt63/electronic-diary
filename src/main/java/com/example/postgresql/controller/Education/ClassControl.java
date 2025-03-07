@@ -28,7 +28,7 @@ public class ClassControl {
     public ResponseEntity<List<Class>> getClasses(@RequestParam Long schoolId) {
         List<Class> classes = classService.getAllClasses()
                 .stream()
-                .filter(cl -> cl.getTeacher().getUser().getEducationalInstitution().getId().equals(schoolId))
+                .filter(cl -> cl.getTeacher().getUser().getId().equals(schoolId))
                 .collect(Collectors.toList());
 
         if (classes.isEmpty()) {

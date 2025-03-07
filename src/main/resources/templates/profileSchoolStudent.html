@@ -58,7 +58,6 @@
 
     if (id) {
         document.getElementById('diaryLink').href = `schoolStudentDiary?id=${id}`;
-        document.getElementById('classLink').href = `classPage?id=${id}`;
         document.getElementById('parentLink').href = `parentPage?id=${id}`;
 
         fetch(`http://localhost:8090/findSchoolStudentById?id=${id}`)
@@ -82,6 +81,10 @@
 
                 const initials = `${data.lastName.charAt(0)}${data.firstName.charAt(0)}`;
                 document.getElementById('profile-picture').innerText = initials.toUpperCase();
+
+                const classId = data.classRoom.id;
+                document.getElementById('classLink').href = `classPage?id=${classId}`;
+
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);

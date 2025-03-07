@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TeacherService {
@@ -30,5 +31,15 @@ public class TeacherService {
 
     public void deleteTeacherById(Long id) {
         teacherRepository.deleteById(id);
+    }
+
+    public List<Teacher> findTeacherByEducationalInstitutionId(Long schoolId) {
+        return teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
+    }
+    public List<Teacher> getTeachersBySchoolId(Long schoolId, List<Long> assignedTeacherIds) {
+        List<Teacher> teachers = teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
+        return teachers.stream()
+                .filter(teacher -> !assignedTeacherIds.contains(teacher.getId()))
+                .collect(Collectors.toList());
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,14 +34,11 @@ public class TeacherControl {
     @Autowired
     private ClassService classService;
 
-
+    //подправить
     @GetMapping("/getTeachers")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachers(@RequestParam Long schoolId) {
-        List<Teacher> teachers = teacherService.getAllTeacher()
-                .stream()
-                .filter(teacher -> teacher.getUser().getEducationalInstitution().getId().equals(schoolId))
-                .collect(Collectors.toList());
+        List<Teacher> teachers = teacherService.findTeacherByEducationalInstitutionId(schoolId);
 
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
@@ -65,7 +63,7 @@ public class TeacherControl {
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByTeacherId(@RequestParam Long id) {
         Teacher teacher = teacherService.findTeacherById(id);
-        EducationalInstitution educationalInstitution = teacher.getUser().getEducationalInstitution();
+        EducationalInstitution educationalInstitution = teacher.getEducationalInstitution();
 
         return ResponseEntity.ok(educationalInstitution);
     }
@@ -78,11 +76,7 @@ public class TeacherControl {
                 .map(classEntity -> classEntity.getTeacher().getId())
                 .collect(Collectors.toSet());
 
-        List<Teacher> teachers = teacherService.getAllTeacher()
-                .stream()
-                .filter(teacher -> teacher.getUser().getEducationalInstitution().getId().equals(schoolId))
-                .filter(teacher -> !assignedTeacherIds.contains(teacher.getId()))
-                .collect(Collectors.toList());
+        List<Teacher> teachers = teacherService.getTeachersBySchoolId(schoolId, new ArrayList<>(assignedTeacherIds));
 
         if (teachers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -96,11 +90,10 @@ public class TeacherControl {
     public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacherDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(teacherDTO.getPassword(), salt);
-        UserType userType = userService.findUserTypeById(21L);
+        UserType userType = userService.findUserTypeById(3L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
                 getEducationalInstitutionById(teacherDTO.getUniversityId());
         User user = new User(teacherDTO.getLogin(), hash, salt, userType);
-        user.setEducationalInstitution(educationalInstitution);
         userService.saveUser(user);
 
         Teacher teacher = new Teacher(teacherDTO.getFirstName(), teacherDTO.getLastName());
@@ -108,6 +101,7 @@ public class TeacherControl {
         teacher.setEmail(teacherDTO.getEmail());
         teacher.setPhoneNumber(teacherDTO.getPhoneNumber());
         teacher.setUser(user);
+        teacher.setEducationalInstitution(educationalInstitution);
         teacherService.saveTeacher(teacher);
 
         return ResponseEntity.ok("{\"message\": \"Учитель успешно добавлен\"}");

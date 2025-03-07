@@ -28,15 +28,10 @@ public class SchoolStudentControl {
     @Autowired
     private ClassService classService;
 
-
-
     @GetMapping("/getSchoolStudents")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
-        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudent()
-                .stream()
-                .filter(student -> student.getUser().getEducationalInstitution().getId().equals(schoolId))
-                .collect(Collectors.toList());
+        List<SchoolStudent> schoolStudents = schoolStudentService.findSchoolStudentByEducationalInstitutionId(schoolId);
 
         if (schoolStudents.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);
@@ -61,7 +56,7 @@ public class SchoolStudentControl {
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolBySchoolStudentId(@RequestParam Long id) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
-        EducationalInstitution educationalInstitution = schoolStudent.getUser().getEducationalInstitution();
+        EducationalInstitution educationalInstitution = schoolStudent.getEducationalInstitution();
 
         return ResponseEntity.ok(educationalInstitution);
     }
@@ -71,18 +66,17 @@ public class SchoolStudentControl {
     public ResponseEntity<String> addSchoolStudents(@RequestBody SchoolStudentDTO schoolStudentDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(schoolStudentDTO.getPassword(), salt);
-        UserType userType = userService.findUserTypeById(23L);
-        Class cl = classService.findClassById(schoolStudentDTO.getClassRoomId());
-
+        UserType userType = userService.findUserTypeById(4L);
         User user = new User(schoolStudentDTO.getLogin(), hash, salt, userType);
-        user.setEducationalInstitution(cl.getTeacher().getUser().getEducationalInstitution());
         userService.saveUser(user);
 
+        Class cl = classService.findClassById(schoolStudentDTO.getClassRoomId());
         SchoolStudent schoolStudent = new SchoolStudent(cl, schoolStudentDTO.getFirstName(), schoolStudentDTO.getLastName());
         schoolStudent.setPatronymic(schoolStudentDTO.getPatronymic());
         schoolStudent.setEmail(schoolStudentDTO.getEmail());
         schoolStudent.setPhoneNumber(schoolStudentDTO.getPhoneNumber());
         schoolStudent.setUser(user);
+        schoolStudent.setEducationalInstitution(cl.getTeacher().getEducationalInstitution());
         schoolStudentService.saveSchoolStudent(schoolStudent);
 
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
@@ -91,10 +85,7 @@ public class SchoolStudentControl {
     @GetMapping("/getStudentsOfClass")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getStudentsOfClass(@RequestParam Long ObjectId) {
-        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudent()
-                .stream()
-                .filter(student -> student.getClassRoom().getId().equals(ObjectId))
-                .collect(Collectors.toList());
+        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudentByClassId(ObjectId);
 
         if (schoolStudents.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(schoolStudents);

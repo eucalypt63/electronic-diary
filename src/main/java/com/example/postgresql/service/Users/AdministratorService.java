@@ -19,6 +19,10 @@ public class AdministratorService {
         return administratorRepository.findAll();
     }
 
+    public List<Administrator> findAdministratorByEducationalInstitutionId(Long id) {
+        return administratorRepository.findAdministratorByEducationalInstitutionId(id);
+    }
+
     public Administrator findAdministratorById(Long id) {
         return administratorRepository.findById(id).orElse(null);
     }

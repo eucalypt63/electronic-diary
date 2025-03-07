@@ -27,14 +27,10 @@ public class AdministrationControl {
     @Autowired
     private EducationalInstitutionService educationalInstitutionService;
 
-
     @GetMapping("/getAdministrators")
     @ResponseBody
     public ResponseEntity<List<Administrator>> getAdministrators(@RequestParam Long schoolId) {
-        List<Administrator> administrators = administratorService.getAllAdministrator()
-                .stream()
-                .filter(admin -> admin.getUser().getEducationalInstitution().getId().equals(schoolId))
-                .collect(Collectors.toList());
+        List<Administrator> administrators = administratorService.findAdministratorByEducationalInstitutionId(schoolId);
 
         if (administrators.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(administrators);
@@ -59,7 +55,7 @@ public class AdministrationControl {
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByAdministratorId(@RequestParam Long id) {
         Administrator administrator = administratorService.findAdministratorById(id);
-        EducationalInstitution educationalInstitution = administrator.getUser().getEducationalInstitution();
+        EducationalInstitution educationalInstitution = administrator.getEducationalInstitution();
 
         if (educationalInstitution == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -73,11 +69,11 @@ public class AdministrationControl {
     public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administratorDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(administratorDTO.getPassword(), salt);
-        UserType userType = userService.findUserTypeById(22L);
+        UserType userType = userService.findUserTypeById(2L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
                 getEducationalInstitutionById(administratorDTO.getUniversityId());
         User user = new User(administratorDTO.getLogin(), hash, salt, userType);
-        user.setEducationalInstitution(educationalInstitution);
+
         userService.saveUser(user);
 
         Administrator administrator = new Administrator(administratorDTO.getFirstName(), administratorDTO.getLastName());
@@ -85,6 +81,7 @@ public class AdministrationControl {
         administrator.setEmail(administratorDTO.getEmail());
         administrator.setPhoneNumber(administratorDTO.getPhoneNumber());
         administrator.setUser(user);
+        administrator.setEducationalInstitution(educationalInstitution);
         administratorService.saveAdministrator(administrator);
 
         return ResponseEntity.ok("{\"message\": \"Администратор успешно добавлен\"}");

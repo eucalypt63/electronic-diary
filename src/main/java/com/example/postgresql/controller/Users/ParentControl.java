@@ -34,9 +34,7 @@ public class ParentControl {
     @GetMapping("/getStudentParents")
     @ResponseBody
     public ResponseEntity<List<StudentParent>> getStudentParents(@RequestParam Long id) {
-        List<StudentParent> studentParents = parentService.getAllStudentParent().stream()
-                .filter(student -> student.getSchoolStudent().getId().equals(id))
-                .toList();
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(id);
 
         if (studentParents.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -50,9 +48,7 @@ public class ParentControl {
     public ResponseEntity<List<Parent>> getNewParents(@RequestParam Long id) {
         List<Parent> allParents = parentService.getAllParents();
 
-        List<StudentParent> studentParents = parentService.getAllStudentParent().stream()
-                .filter(parent -> parent.getSchoolStudent().getId().equals(id))
-                .toList();
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(id);
 
         Set<Long> excludedParentIds = studentParents.stream()
                 .map(sp -> sp.getParent().getId())
@@ -75,11 +71,11 @@ public class ParentControl {
     public ResponseEntity<String> addNewParent(@RequestBody ParentDTO parentDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(parentDTO.getPassword(), salt);
-        UserType userType = userService.findUserTypeById(24L);
+        UserType userType = userService.findUserTypeById(5L);
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(parentDTO.getSchoolStudentId());
-        EducationalInstitution educationalInstitution = schoolStudent.getUser().getEducationalInstitution();
+        EducationalInstitution educationalInstitution = schoolStudent.getEducationalInstitution();
         User user = new User(parentDTO.getLogin(), hash, salt, userType);
-        user.setEducationalInstitution(educationalInstitution);
+
         userService.saveUser(user);
 
         Parent parent = new Parent(parentDTO.getFirstName(), parentDTO.getLastName());
@@ -87,6 +83,7 @@ public class ParentControl {
         parent.setEmail(parentDTO.getEmail());
         parent.setPhoneNumber(parentDTO.getPhoneNumber());
         parent.setUser(user);
+        parent.setEducationalInstitution(educationalInstitution);
         parentService.saveParent(parent);
 
         ParentType parentType = parentService.findParentTypeById(parentDTO.getParentType());

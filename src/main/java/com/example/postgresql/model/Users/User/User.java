@@ -30,10 +30,6 @@ public class User{
     @NonNull
     private byte[] salt;
 
-    @ManyToOne
-    @JoinColumn(name = "u_ei_id", foreignKey = @ForeignKey(name = "u_ei_id"))
-    private EducationalInstitution educationalInstitution;
-
     @NonNull
     @ManyToOne
     @JoinColumn(name = "u_ut_id", nullable = false, foreignKey = @ForeignKey(name = "u_ut_id"))

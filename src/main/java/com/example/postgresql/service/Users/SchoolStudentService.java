@@ -37,6 +37,10 @@ public class SchoolStudentService {
         return schoolStudentRepository.findAll();
     }
 
+    public List<SchoolStudent> findSchoolStudentByEducationalInstitutionId(Long id) {
+        return schoolStudentRepository.findSchoolStudentByEducationalInstitutionId(id);
+    }
+
     public void saveSchoolStudent(SchoolStudent schoolStudent) {
         schoolStudentRepository.save(schoolStudent);
     }
@@ -46,6 +50,10 @@ public class SchoolStudentService {
 
     public void deleteSchoolStudentById(Long id) {
         schoolStudentRepository.deleteById(id);
+    }
+
+    public List<SchoolStudent> getAllSchoolStudentByClassId(Long id) {
+        return schoolStudentRepository.findByClassRoomId(id);
     }
 
 }

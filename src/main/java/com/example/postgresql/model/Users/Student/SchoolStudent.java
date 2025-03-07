@@ -3,6 +3,7 @@ package com.example.postgresql.model.Users.Student;
 import javax.persistence.*;
 
 import com.example.postgresql.model.Class;
+import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,10 @@ public class SchoolStudent {
     @ManyToOne
     @JoinColumn(name = "sst_c_id", nullable = false, foreignKey = @ForeignKey(name = "sst_c_id"))
     private Class classRoom;
+
+    @ManyToOne
+    @JoinColumn(name = "sst_ei_id", foreignKey = @ForeignKey(name = "sst_ei_id"))
+    private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)
     @NonNull
