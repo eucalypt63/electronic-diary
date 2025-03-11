@@ -13,6 +13,7 @@ import com.example.postgresql.service.Users.ParentService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,14 @@ public class ParentControl {
         }
 
         return ResponseEntity.ok(studentParents);
+    }
+
+    @GetMapping("/findParentById")
+    @ResponseBody
+    public ResponseEntity<Parent> findParentById(@RequestParam Long id) {
+        Parent parent = parentService.findParentById(id);
+
+        return ResponseEntity.ok(parent);
     }
 
     @GetMapping("/getNewParents")
@@ -128,5 +137,21 @@ public class ParentControl {
         }
 
         return ResponseEntity.ok(parentTypes);
+    }
+
+    @GetMapping("/getStudentsOfParent")
+    @ResponseBody
+    public ResponseEntity<List<SchoolStudent>> getStudentsOfParent(@RequestParam Long ObjectId) {
+        List<StudentParent> studentParents = parentService.getAllStudentParentByParentId(ObjectId);
+
+        List<SchoolStudent> schoolStudentList = studentParents.stream()
+                .map(StudentParent::getSchoolStudent)
+                .toList();
+
+        if (schoolStudentList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(schoolStudentList);
     }
 }

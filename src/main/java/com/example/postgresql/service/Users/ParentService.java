@@ -40,6 +40,8 @@ public class ParentService {
 
     public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
 
+    public List<StudentParent> getAllStudentParentByParentId(Long id) { return studentParentRepository.findStudentParentByParentId(id); }
+
     public List<StudentParent> findStudentParentBySchoolStudentId(Long id) {
         return studentParentRepository.findStudentParentBySchoolStudentId(id);
     }

@@ -82,7 +82,7 @@ let selectedObjectColumnThreeId = null;
 // Обработка нажатия на школу
 const educationColumn = document.getElementById('educationColumn');
 educationColumn.addEventListener('click', function(event) {
-    if (event.target.tagName === 'DIV') {
+    if (event.target.tagName === 'DIV' && selectedElementId !== event.target.id) {
         const divs = educationColumn.querySelectorAll('div');
         divs.forEach(div => div.classList.remove('active'));
         event.target.classList.add('active');
@@ -101,43 +101,38 @@ educationColumn.addEventListener('click', function(event) {
 // Обработка нажатия на объект столбца 2
 const objectColumn = document.getElementById('objectColumn');
 objectColumn.addEventListener('click', function(event) {
-if (event.target.tagName === 'DIV') {
-        const divs = objectColumn.querySelectorAll('div');
-        divs.forEach(div => div.classList.remove('active'));
-        event.target.classList.add('active');
+if (event.target.tagName === 'DIV' && selectedObjectId !== event.target.id) {
+    const divs = objectColumn.querySelectorAll('div');
+    divs.forEach(div => div.classList.remove('active'));
+    event.target.classList.add('active');
 
-        selectedObjectId = event.target.id;
+    selectedObjectId = event.target.id;
 
-        selectedObjectColumnThreeId = null;
+    selectedObjectColumnThreeId = null;
 
-        if (selectedModule == "classSelector" || selectedModule == "studentsSelector")
-        {
-            updateColumnThreeList();
-        }
+    if (selectedModule == "classSelector")
+    {
+        updateColumnThreeList();
     }
+}
 });
 
 // Обработка нажатия на объект столбца 3
 const objectColumnThree = document.getElementById('objectColumnThree');
 objectColumnThree.addEventListener('click', function(event) {
-if (event.target.tagName === 'DIV') {
-        const divs = objectColumnThree.querySelectorAll('div');
-        divs.forEach(div => div.classList.remove('active'));
-        event.target.classList.add('active');
+if (event.target.tagName === 'DIV' && selectedObjectColumnThreeId !== event.target.id) {
+    const divs = objectColumnThree.querySelectorAll('div');
+    divs.forEach(div => div.classList.remove('active'));
+    event.target.classList.add('active');
 
-        selectedObjectColumnThreeId = event.target.id;
-
-        if (selectedModule == "classSelector" || selectedModule == "studentsSelector")
-        {
-            //updateColumnThreeList();
-        }
-    }
+    selectedObjectColumnThreeId = event.target.id;
+}
 });
 
 // Обработка нажатия на селектор столбца 2
 const selector = document.querySelector('.selector');
 selector.addEventListener('click', function(event) {
-    if (event.target.tagName === 'DIV') {
+    if (event.target.tagName === 'DIV' && selectedModule !== event.target.id) {
         selectedObjectId = null
 
         const divs = selector.querySelectorAll('div');

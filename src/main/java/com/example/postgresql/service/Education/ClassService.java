@@ -15,6 +15,9 @@ public class ClassService {
     @Autowired
     private ClassesRepository classesRepository;
 
+    public Class findClassByTeacherId(Long id) {
+        return classesRepository.findClassByTeacherId(id);
+    }
 
     public List<Class> getAllClasses() {
         return classesRepository.findAll();

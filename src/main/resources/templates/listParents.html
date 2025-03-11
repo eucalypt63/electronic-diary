@@ -185,6 +185,7 @@
 
 <script>
 
+
   function updateObjectList() {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -213,6 +214,10 @@
                 <p><strong>Телефон:</strong> ${parent.phoneNumber}</p>
                 <p><strong>Опекун -</strong> ${parentType.name}</p>
             `;
+            userDiv.ondblclick = function() {
+                window.location.href = `/profileParent?id=${id}`;
+            };
+
             userList.appendChild(userDiv);
         });
         userSelected();

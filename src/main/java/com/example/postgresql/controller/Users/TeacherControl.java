@@ -68,6 +68,7 @@ public class TeacherControl {
         return ResponseEntity.ok(educationalInstitution);
     }
 
+    //Получение доступных учителей для доавления в класс
     @GetMapping("/getTeachersToClass")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachersToClass(@RequestParam Long schoolId) {

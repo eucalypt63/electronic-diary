@@ -60,7 +60,7 @@
         document.getElementById('diaryLink').href = `schoolStudentDiary?id=${id}`;
         document.getElementById('parentLink').href = `parentPage?id=${id}`;
 
-        fetch(`http://localhost:8090/findSchoolStudentById?id=${id}`)
+        fetch(`/findSchoolStudentById?id=${id}`)
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 204) {
@@ -78,6 +78,7 @@
                 document.getElementById('fullName').innerText = Name;
                 document.getElementById('email').innerText = data.email || 'Не указан';
                 document.getElementById('phoneNumber').innerText = data.phoneNumber || 'Не указан';
+                document.getElementById('school').innerText = data.educationalInstitution.name;
 
                 const initials = `${data.lastName.charAt(0)}${data.firstName.charAt(0)}`;
                 document.getElementById('profile-picture').innerText = initials.toUpperCase();
@@ -89,24 +90,6 @@
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
-
-        // Найти школу
-        fetch(`http://localhost:8090/findSchoolBySchoolStudentId?id=${id}`)
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 204) {
-                    throw new Error('Нет данных для данного ID');
-                }
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('school').innerText = data.name;
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });
     }
 
     document.querySelector('.logout-button').addEventListener('click', function() {

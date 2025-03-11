@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Класс</title>
+    <title>Список детей</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,7 +50,7 @@
             justify-content: space-between;
             padding: 20px;
         }
-        .teacher-div {
+        .parent-div {
             background: #fff;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -60,12 +60,17 @@
             margin-bottom: 10px;
             max-height: 20vh;
         }
-        .teacher-div p {
+        .parent-div p {
           margin-top: 5px;
           margin-bottom: 5px;
           margin-left: 5px;
         }
-        .teacher-name {
+        .user-list p {
+          margin-top: 5px;
+          margin-bottom: 5px;
+          margin-left: 5px;
+        }
+        .parent-name {
             margin: 0;
         }
         .user-list {
@@ -90,8 +95,6 @@
         }
         .user h3 {
             margin: 0;
-            font-size: 1em;
-            font-weight: normal;
         }
     </style>
 </head>
@@ -103,9 +106,9 @@
 </header>
 
 <div class="container">
-    <h1>Класс: <span id="class-name"></span></h1>
+    <h1>Список детей</h1>
 
-    <div class="teacher-div">
+    <div class="parent-div">
     </div>
 
     <div class="user-list">
@@ -118,7 +121,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
 
-      fetch(`/getStudentsOfClass?ObjectId=${id}`, {
+      fetch(`/getStudentsOfParent?ObjectId=${id}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json'
@@ -129,9 +132,6 @@
           const userList = document.querySelector('.user-list');
           userList.innerHTML = '';
 
-          const firstStudent = students[0];
-          document.getElementById('class-name').textContent = firstStudent.classRoom.name;
-
           students.forEach(student => {
               const fullName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
 
@@ -140,6 +140,10 @@
               userDiv.id = student.id;
               userDiv.innerHTML = `
                   <h3>${fullName}</h3>
+
+                  <p><strong>Школа:</strong> ${student.educationalInstitution.name}</p>
+                  <p><strong>Email:</strong> ${student.email}</p>
+                  <p><strong>Телефон:</strong> ${student.phoneNumber}</p>
               `;
 
               userDiv.addEventListener('dblclick', () => {
@@ -161,50 +165,51 @@
     }
     updateObjectList();
 
-    function updateTeacher() {
+
+    function updateParent() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
 
-      fetch(`/getTeacherOfClass?id=${id}`, {
+      fetch(`/findParentById?id=${id}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json'
           }
       })
       .then(response => response.json())
-      .then(teacher => {
-            const teacherDiv = document.querySelector('.teacher-div');
-            teacherDiv.innerHTML = '';
+      .then(parent => {
+            const parentDiv = document.querySelector('.parent-div');
+            parentDiv.innerHTML = '';
 
-            const fullName = `${teacher.lastName} ${teacher.firstName} ${teacher.patronymic || ''}`.trim();
+            const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
 
-            const teacherElement = document.createElement('div');
-            teacherElement.className = 'teacher';
-            teacherElement.id = teacher.id;
-            teacherElement.innerHTML = `
-                <h3 class="teacher-name">${fullName}</h3>
-                <p><strong>Школа:</strong> ${teacher.educationalInstitution.name}</p>
-                <p><strong>Email:</strong> ${teacher.email}</p>
-                <p><strong>Телефон:</strong> ${teacher.phoneNumber}</p>
+            const parentElement = document.createElement('div');
+            parentElement.className = 'parent';
+            parentElement.id = parent.id;
+            parentElement.innerHTML = `
+                <h3 class="parent-name">${fullName}</h3>
+                <p><strong>Школа:</strong> ${parent.educationalInstitution.name}</p>
+                <p><strong>Email:</strong> ${parent.email}</p>
+                <p><strong>Телефон:</strong> ${parent.phoneNumber}</p>
             `;
 
-            teacherElement.addEventListener('dblclick', () => {
-                window.location.href = `/profileTeacher?id=${teacher.id}`;
+            parentElement.addEventListener('dblclick', () => {
+                window.location.href = `/profileParent?id=${parent.id}`;
             });
 
-            teacherElement.addEventListener('mousedown', () => {
-                teacherElement.style.backgroundColor = 'lightgray';
+            parentElement.addEventListener('mousedown', () => {
+                parentElement.style.backgroundColor = 'lightgray';
             });
 
-            teacherElement.addEventListener('mouseup', () => {
-                teacherElement.style.backgroundColor = '';
+            parentElement.addEventListener('mouseup', () => {
+                parentElement.style.backgroundColor = '';
             });
 
-            teacherDiv.appendChild(teacherElement);
+            parentDiv.appendChild(parentElement);
         })
       .catch(error => console.error('Ошибка при получении данных:', error));
     }
-    updateTeacher();
+    updateParent();
 
 </script>
 

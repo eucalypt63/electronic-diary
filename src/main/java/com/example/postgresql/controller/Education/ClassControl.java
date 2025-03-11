@@ -28,7 +28,7 @@ public class ClassControl {
     public ResponseEntity<List<Class>> getClasses(@RequestParam Long schoolId) {
         List<Class> classes = classService.getAllClasses()
                 .stream()
-                .filter(cl -> cl.getTeacher().getUser().getId().equals(schoolId))
+                .filter(cl -> cl.getTeacher().getEducationalInstitution().getId().equals(schoolId))
                 .collect(Collectors.toList());
 
         if (classes.isEmpty()) {
@@ -41,22 +41,25 @@ public class ClassControl {
     @GetMapping("/findClassByTeacherId")
     @ResponseBody
     public ResponseEntity<Class> findClassByTeacherId(@RequestParam Long id) {
-        List<Class> classes = classService.getAllClasses()
-                .stream()
-                .filter(cl -> cl.getTeacher().getId().equals(id))
-                .toList();
+        Class cl = classService.findClassByTeacherId(id);
 
-        if (classes.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
+        return ResponseEntity.ok(cl);
+    }
 
-        return ResponseEntity.ok(classes.get(0));
+    @GetMapping("/getTeacherOfClass")
+    @ResponseBody
+    public ResponseEntity<Teacher> getTeacherOfClass(@RequestParam Long id) {
+        Class cl = classService.findClassById(id);
+        Teacher teacher = cl.getTeacher();
+
+        return ResponseEntity.ok(teacher);
     }
 
     @PostMapping("/addClass")
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassDTO classDTO) {
         System.out.println("Данные учителя: " + classDTO);
+
         Teacher teacher = teacherService.findTeacherById(classDTO.getTeacherId());
         Class cl = new Class(classDTO.getName(), teacher);
 
