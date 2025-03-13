@@ -22,7 +22,7 @@ public class Administrator {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "a_ei_id", foreignKey = @ForeignKey(name = "u_ei_id"))
+    @JoinColumn(name = "a_ei_id", nullable = false, foreignKey = @ForeignKey(name = "u_ei_id"))
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)

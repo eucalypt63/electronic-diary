@@ -24,7 +24,7 @@ public class Parent {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "p_ei_id", foreignKey = @ForeignKey(name = "p_ei_id"))
+    @JoinColumn(name = "p_ei_id", nullable = false, foreignKey = @ForeignKey(name = "p_ei_id"))
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)

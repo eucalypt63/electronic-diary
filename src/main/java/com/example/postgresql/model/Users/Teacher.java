@@ -24,7 +24,7 @@ public class Teacher {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "t_ei_id", foreignKey = @ForeignKey(name = "t_ei_id"))
+    @JoinColumn(name = "t_ei_id", nullable = false, foreignKey = @ForeignKey(name = "t_ei_id"))
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)

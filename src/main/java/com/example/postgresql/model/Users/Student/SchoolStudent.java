@@ -30,7 +30,7 @@ public class SchoolStudent {
     private Class classRoom;
 
     @ManyToOne
-    @JoinColumn(name = "sst_ei_id", foreignKey = @ForeignKey(name = "sst_ei_id"))
+    @JoinColumn(name = "sst_ei_id", nullable = false, foreignKey = @ForeignKey(name = "sst_ei_id"))
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)
