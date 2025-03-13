@@ -34,7 +34,7 @@ public class TeacherControl {
     @Autowired
     private ClassService classService;
 
-    //подправить
+    //Получить учителей по id школы
     @GetMapping("/getTeachers")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachers(@RequestParam Long schoolId) {
@@ -47,6 +47,7 @@ public class TeacherControl {
         return ResponseEntity.ok(teachers);
     }
 
+    //Получить учителя по id
     @GetMapping("/findTeacherById")
     @ResponseBody
     public ResponseEntity<Teacher> findTeacherById(@RequestParam Long id) {
@@ -59,6 +60,7 @@ public class TeacherControl {
         return ResponseEntity.ok(teacher);
     }
 
+    //Получить школу по id учителя
     @GetMapping("/findSchoolByTeacherId")
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByTeacherId(@RequestParam Long id) {
@@ -68,7 +70,7 @@ public class TeacherControl {
         return ResponseEntity.ok(educationalInstitution);
     }
 
-    //Получение доступных учителей для доавления в класс
+    //Получить учителей исключив тех, у кого уже есть свой класс
     @GetMapping("/getTeachersToClass")
     @ResponseBody
     public ResponseEntity<List<Teacher>> getTeachersToClass(@RequestParam Long schoolId) {
@@ -86,6 +88,7 @@ public class TeacherControl {
         return ResponseEntity.ok(teachers);
     }
 
+    //Добавить учителя
     @PostMapping("/addTeacher")
     @ResponseBody
     public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacherDTO) {
@@ -108,6 +111,7 @@ public class TeacherControl {
         return ResponseEntity.ok("{\"message\": \"Учитель успешно добавлен\"}");
     }
 
+    //Удалить учителя
     @DeleteMapping("/deleteTeacher")
     public ResponseEntity<Void> deleteTeacher(@RequestParam("id") Long id) {
         teacherService.deleteTeacherById(id);

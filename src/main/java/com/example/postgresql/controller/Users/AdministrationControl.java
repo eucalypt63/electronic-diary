@@ -27,6 +27,7 @@ public class AdministrationControl {
     @Autowired
     private EducationalInstitutionService educationalInstitutionService;
 
+    //Получить администрацию по id школы
     @GetMapping("/getAdministrators")
     @ResponseBody
     public ResponseEntity<List<Administrator>> getAdministrators(@RequestParam Long schoolId) {
@@ -39,6 +40,7 @@ public class AdministrationControl {
         return ResponseEntity.ok(administrators);
     }
 
+    //Получить администратора по его id
     @GetMapping("/findAdministratorById")
     @ResponseBody
     public ResponseEntity<Administrator> findAdministratorById(@RequestParam Long id) {
@@ -51,6 +53,7 @@ public class AdministrationControl {
         return ResponseEntity.ok(administrator);
     }
 
+    //Получить школу по id админа
     @GetMapping("/findSchoolByAdministratorId")
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByAdministratorId(@RequestParam Long id) {
@@ -64,6 +67,7 @@ public class AdministrationControl {
         return ResponseEntity.ok(educationalInstitution);
     }
 
+    //Добавить админа
     @PostMapping("/addAdministrator")
     @ResponseBody
     public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administratorDTO) {
@@ -87,6 +91,7 @@ public class AdministrationControl {
         return ResponseEntity.ok("{\"message\": \"Администратор успешно добавлен\"}");
     }
 
+    //Удалить админа
     @DeleteMapping("/deleteAdministrator")
     public ResponseEntity<Void> deleteAdministrator(@RequestParam("id") Long id) {
         administratorService.deleteAdministratorById(id);

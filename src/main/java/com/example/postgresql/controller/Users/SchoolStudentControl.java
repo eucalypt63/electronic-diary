@@ -28,6 +28,7 @@ public class SchoolStudentControl {
     @Autowired
     private ClassService classService;
 
+    //Получить учеников по id школы
     @GetMapping("/getSchoolStudents")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getSchoolStudents(@RequestParam Long schoolId) {
@@ -40,6 +41,7 @@ public class SchoolStudentControl {
         return ResponseEntity.ok(schoolStudents);
     }
 
+    //Получить ученика по id
     @GetMapping("/findSchoolStudentById")
     @ResponseBody
     public ResponseEntity<SchoolStudent> findSchoolStudentById(@RequestParam Long id) {
@@ -52,6 +54,7 @@ public class SchoolStudentControl {
         return ResponseEntity.ok(schoolStudent);
     }
 
+    //Получить школу по id ученика
     @GetMapping("/findSchoolBySchoolStudentId")
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolBySchoolStudentId(@RequestParam Long id) {
@@ -61,6 +64,7 @@ public class SchoolStudentControl {
         return ResponseEntity.ok(educationalInstitution);
     }
 
+    //Добавить ученика
     @PostMapping("/addSchoolStudent")
     @ResponseBody
     public ResponseEntity<String> addSchoolStudents(@RequestBody SchoolStudentDTO schoolStudentDTO) {
@@ -82,6 +86,7 @@ public class SchoolStudentControl {
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
     }
 
+    //Получить учеников по id класса
     @GetMapping("/getStudentsOfClass")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getStudentsOfClass(@RequestParam Long ObjectId) {
@@ -94,6 +99,7 @@ public class SchoolStudentControl {
         return ResponseEntity.ok(schoolStudents);
     }
 
+    //Удалить ученика
     @DeleteMapping("/deleteSchoolStudent")
     public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id) {
         schoolStudentService.deleteSchoolStudentById(id);

@@ -19,7 +19,7 @@ public class AddressControl {
     private AddressService addressService;
 
 
-    //Регионы
+    //Получить все регионы
     @GetMapping("/getRegions")
     @ResponseBody
     public ResponseEntity<List<Region>> getRegions() {
@@ -32,7 +32,7 @@ public class AddressControl {
         return ResponseEntity.ok(regions);
     }
 
-    //Районы
+    //Получить все Settlements определённого региона
     @GetMapping("/getSettlements")
     @ResponseBody
     public ResponseEntity<List<Settlement>> getSettlements(@RequestParam Long region) {

@@ -29,6 +29,7 @@ public class EducationalInstitutionControl {
     @Autowired
     private AddressService addressService;
 
+    //Получить все школы
     @GetMapping("/getSchools")
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchools() {
@@ -41,6 +42,7 @@ public class EducationalInstitutionControl {
         return ResponseEntity.ok(institutions);
     }
 
+    //Получить школу текущего пользователя
     @GetMapping("/getSchoolById")
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolById(HttpSession session) {
@@ -53,6 +55,7 @@ public class EducationalInstitutionControl {
         return ResponseEntity.ok(institutions);
     }
 
+    //Добавить школу
     @PostMapping("/addEducationalInstitution")
     @ResponseBody
     public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitutionDTO institutionDTO) {
@@ -69,6 +72,7 @@ public class EducationalInstitutionControl {
         return ResponseEntity.ok("{\"message\": \"Школа успешно добавлена\"}");
     }
 
+    //Удалить школу
     @DeleteMapping("/deleteEducationalInstitution")
     public ResponseEntity<Void> deleteEducationalInstitution(@RequestParam Long id) {
         educationalInstitutionService.deleteEducationalInstitutionById(id);

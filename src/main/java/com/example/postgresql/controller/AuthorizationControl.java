@@ -64,6 +64,7 @@ public class AuthorizationControl {
         return "redirect:/login";
     }
 
+    //Получить роль в сессии
     @PostMapping("/getRole")
     @ResponseBody
     public ResponseEntity<String> getRole(HttpSession session) {

@@ -32,6 +32,7 @@ public class ParentControl {
     @Autowired
     private ParentService parentService;
 
+    //Получить StudentParent по id школьник (В будущем получить student)
     @GetMapping("/getStudentParents")
     @ResponseBody
     public ResponseEntity<List<StudentParent>> getStudentParents(@RequestParam Long id) {
@@ -44,6 +45,7 @@ public class ParentControl {
         return ResponseEntity.ok(studentParents);
     }
 
+    //Получить родителя по id
     @GetMapping("/findParentById")
     @ResponseBody
     public ResponseEntity<Parent> findParentById(@RequestParam Long id) {
@@ -52,6 +54,20 @@ public class ParentControl {
         return ResponseEntity.ok(parent);
     }
 
+    //Получить родителей
+    @GetMapping("/getParents")
+    @ResponseBody
+    public ResponseEntity<List<Parent>> getParents() {
+        List<Parent> parents = parentService.getAllParents();
+
+        if (parents.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(parents);
+    }
+
+    //Получить родителей исключив родителей по id ребёнка
     @GetMapping("/getNewParents")
     @ResponseBody
     public ResponseEntity<List<Parent>> getNewParents(@RequestParam Long id) {
@@ -74,7 +90,7 @@ public class ParentControl {
         return ResponseEntity.ok(filteredParents);
     }
 
-
+    //Добавить нового родителя
     @PostMapping("/addNewParent")
     @ResponseBody
     public ResponseEntity<String> addNewParent(@RequestBody ParentDTO parentDTO) {
@@ -102,6 +118,7 @@ public class ParentControl {
         return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
     }
 
+    //Добавить уже существующего родителя ребёнку
     @PostMapping("/addParent")
     @ResponseBody
     public ResponseEntity<String> addParent(@RequestBody StudentParentDTO studentParentDTO) {
@@ -115,18 +132,21 @@ public class ParentControl {
         return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
     }
 
+    //Удалить родителя
     @DeleteMapping("/deleteParent")
     public ResponseEntity<Void> deleteParent(@RequestParam("id") Long id) {
         parentService.deleteParentById(id);
         return ResponseEntity.ok().build();
     }
 
+    //Удалить связь StudentParent
     @DeleteMapping("/deleteStudentParent")
     public ResponseEntity<Void> deleteStudentParent(@RequestParam("id") Long id) {
         parentService.deleteStudentParentById(id);
         return ResponseEntity.ok().build();
     }
 
+    //Получить тип родитлея
     @GetMapping("/getParentType")
     @ResponseBody
     public ResponseEntity<List<ParentType>> getParentType() {
@@ -139,6 +159,7 @@ public class ParentControl {
         return ResponseEntity.ok(parentTypes);
     }
 
+    //Получить учеников по id родителя
     @GetMapping("/getStudentsOfParent")
     @ResponseBody
     public ResponseEntity<List<SchoolStudent>> getStudentsOfParent(@RequestParam Long ObjectId) {

@@ -22,7 +22,7 @@ public class ClassControl {
     @Autowired
     private ClassService classService;
 
-
+    //Получить классы по id школы
     @GetMapping("/getClasses")
     @ResponseBody
     public ResponseEntity<List<Class>> getClasses(@RequestParam Long schoolId) {
@@ -38,6 +38,7 @@ public class ClassControl {
         return ResponseEntity.ok(classes);
     }
 
+    //Получить класс по id учителя
     @GetMapping("/findClassByTeacherId")
     @ResponseBody
     public ResponseEntity<Class> findClassByTeacherId(@RequestParam Long id) {
@@ -46,6 +47,7 @@ public class ClassControl {
         return ResponseEntity.ok(cl);
     }
 
+    // Получить учителя по id класс
     @GetMapping("/getTeacherOfClass")
     @ResponseBody
     public ResponseEntity<Teacher> getTeacherOfClass(@RequestParam Long id) {
@@ -55,6 +57,7 @@ public class ClassControl {
         return ResponseEntity.ok(teacher);
     }
 
+    // Создать новый класс
     @PostMapping("/addClass")
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassDTO classDTO) {
@@ -67,6 +70,7 @@ public class ClassControl {
         return ResponseEntity.ok("{\"message\": \"Класс успешно добавлен\"}");
     }
 
+    //Удалить класс
     @DeleteMapping("/deleteClass")
     public ResponseEntity<Void> deleteClass(@RequestParam("id") Long id) {
         classService.deleteClassById(id);
