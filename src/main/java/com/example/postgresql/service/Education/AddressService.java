@@ -23,6 +23,9 @@ public class AddressService {
     public List<Settlement> getAllSettlement() {
         return settlementRepository.findAll();
     }
+    public List<Settlement> findSettlementByRegionId(Long id) {
+        return settlementRepository.findSettlementByRegionId(id);
+    }
 
     public List<Region> getAllRegion() {
         return regionRepository.findAll();

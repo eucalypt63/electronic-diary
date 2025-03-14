@@ -33,10 +33,8 @@ public class ClassControl {
     @GetMapping("/getClasses")
     @ResponseBody
     public ResponseEntity<List<ClassResponseDTO>> getClasses(@RequestParam Long schoolId) {
-        List<Class> classes = classService.getAllClasses()
-                .stream()
-                .filter(cl -> cl.getTeacher().getEducationalInstitution().getId().equals(schoolId))
-                .collect(Collectors.toList());
+        List<Class> classes = classService.findAllByTeacherEducationalInstitutionId(schoolId);
+
         List<ClassResponseDTO> classResponseDTOS = new ArrayList<>();
         for (Class cl : classes)
         {
@@ -76,7 +74,6 @@ public class ClassControl {
     @PostMapping("/addClass")
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassRequestDTO classRequestDTO) {
-        System.out.println("Данные учителя: " + classRequestDTO);
 
         Teacher teacher = teacherService.findTeacherById(classRequestDTO.getTeacherId());
         Class cl = new Class(classRequestDTO.getName(), teacher);

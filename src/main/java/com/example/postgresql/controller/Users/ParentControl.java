@@ -72,7 +72,7 @@ public class ParentControl {
     @GetMapping("/getParentsByEducationId")
     @ResponseBody
     public ResponseEntity<List<ParentResponseDTO>> getParentsByEducationId(@RequestParam Long id) {
-        List<Parent> parents = parentService.getParentsByEducationId(id);
+        List<Parent> parents = parentService.findParentsByEducationId(id);
         List<ParentResponseDTO> parentResponseDTOS = new ArrayList<>();
         for (Parent parent : parents){
             ParentResponseDTO parentResponseDTO = dtoService.ParentToDto(parent);
@@ -90,7 +90,8 @@ public class ParentControl {
     @GetMapping("/getNewParents")
     @ResponseBody
     public ResponseEntity<List<ParentResponseDTO>> getNewParents(@RequestParam Long id) {
-        List<Parent> allParents = parentService.getAllParents();
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
+        List<Parent> allParents = parentService.findParentsByEducationId(schoolStudent.getEducationalInstitution().getId());
 
         List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(id);
 

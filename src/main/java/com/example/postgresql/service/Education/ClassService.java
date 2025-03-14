@@ -15,19 +15,18 @@ public class ClassService {
     @Autowired
     private ClassesRepository classesRepository;
 
+    public Class findClassById(Long id) {
+        return classesRepository.findById(id).orElse(null);
+    }
     public Class findClassByTeacherId(Long id) {
         return classesRepository.findClassByTeacherId(id);
     }
-
-    public List<Class> getAllClasses() {
-        return classesRepository.findAll();
+    public List<Class> findAllByTeacherEducationalInstitutionId(Long id) {
+        return classesRepository.findAllByTeacherEducationalInstitutionId(id);
     }
+
     public void saveClass(Class cl) {
         classesRepository.save(cl);
-    }
-
-    public Class findClassById(Long id) {
-        return classesRepository.findById(id).orElse(null);
     }
     public void deleteClassById(Long id) {
         classesRepository.deleteById(id);

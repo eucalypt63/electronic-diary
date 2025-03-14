@@ -84,7 +84,8 @@ public class TeacherControl {
     @GetMapping("/getTeachersToClass")
     @ResponseBody
     public ResponseEntity<List<TeacherResponseDTO>> getTeachersToClass(@RequestParam Long schoolId) {
-        List<Class> classes = classService.getAllClasses();
+        List<Class> classes = classService.findAllByTeacherEducationalInstitutionId(schoolId);
+
         Set<Long> assignedTeacherIds = classes.stream()
                 .map(classEntity -> classEntity.getTeacher().getId())
                 .collect(Collectors.toSet());

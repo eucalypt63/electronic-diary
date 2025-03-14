@@ -36,10 +36,7 @@ public class AddressControl {
     @GetMapping("/getSettlements")
     @ResponseBody
     public ResponseEntity<List<Settlement>> getSettlements(@RequestParam Long region) {
-        List<Settlement> settlements = addressService.getAllSettlement()
-                .stream()
-                .filter(settlement -> settlement.getRegion().getId().equals(region))
-                .collect(Collectors.toList());
+        List<Settlement> settlements = addressService.findSettlementByRegionId(region);
 
         if (settlements.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(settlements);
