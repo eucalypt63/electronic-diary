@@ -28,6 +28,7 @@ public class ParentService {
 
 
     public List<Parent> getAllParents() { return parentRepository.findAll(); }
+    public List<Parent> getParentsByEducationId(Long id) { return parentRepository.findParentByEducationId(id); }
     public Parent findParentById(Long id) { return  parentRepository.findById(id).orElse(null); }
     public void saveParent(Parent parent) {
         parentRepository.save(parent);

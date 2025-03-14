@@ -54,11 +54,11 @@ public class ParentControl {
         return ResponseEntity.ok(parent);
     }
 
-    //Получить родителей
-    @GetMapping("/getParents")
+    //Получить родителей по id школы
+    @GetMapping("/getParentsByEducationId")
     @ResponseBody
-    public ResponseEntity<List<Parent>> getParents() {
-        List<Parent> parents = parentService.getAllParents();
+    public ResponseEntity<List<Parent>> getParentsByEducationId(@RequestParam Long id) {
+        List<Parent> parents = parentService.getParentsByEducationId(id);
 
         if (parents.isEmpty()) {
             return ResponseEntity.noContent().build();
