@@ -1,10 +1,12 @@
 package com.example.postgresql.controller.Users;
 
-import com.example.postgresql.DTO.AdministratorDTO;
+import com.example.postgresql.DTO.RequestDTO.AdministratorRequestDTO;
+import com.example.postgresql.DTO.ResponseDTO.AdministratorResponseDTO;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Users.AdministratorService;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Users.UserService;
@@ -14,8 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class AdministrationControl {
@@ -27,30 +29,38 @@ public class AdministrationControl {
     @Autowired
     private EducationalInstitutionService educationalInstitutionService;
 
+    @Autowired
+    private DTOService dtoService;
+
+
     //Получить администрацию по id школы
     @GetMapping("/getAdministrators")
     @ResponseBody
-    public ResponseEntity<List<Administrator>> getAdministrators(@RequestParam Long schoolId) {
+    public ResponseEntity<List<AdministratorResponseDTO>> getAdministrators(@RequestParam Long schoolId) {
         List<Administrator> administrators = administratorService.findAdministratorByEducationalInstitutionId(schoolId);
 
-        if (administrators.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(administrators);
+        List<AdministratorResponseDTO> administratorResponse = new ArrayList<>();
+        for (Administrator admin : administrators) {
+            AdministratorResponseDTO dto = dtoService.AdministratorToDto(admin);
+            administratorResponse.add(dto);
         }
 
-        return ResponseEntity.ok(administrators);
+
+        if (administratorResponse.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(administratorResponse);
     }
 
     //Получить администратора по его id
     @GetMapping("/findAdministratorById")
     @ResponseBody
-    public ResponseEntity<Administrator> findAdministratorById(@RequestParam Long id) {
+    public ResponseEntity<AdministratorResponseDTO> findAdministratorById(@RequestParam Long id) {
         Administrator administrator = administratorService.findAdministratorById(id);
+        AdministratorResponseDTO administratorResponse = dtoService.AdministratorToDto(administrator);
 
-        if (administrator == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-
-        return ResponseEntity.ok(administrator);
+        return ResponseEntity.ok(administratorResponse);
     }
 
     //Получить школу по id админа
@@ -70,20 +80,20 @@ public class AdministrationControl {
     //Добавить админа
     @PostMapping("/addAdministrator")
     @ResponseBody
-    public ResponseEntity<String> addAdministrator(@RequestBody AdministratorDTO administratorDTO) {
+    public ResponseEntity<String> addAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
         byte[] salt = userService.generateSalt();
-        byte[] hash = userService.hashPassword(administratorDTO.getPassword(), salt);
+        byte[] hash = userService.hashPassword(administratorRequestDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(2L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
-                getEducationalInstitutionById(administratorDTO.getUniversityId());
-        User user = new User(administratorDTO.getLogin(), hash, salt, userType);
+                getEducationalInstitutionById(administratorRequestDTO.getUniversityId());
+        User user = new User(administratorRequestDTO.getLogin(), hash, salt, userType);
 
         userService.saveUser(user);
 
-        Administrator administrator = new Administrator(administratorDTO.getFirstName(), administratorDTO.getLastName());
-        administrator.setPatronymic(administratorDTO.getPatronymic());
-        administrator.setEmail(administratorDTO.getEmail());
-        administrator.setPhoneNumber(administratorDTO.getPhoneNumber());
+        Administrator administrator = new Administrator(administratorRequestDTO.getFirstName(), administratorRequestDTO.getLastName());
+        administrator.setPatronymic(administratorRequestDTO.getPatronymic());
+        administrator.setEmail(administratorRequestDTO.getEmail());
+        administrator.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
         administrator.setUser(user);
         administrator.setEducationalInstitution(educationalInstitution);
         administratorService.saveAdministrator(administrator);

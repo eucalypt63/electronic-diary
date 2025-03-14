@@ -1,11 +1,11 @@
-package com.example.postgresql.DTO;
+package com.example.postgresql.DTO.RequestDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class ClassDTO {
+public class ClassRequestDTO {
     private String name;
     private Long teacherId;
 }

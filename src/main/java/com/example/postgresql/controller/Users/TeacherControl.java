@@ -1,11 +1,13 @@
 package com.example.postgresql.controller.Users;
 
-import com.example.postgresql.DTO.TeacherDTO;
+import com.example.postgresql.DTO.RequestDTO.TeacherRequestDTO;
+import com.example.postgresql.DTO.ResponseDTO.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.ClassService;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Users.TeacherService;
@@ -30,34 +32,42 @@ public class TeacherControl {
     private UserService userService;
     @Autowired
     private EducationalInstitutionService educationalInstitutionService;
-
     @Autowired
     private ClassService classService;
+    @Autowired
+    private DTOService dtoService;
 
     //Получить учителей по id школы
     @GetMapping("/getTeachers")
     @ResponseBody
-    public ResponseEntity<List<Teacher>> getTeachers(@RequestParam Long schoolId) {
+    public ResponseEntity<List<TeacherResponseDTO>> getTeachers(@RequestParam Long schoolId) {
         List<Teacher> teachers = teacherService.findTeacherByEducationalInstitutionId(schoolId);
 
-        if (teachers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
+        List<TeacherResponseDTO> teacherResponseDTOS = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            TeacherResponseDTO teacherResponseDTO = dtoService.TeacherToDto(teacher);
+            teacherResponseDTOS.add(teacherResponseDTO);
         }
 
-        return ResponseEntity.ok(teachers);
+        if (teacherResponseDTOS.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        return ResponseEntity.ok(teacherResponseDTOS);
     }
 
     //Получить учителя по id
     @GetMapping("/findTeacherById")
     @ResponseBody
-    public ResponseEntity<Teacher> findTeacherById(@RequestParam Long id) {
+    public ResponseEntity<TeacherResponseDTO> findTeacherById(@RequestParam Long id) {
         Teacher teacher = teacherService.findTeacherById(id);
+        TeacherResponseDTO teacherResponseDTO = dtoService.TeacherToDto(teacher);
 
-        if (teacher == null) {
+        if (teacherResponseDTO == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        return ResponseEntity.ok(teacher);
+        return ResponseEntity.ok(teacherResponseDTO);
     }
 
     //Получить школу по id учителя
@@ -73,7 +83,7 @@ public class TeacherControl {
     //Получить учителей исключив тех, у кого уже есть свой класс
     @GetMapping("/getTeachersToClass")
     @ResponseBody
-    public ResponseEntity<List<Teacher>> getTeachersToClass(@RequestParam Long schoolId) {
+    public ResponseEntity<List<TeacherResponseDTO>> getTeachersToClass(@RequestParam Long schoolId) {
         List<Class> classes = classService.getAllClasses();
         Set<Long> assignedTeacherIds = classes.stream()
                 .map(classEntity -> classEntity.getTeacher().getId())
@@ -81,29 +91,35 @@ public class TeacherControl {
 
         List<Teacher> teachers = teacherService.getTeachersBySchoolId(schoolId, new ArrayList<>(assignedTeacherIds));
 
-        if (teachers.isEmpty()) {
+        List<TeacherResponseDTO> teacherResponseDTOS = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            TeacherResponseDTO teacherResponseDTO = dtoService.TeacherToDto(teacher);
+            teacherResponseDTOS.add(teacherResponseDTO);
+        }
+
+        if (teacherResponseDTOS.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        return ResponseEntity.ok(teachers);
+        return ResponseEntity.ok(teacherResponseDTOS);
     }
 
     //Добавить учителя
     @PostMapping("/addTeacher")
     @ResponseBody
-    public ResponseEntity<String> addTeacher(@RequestBody TeacherDTO teacherDTO) {
+    public ResponseEntity<String> addTeacher(@RequestBody TeacherRequestDTO teacherRequestDTO) {
         byte[] salt = userService.generateSalt();
-        byte[] hash = userService.hashPassword(teacherDTO.getPassword(), salt);
+        byte[] hash = userService.hashPassword(teacherRequestDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(3L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
-                getEducationalInstitutionById(teacherDTO.getUniversityId());
-        User user = new User(teacherDTO.getLogin(), hash, salt, userType);
+                getEducationalInstitutionById(teacherRequestDTO.getUniversityId());
+        User user = new User(teacherRequestDTO.getLogin(), hash, salt, userType);
         userService.saveUser(user);
 
-        Teacher teacher = new Teacher(teacherDTO.getFirstName(), teacherDTO.getLastName());
-        teacher.setPatronymic(teacherDTO.getPatronymic());
-        teacher.setEmail(teacherDTO.getEmail());
-        teacher.setPhoneNumber(teacherDTO.getPhoneNumber());
+        Teacher teacher = new Teacher(teacherRequestDTO.getFirstName(), teacherRequestDTO.getLastName());
+        teacher.setPatronymic(teacherRequestDTO.getPatronymic());
+        teacher.setEmail(teacherRequestDTO.getEmail());
+        teacher.setPhoneNumber(teacherRequestDTO.getPhoneNumber());
         teacher.setUser(user);
         teacher.setEducationalInstitution(educationalInstitution);
         teacherService.saveTeacher(teacher);

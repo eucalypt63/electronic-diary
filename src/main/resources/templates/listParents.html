@@ -199,7 +199,7 @@
     .then(response => response.json())
     .then(parents => {
         const userList = document.querySelector('.user-list');
-        userList.innerHTML = ''; // Очистить предыдущие данные
+        userList.innerHTML = '';
 
         parents.forEach(parentEntry => {
             const { parent, parentType, id } = parentEntry;
@@ -207,7 +207,7 @@
 
             const userDiv = document.createElement('div');
             userDiv.className = 'user';
-            userDiv.id = id;
+            userDiv.id = parent.id;
             userDiv.innerHTML = `
                 <h3>${fullName}</h3>
                 <p><strong>Email:</strong> ${parent.email}</p>

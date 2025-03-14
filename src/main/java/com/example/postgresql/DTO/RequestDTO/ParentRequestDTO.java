@@ -1,11 +1,11 @@
-package com.example.postgresql.DTO;
+package com.example.postgresql.DTO.RequestDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class SchoolStudentDTO {
+public class ParentRequestDTO {
     private String firstName;
     private String lastName;
     private String patronymic;
@@ -13,5 +13,7 @@ public class SchoolStudentDTO {
     private String password;
     private String email;
     private String phoneNumber;
-    private Long classRoomId;
+
+    private Long parentType;
+    private Long schoolStudentId;
 }
