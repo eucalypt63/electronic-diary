@@ -58,6 +58,25 @@ public class ParentControl {
         return ResponseEntity.ok(studentParentResponseDTOS);
     }
 
+    //Получить StudentParent по id родителя
+    @GetMapping("/getStudentParentsByParentTd")
+    @ResponseBody
+    public ResponseEntity<List<StudentParentResponseDTO>> getStudentParentsByParentTd(@RequestParam Long id) {
+        List<StudentParent> studentParents = parentService.findStudentParentByParentId(id);
+
+        List<StudentParentResponseDTO> studentParentResponseDTOS = new ArrayList<>();
+        for (StudentParent studentParent : studentParents) {
+            StudentParentResponseDTO studentParentResponseDTO = dtoService.StudentParentToDto(studentParent);
+            studentParentResponseDTOS.add(studentParentResponseDTO);
+        }
+
+        if (studentParentResponseDTOS.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(studentParentResponseDTOS);
+    }
+
     //Получить родителя по id
     @GetMapping("/findParentById")
     @ResponseBody
@@ -189,7 +208,7 @@ public class ParentControl {
     @GetMapping("/getStudentsOfParent")
     @ResponseBody
     public ResponseEntity<List<SchoolStudentResponseDTO>> getStudentsOfParent(@RequestParam Long ObjectId) {
-        List<StudentParent> studentParents = parentService.getAllStudentParentByParentId(ObjectId);
+        List<StudentParent> studentParents = parentService.findStudentParentByParentId(ObjectId);
 
         List<SchoolStudent> schoolStudentList = studentParents.stream()
                 .map(StudentParent::getSchoolStudent)

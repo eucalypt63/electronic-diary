@@ -2,7 +2,9 @@ package com.example.postgresql.service;
 
 import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.model.Class;
+import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
+import com.example.postgresql.model.Users.Education.Group;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
@@ -91,5 +93,26 @@ public class DTOService {
         studentParentResponseDTO.setParentType(studentParent.getParentType());
 
         return studentParentResponseDTO;
+    }
+
+    public TeacherAssignmentResponseDTO TeacherAssignmentToDto(TeacherAssignment teacherAssignment)
+    {
+        TeacherAssignmentResponseDTO teacherAssignmentResponseDTO = new TeacherAssignmentResponseDTO();
+        teacherAssignmentResponseDTO.setId(teacherAssignment.getId());
+        teacherAssignmentResponseDTO.setTeacher(TeacherToDto(teacherAssignment.getTeacher()));
+        teacherAssignmentResponseDTO.setSchoolSubject(teacherAssignment.getSchoolSubject());
+        teacherAssignmentResponseDTO.setClassRoom(ClassToDto(teacherAssignment.getClassRoom()));
+
+        return teacherAssignmentResponseDTO;
+    }
+
+    public GroupResponseDTO GroupToDto(Group group)
+    {
+        GroupResponseDTO groupResponseDTO = new GroupResponseDTO();
+        groupResponseDTO.setId(group.getId());
+        groupResponseDTO.setTeacherAssignment(TeacherAssignmentToDto(group.getTeacherAssignment()));
+        groupResponseDTO.setSchoolStudent(SchoolStudentToDto(group.getSchoolStudent()));
+
+        return groupResponseDTO;
     }
 }
