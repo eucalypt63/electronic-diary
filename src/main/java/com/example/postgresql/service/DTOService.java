@@ -4,7 +4,7 @@ import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
-import com.example.postgresql.model.Users.Education.Group;
+import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
@@ -111,7 +111,7 @@ public class DTOService {
         GroupResponseDTO groupResponseDTO = new GroupResponseDTO();
         groupResponseDTO.setId(group.getId());
         groupResponseDTO.setTeacherAssignment(TeacherAssignmentToDto(group.getTeacherAssignment()));
-        groupResponseDTO.setSchoolStudent(SchoolStudentToDto(group.getSchoolStudent()));
+        groupResponseDTO.setGroupName(group.getGroupName());
 
         return groupResponseDTO;
     }

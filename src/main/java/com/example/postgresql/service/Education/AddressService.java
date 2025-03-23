@@ -1,9 +1,9 @@
 package com.example.postgresql.service.Education;
 
-import com.example.postgresql.model.Users.Education.Region;
-import com.example.postgresql.model.Users.Education.Settlement;
-import com.example.postgresql.repository.Users.Education.RegionRepository;
-import com.example.postgresql.repository.Users.Education.SettlementRepository;
+import com.example.postgresql.model.Education.EducationInfo.Region;
+import com.example.postgresql.model.Education.EducationInfo.Settlement;
+import com.example.postgresql.repository.Education.EducationInfo.RegionRepository;
+import com.example.postgresql.repository.Education.EducationInfo.SettlementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

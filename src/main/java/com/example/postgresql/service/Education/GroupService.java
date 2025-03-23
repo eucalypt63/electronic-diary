@@ -1,11 +1,7 @@
 package com.example.postgresql.service.Education;
 
-import com.example.postgresql.model.Users.Education.Group;
-import com.example.postgresql.model.Users.Education.Region;
-import com.example.postgresql.model.Users.Education.Settlement;
-import com.example.postgresql.repository.Users.Education.GroupRepository;
-import com.example.postgresql.repository.Users.Education.RegionRepository;
-import com.example.postgresql.repository.Users.Education.SettlementRepository;
+import com.example.postgresql.model.Education.Group.Group;
+import com.example.postgresql.repository.Education.Group.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

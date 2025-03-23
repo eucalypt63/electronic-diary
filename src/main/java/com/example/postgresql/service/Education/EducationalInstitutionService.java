@@ -1,9 +1,9 @@
 package com.example.postgresql.service.Education;
 
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
-import com.example.postgresql.model.Users.Education.EducationalInstitutionType;
-import com.example.postgresql.repository.Users.Education.EducationalInstitutionRepository;
-import com.example.postgresql.repository.Users.Education.EducationalInstitutionTypeRepository;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
+import com.example.postgresql.repository.Education.EducationInfo.EducationalInstitutionRepository;
+import com.example.postgresql.repository.Education.EducationInfo.EducationalInstitutionTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

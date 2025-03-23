@@ -1,6 +1,5 @@
-package com.example.postgresql.model.Users.Education;
+package com.example.postgresql.model.Education.EducationInfo;
 
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

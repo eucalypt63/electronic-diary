@@ -1,7 +1,7 @@
 package com.example.postgresql.controller.Education;
 
-import com.example.postgresql.model.Users.Education.Region;
-import com.example.postgresql.model.Users.Education.Settlement;
+import com.example.postgresql.model.Education.EducationInfo.Region;
+import com.example.postgresql.model.Education.EducationInfo.Settlement;
 import com.example.postgresql.service.Education.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,14 +10,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class AddressControl {
 
     @Autowired
     private AddressService addressService;
-
 
     //Получить все регионы
     @GetMapping("/getRegions")

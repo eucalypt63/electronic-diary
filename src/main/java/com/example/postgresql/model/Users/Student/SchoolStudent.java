@@ -3,7 +3,7 @@ package com.example.postgresql.model.Users.Student;
 import javax.persistence.*;
 
 import com.example.postgresql.model.Class;
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;

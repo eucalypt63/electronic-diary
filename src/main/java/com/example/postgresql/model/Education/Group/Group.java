@@ -1,4 +1,4 @@
-package com.example.postgresql.model.Users.Education;
+package com.example.postgresql.model.Education.Group;
 
 import javax.persistence.*;
 
@@ -24,8 +24,7 @@ public class Group {
     @JoinColumn(name = "g_ta_id", nullable = false, foreignKey = @ForeignKey(name = "g_ta_id"))
     private TeacherAssignment teacherAssignment;
 
+    @Column(nullable = false)
     @NonNull
-    @ManyToOne
-    @JoinColumn(name = "g_ss_id", nullable = false, foreignKey = @ForeignKey(name = "g_ss_id"))
-    private SchoolStudent schoolStudent;
+    private String groupName;
 }

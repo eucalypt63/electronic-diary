@@ -1,6 +1,5 @@
 package com.example.postgresql.model.Users.User;
 
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

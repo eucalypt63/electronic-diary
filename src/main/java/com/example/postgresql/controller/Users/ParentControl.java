@@ -5,13 +5,14 @@ import com.example.postgresql.DTO.RequestDTO.StudentParentRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.ParentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.SchoolStudentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.StudentParentResponseDTO;
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.ParentType;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.repository.Users.Student.StudentParentRepository;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Users.ParentService;
 import com.example.postgresql.service.Users.SchoolStudentService;
@@ -35,6 +36,9 @@ public class ParentControl {
     private SchoolStudentService schoolStudentService;
     @Autowired
     private DTOService dtoService;
+
+    @Autowired
+    private StudentParentRepository studentParentRepository;
 
     @Autowired
     private ParentService parentService;

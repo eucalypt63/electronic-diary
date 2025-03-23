@@ -1,4 +1,4 @@
-package com.example.postgresql.model.Users.Education;
+package com.example.postgresql.model.Education.EducationInfo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

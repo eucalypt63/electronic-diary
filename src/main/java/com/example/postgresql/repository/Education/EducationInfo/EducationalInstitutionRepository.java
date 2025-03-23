@@ -1,7 +1,6 @@
-package com.example.postgresql.repository.Users.Education;
+package com.example.postgresql.repository.Education.EducationInfo;
 
-import com.example.postgresql.model.Users.Education.EducationalInstitution;
-import com.example.postgresql.model.Users.User.User;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
