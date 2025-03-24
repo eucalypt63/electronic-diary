@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ELD_SHEDULE_LESSONS")
+@Table(name = "ELD_SCHEDULE_LESSONS")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -34,5 +34,4 @@ public class ScheduleLesson {
     @Column(nullable = false)
     @NonNull
     private Long lessonNumber;
-
 }

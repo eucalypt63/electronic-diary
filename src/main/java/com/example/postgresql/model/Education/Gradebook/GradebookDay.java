@@ -23,11 +23,11 @@ public class GradebookDay {
     @JoinColumn(name = "gd_g_id", nullable = false, foreignKey = @ForeignKey(name = "gd_g_id"))
     private Group group;
 
-    private LocalDateTime day;
-    private String topic;
-
     @Column(nullable = false)
     @NonNull
+    private LocalDateTime dateTime;
+
+    private String topic;
     private String homework;
 
     @Column(nullable = false)

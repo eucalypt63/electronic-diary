@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class NewComment {
+public class NewsComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "nc_n_getter_id", nullable = false, foreignKey = @ForeignKey(name = "nc_n_getter_id"))
-    private News news;
-
-    @ManyToOne
     @JoinColumn(name = "nc_u_getter_id", nullable = false, foreignKey = @ForeignKey(name = "nc_u_getter_id"))
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "nc_n_getter_id", nullable = false, foreignKey = @ForeignKey(name = "nc_n_getter_id"))
+    private News news;
 
     @Column(nullable = false)
     @NonNull
