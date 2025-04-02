@@ -2,6 +2,7 @@ package com.example.postgresql.model;
 
 import javax.persistence.*;
 
+import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Teacher;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,6 @@ public class TeacherAssignment {
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ta_c_id", nullable = false, foreignKey = @ForeignKey(name = "ta_c_id"))
-    private Class classRoom;
+    @JoinColumn(name = "ta_g_id", nullable = false, foreignKey = @ForeignKey(name = "ta_g_id"))
+    private Group group;
 }

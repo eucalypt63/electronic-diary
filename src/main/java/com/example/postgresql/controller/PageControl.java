@@ -9,36 +9,46 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class PageControl {
     @GetMapping("/profileSchoolStudent")
     public String getProfileSchoolStudent(@RequestParam String id) {
-        return "profileSchoolStudent";
+        return "profile/profileSchoolStudent";
     }
 
     @GetMapping("/profileTeacher")
     public String getProfileTeacher(@RequestParam String id) {
-        return "profileTeacher";
+        return "profile/profileTeacher";
     }
 
     @GetMapping("/profileParent")
     public String getProfileParent(@RequestParam String id) {
-        return "profileParent";
+        return "profile/profileParent";
     }
 
     @GetMapping("/profileAdministrator")
     public String getProfileAdministrator(@RequestParam String id) {
-        return "profileAdministrator";
+        return "profile/profileAdministrator";
     }
 
     @GetMapping("/parentPage")
     public String getParentPage(@RequestParam String id) {
-        return "listParents";
+        return "lists/listParents";
     }
 
     @GetMapping("/parentsSchoolStudents")
     public String getParentsSchoolStudents(@RequestParam String id) {
-        return "listParentsSchoolStudents";
+        return "lists/listParentsSchoolStudents";
     }
 
     @GetMapping("/classPage")
     public String getClassPage(@RequestParam String id) {
-        return "classPage";
+        return "lists/classPage";
+    }
+
+    @GetMapping("/classSchedule")
+    public String getClassSchedule(@RequestParam String id) {
+        return "classSchedule";
+    }
+
+    @GetMapping("/test")
+    public String getTest() {
+        return "test";
     }
 }

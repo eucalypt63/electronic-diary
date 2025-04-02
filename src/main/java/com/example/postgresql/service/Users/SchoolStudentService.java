@@ -13,26 +13,18 @@ public class SchoolStudentService {
     @Autowired
     private SchoolStudentRepository schoolStudentRepository;
 
-
-    public List<SchoolStudent> getAllSchoolStudent() {
-        return schoolStudentRepository.findAll();
-    }
-
     public List<SchoolStudent> findSchoolStudentByEducationalInstitutionId(Long id) {
         return schoolStudentRepository.findSchoolStudentByEducationalInstitutionId(id);
     }
-
     public void saveSchoolStudent(SchoolStudent schoolStudent) {
         schoolStudentRepository.save(schoolStudent);
     }
     public SchoolStudent findSchoolStudentById(Long id) {
         return schoolStudentRepository.findById(id).orElse(null);
     }
-
     public void deleteSchoolStudentById(Long id) {
         schoolStudentRepository.deleteById(id);
     }
-
     public List<SchoolStudent> getAllSchoolStudentByClassId(Long id) {
         return schoolStudentRepository.findByClassRoomId(id);
     }

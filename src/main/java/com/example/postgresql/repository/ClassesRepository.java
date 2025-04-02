@@ -10,4 +10,5 @@ import java.util.List;
 public interface ClassesRepository extends JpaRepository<Class, Long> {
     Class findClassByTeacherId(Long id);
     List<Class> findAllByTeacherEducationalInstitutionId(Long id);
+
 }

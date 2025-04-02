@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Table(name = "ELD_GRADEBOOK_ATTENDANCES")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class GradebookAttendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

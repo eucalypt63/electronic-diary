@@ -11,11 +11,15 @@ import com.example.postgresql.service.Users.AdministratorService;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,5 +110,34 @@ public class AdministrationControl {
     public ResponseEntity<Void> deleteAdministrator(@RequestParam("id") Long id) {
         administratorService.deleteAdministratorById(id);
         return ResponseEntity.ok().build();
+    }
+
+    //Добавление фотографии Администратора
+    @PostMapping("/addImageAdministrator")
+    @ResponseBody
+    public ResponseEntity<String> addImageAdministrator(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
+        try {
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(originalImage, "png", pngOutputStream);
+            byte[] pngBytes = pngOutputStream.toByteArray();
+
+            String uploadUrl = "http://77.222.37.9/files/" + "Administrator" + id + ".png";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.IMAGE_JPEG);
+            HttpEntity<byte[]> requestEntity = new HttpEntity<>(pngBytes, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, requestEntity, String.class);
+
+            Administrator administrator = administratorService.findAdministratorById(id);
+            administrator.setPathImage(uploadUrl);
+            administratorService.saveAdministrator(administrator);
+
+            return ResponseEntity.ok("{\"message\": \"Image uploaded successfully \"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
+        }
     }
 }

@@ -24,12 +24,16 @@ public class ScheduleLesson {
     private Group group;
 
     @ManyToOne
-    @JoinColumn(name = "sl_sh_d", nullable = false, foreignKey = @ForeignKey(name = "sl_sh_d"))
-    private Schedule schedule;
-
-    @ManyToOne
     @JoinColumn(name = "sl_ta_id", nullable = false, foreignKey = @ForeignKey(name = "sl_ta_id"))
     private TeacherAssignment teacherAssignment;
+
+    @Column(nullable = false)
+    @NonNull
+    private Long quarterNumber;
+
+    @Column(nullable = false)
+    @NonNull
+    private Long dayNumber;
 
     @Column(nullable = false)
     @NonNull

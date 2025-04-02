@@ -1,6 +1,7 @@
 package com.example.postgresql.model.Education.Gradebook;
 
 import com.example.postgresql.model.Education.Group.Group;
+import com.example.postgresql.model.TeacherAssignment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -20,8 +21,12 @@ public class GradebookDay {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "gd_g_id", nullable = false, foreignKey = @ForeignKey(name = "gd_g_id"))
-    private Group group;
+    @JoinColumn(name = "gd_ta_id", nullable = false, foreignKey = @ForeignKey(name = "gd_ta_id"))
+    private TeacherAssignment teacherAssignment;
+
+    @ManyToOne
+    @JoinColumn(name = "gd_sl_id", nullable = false, foreignKey = @ForeignKey(name = "gd_sl_id"))
+    private ScheduleLesson scheduleLesson;
 
     @Column(nullable = false)
     @NonNull

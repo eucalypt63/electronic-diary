@@ -61,9 +61,9 @@
             max-height: 20vh;
         }
         .teacher-div p {
-          margin-top: 5px;
-          margin-bottom: 5px;
-          margin-left: 5px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            margin-left: 5px;
         }
         .teacher-name {
             margin: 0;
@@ -72,7 +72,7 @@
             background: #fff;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 10px; /* Уменьшено отступ */
+            padding: 10px;
             overflow-y: auto;
             flex: 1;
             margin-bottom: 20px;
@@ -93,6 +93,19 @@
             font-size: 1em;
             font-weight: normal;
         }
+        .schedule-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin: auto;
+        }
+        .schedule-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -105,74 +118,73 @@
 <div class="container">
     <h1>Класс: <span id="class-name"></span></h1>
 
-    <div class="teacher-div">
-    </div>
+    <div class="teacher-div"></div>
 
-    <div class="user-list">
-    </div>
+    <div class="user-list"></div>
+
+    <button class="schedule-button" id="schedule-button">Просмотр расписания</button>
 </div>
 
 <script>
-
     function updateObjectList() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
 
-      fetch(`/getStudentsOfClass?ObjectId=${id}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
-      .then(response => response.json())
-      .then(students => {
-          const userList = document.querySelector('.user-list');
-          userList.innerHTML = '';
+        fetch(`/getStudentsOfClass?ObjectId=${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(students => {
+            const userList = document.querySelector('.user-list');
+            userList.innerHTML = '';
 
-          const firstStudent = students[0];
-          document.getElementById('class-name').textContent = firstStudent.classRoom.name;
+            const firstStudent = students[0];
+            document.getElementById('class-name').textContent = firstStudent.classRoom.name;
 
-          students.forEach(student => {
-              const fullName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
+            students.forEach(student => {
+                const fullName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
 
-              const userDiv = document.createElement('div');
-              userDiv.className = 'user';
-              userDiv.id = student.id;
-              userDiv.innerHTML = `
-                  <h3>${fullName}</h3>
-              `;
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user';
+                userDiv.id = student.id;
+                userDiv.innerHTML = `
+                    <h3>${fullName}</h3>
+                `;
 
-              userDiv.addEventListener('dblclick', () => {
-                  window.location.href = `/profileSchoolStudent?id=${student.id}`;
-              });
+                userDiv.addEventListener('dblclick', () => {
+                    window.location.href = `/profileSchoolStudent?id=${student.id}`;
+                });
 
-              userDiv.addEventListener('mousedown', () => {
-                  userDiv.style.backgroundColor = 'lightgray';
-              });
+                userDiv.addEventListener('mousedown', () => {
+                    userDiv.style.backgroundColor = 'lightgray';
+                });
 
-              userDiv.addEventListener('mouseup', () => {
-                  userDiv.style.backgroundColor = '';
-              });
+                userDiv.addEventListener('mouseup', () => {
+                    userDiv.style.backgroundColor = '';
+                });
 
-              userList.appendChild(userDiv);
-          });
-      })
-      .catch(error => console.error('Ошибка при получении данных:', error));
+                userList.appendChild(userDiv);
+            });
+        })
+        .catch(error => console.error('Ошибка при получении данных:', error));
     }
     updateObjectList();
 
     function updateTeacher() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
 
-      fetch(`/getTeacherOfClass?id=${id}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
-      .then(response => response.json())
-      .then(teacher => {
+        fetch(`/getTeacherOfClass?id=${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(teacher => {
             const teacherDiv = document.querySelector('.teacher-div');
             teacherDiv.innerHTML = '';
 
@@ -202,10 +214,15 @@
 
             teacherDiv.appendChild(teacherElement);
         })
-      .catch(error => console.error('Ошибка при получении данных:', error));
+        .catch(error => console.error('Ошибка при получении данных:', error));
     }
     updateTeacher();
 
+    document.getElementById('schedule-button').addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        window.location.href = `/classSchedule?id=${id}`;
+    });
 </script>
 
 </body>

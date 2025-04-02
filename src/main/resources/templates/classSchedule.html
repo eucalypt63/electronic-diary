@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/Header.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .container {
+            margin: 20px;
+        }
+        .info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            break-inside: avoid;
+            margin-bottom: 20px;
+        }
+        .info h2, .section h2 {
+            margin: 0 0 10px 0;
+        }
+        .day {
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            padding: 15px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Центрирование заголовка */
+        }
+        .lessons {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование ячеек */
+        }
+        .lesson {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 80%; /* Установка ширины ячеек */
+            min-height: 18px; /* Минимальный размер ячейки */
+            cursor: pointer; /* Изменение курсора на указатель */
+            transition: background-color 0.3s; /* Плавный переход цвета */
+        }
+        .lesson:hover {
+            background-color: #f0f0f0; /* Изменение цвета при наведении */
+        }
+        .lesson:active {
+            background-color: #e0e0e0; /* Цвет при нажатии */
+        }
+        .schedule {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+            gap: 20px; /* Промежуток между днями */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="school-name">Школа</div>
+    <button class="logout-button">Выйти</button>
+</header>
+
+<div class="profile-header">
+    <div class="profile-picture" id="profile-picture" onclick="uploadPhoto()"></div>
+    <h1 id="fullName"></h1>
+</div>
+
+<div class="container">
+    <div class="schedule">
+        <div class="day">
+            <h2>Понедельник</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+        <div class="day">
+            <h2>Вторник</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+        <div class="day">
+            <h2>Среда</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+        <div class="day">
+            <h2>Четверг</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+        <div class="day">
+            <h2>Пятница</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+        <div class="day">
+            <h2>Суббота</h2>
+            <div class="lessons">
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+                <div class="lesson"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    document.querySelector('.logout-button').addEventListener('click', function() {
+        fetch('/logout', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    });
+
+</script>
+
+</body>
+</html>

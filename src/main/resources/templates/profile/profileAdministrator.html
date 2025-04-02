@@ -15,7 +15,7 @@
 </header>
 
 <div class="profile-header">
-    <div class="profile-picture" id="profile-picture"></div>
+    <div class="profile-picture" id="profile-picture" onclick="uploadPhoto()"></div>
     <h1 id="fullName"></h1>
 </div>
 
@@ -82,6 +82,41 @@
         })
         .catch(error => console.error('Ошибка при выходе:', error));
     });
+
+    function uploadPhoto() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('id', id);
+
+                fetch('/addImageAdministrator', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка при загрузке изображения');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Фото успешно загружено', data.message);
+                    //обновить фото
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert(error.message);
+                });
+            }
+        });
+        fileInput.click();
+    }
 </script>
 
 </body>

@@ -7,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GroupResponseDTO {
     private Long id;
-    private TeacherAssignmentResponseDTO teacherAssignment;
+    private ClassResponseDTO classRoom;
     private String groupName;
 }

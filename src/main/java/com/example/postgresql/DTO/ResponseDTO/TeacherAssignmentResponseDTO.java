@@ -10,5 +10,5 @@ public class TeacherAssignmentResponseDTO {
     private Long id;
     private TeacherResponseDTO teacher;
     private SchoolSubject schoolSubject;
-    private ClassResponseDTO classRoom;
+    private GroupResponseDTO group;
 }

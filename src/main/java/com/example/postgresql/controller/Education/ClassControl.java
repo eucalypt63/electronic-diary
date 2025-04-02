@@ -4,9 +4,11 @@ import com.example.postgresql.DTO.RequestDTO.ClassRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.ClassResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
+import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.ClassService;
+import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,9 +27,11 @@ public class ClassControl {
     private TeacherService teacherService;
     @Autowired
     private ClassService classService;
-
     @Autowired
     private DTOService dtoService;
+
+    @Autowired
+    private GroupService groupService;
 
     //Получить классы по id школы
     @GetMapping("/getClasses")
@@ -74,11 +78,13 @@ public class ClassControl {
     @PostMapping("/addClass")
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassRequestDTO classRequestDTO) {
-
         Teacher teacher = teacherService.findTeacherById(classRequestDTO.getTeacherId());
         Class cl = new Class(classRequestDTO.getName(), teacher);
-
         classService.saveClass(cl);
+
+        Group group = new Group(cl, "Класс");
+        groupService.saveGroup(group);
+
         return ResponseEntity.ok("{\"message\": \"Класс успешно добавлен\"}");
     }
 

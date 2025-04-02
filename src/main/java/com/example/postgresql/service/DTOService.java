@@ -95,24 +95,25 @@ public class DTOService {
         return studentParentResponseDTO;
     }
 
+
+    public GroupResponseDTO GroupToDto(Group group)
+    {
+        GroupResponseDTO groupResponseDTO = new GroupResponseDTO();
+        groupResponseDTO.setId(group.getId());
+        groupResponseDTO.setClassRoom(ClassToDto(group.getClassRoom()));
+        groupResponseDTO.setGroupName(group.getGroupName());
+
+        return groupResponseDTO;
+    }
+
     public TeacherAssignmentResponseDTO TeacherAssignmentToDto(TeacherAssignment teacherAssignment)
     {
         TeacherAssignmentResponseDTO teacherAssignmentResponseDTO = new TeacherAssignmentResponseDTO();
         teacherAssignmentResponseDTO.setId(teacherAssignment.getId());
         teacherAssignmentResponseDTO.setTeacher(TeacherToDto(teacherAssignment.getTeacher()));
         teacherAssignmentResponseDTO.setSchoolSubject(teacherAssignment.getSchoolSubject());
-        teacherAssignmentResponseDTO.setClassRoom(ClassToDto(teacherAssignment.getClassRoom()));
+        teacherAssignmentResponseDTO.setGroup(GroupToDto(teacherAssignment.getGroup()));
 
         return teacherAssignmentResponseDTO;
-    }
-
-    public GroupResponseDTO GroupToDto(Group group)
-    {
-        GroupResponseDTO groupResponseDTO = new GroupResponseDTO();
-        groupResponseDTO.setId(group.getId());
-        groupResponseDTO.setTeacherAssignment(TeacherAssignmentToDto(group.getTeacherAssignment()));
-        groupResponseDTO.setGroupName(group.getGroupName());
-
-        return groupResponseDTO;
     }
 }

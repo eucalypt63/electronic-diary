@@ -22,10 +22,22 @@ public class GroupService {
         return groupRepository.findAll();
     }
 
+    public Group findGroupByClassRoomIdAndGroupName(Long classRoomId, String groupName) {
+        return groupRepository.findGroupByClassRoomIdAndGroupName(classRoomId, groupName);
+    }
+
+    public List<Group> findGroupByClassId(Long id) {return groupRepository.findGroupByClassRoomId(id);}
+
+    public void deleteGroupById(Long id){ groupRepository.deleteById(id);}
+
+    public void saveGroup(Group group) { groupRepository.save(group);}
+
     //___
 
     public List<GroupMember> getAllGroupMember() {
         return groupMemberRepository.findAll();
     }
+
+    public void saveGroupMember(GroupMember groupMember) { groupMemberRepository.save(groupMember);}
 
 }

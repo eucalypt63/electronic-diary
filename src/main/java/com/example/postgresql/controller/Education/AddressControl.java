@@ -24,7 +24,7 @@ public class AddressControl {
         List<Region> regions = addressService.getAllRegion();
 
         if (regions.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(regions);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
         return ResponseEntity.ok(regions);
