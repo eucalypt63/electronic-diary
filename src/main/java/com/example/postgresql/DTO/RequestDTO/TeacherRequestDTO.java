@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class TeacherRequestDTO {
+    private Long id;
     private String firstName;
     private String lastName;
     private String patronymic;

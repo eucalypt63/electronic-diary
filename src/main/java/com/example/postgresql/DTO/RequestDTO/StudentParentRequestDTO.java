@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class StudentParentRequestDTO {
-    Long schoolStudentId;
-    Long parentId;
-    Long parentTypeId;
+    private Long id;
+    private Long schoolStudentId;
+    private Long parentId;
+    private Long parentTypeId;
 }

@@ -6,7 +6,6 @@ import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
-import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class EducationalInstitutionControl {
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolById(HttpSession session) {
         Administrator administrator = (Administrator) session.getAttribute("user");
-        EducationalInstitution institution = educationalInstitutionService.getEducationalInstitutionById(administrator
+        EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrator
                 .getEducationalInstitution()
                 .getId());
         List<EducationalInstitution> institutions = new ArrayList<>();
@@ -100,7 +99,7 @@ public class EducationalInstitutionControl {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, requestEntity, String.class);
 
-            EducationalInstitution educationalInstitution = educationalInstitutionService.getEducationalInstitutionById(id);
+            EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(id);
             educationalInstitution.setPathImage(uploadUrl);
             educationalInstitutionService.saveEducationalInstitutional(educationalInstitution);
 
@@ -108,5 +107,19 @@ public class EducationalInstitutionControl {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
         }
+    }
+
+    @PostMapping("/changeEducationalInstitution")
+    @ResponseBody
+    public ResponseEntity<String> changeEducationalInstitution(@RequestBody EducationalInstitutionRequestDTO institutionDTO) {
+        EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(institutionDTO.getId());
+        educationalInstitution.setName(institutionDTO.getName());
+        educationalInstitution.setAddress(institutionDTO.getAddress());
+        educationalInstitution.setEmail(institutionDTO.getEmail());
+        educationalInstitution.setPhoneNumber(institutionDTO.getPhoneNumber());
+        educationalInstitution.setSettlement(addressService.findSettlementById(institutionDTO.getSettlementId()));
+        educationalInstitutionService.saveEducationalInstitutional(educationalInstitution);
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -26,6 +26,10 @@ public class GroupService {
         return groupRepository.findGroupByClassRoomIdAndGroupName(classRoomId, groupName);
     }
 
+    public Group findGroupById(Long id){
+        return groupRepository.findById(id).orElse(null);
+    }
+
     public List<Group> findGroupByClassId(Long id) {return groupRepository.findGroupByClassRoomId(id);}
 
     public void deleteGroupById(Long id){ groupRepository.deleteById(id);}

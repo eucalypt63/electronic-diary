@@ -263,4 +263,27 @@ public class ParentControl {
             return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
         }
     }
+
+    @PostMapping("/changeStudentParent")
+    @ResponseBody
+    public ResponseEntity<Void> changeStudentParent(@RequestBody StudentParentRequestDTO studentParentRequestDTO) {
+        StudentParent studentParent = parentService.findStudentParentById(studentParentRequestDTO.getId());
+        studentParent.setParentType(parentService.findParentTypeById(studentParentRequestDTO.getParentTypeId()));
+        parentService.saveStudentParent(studentParent);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/changeParent")
+    @ResponseBody
+    public ResponseEntity<String> changeParent(@RequestBody ParentRequestDTO parentRequestDTO){
+        Parent parent = parentService.findParentById(parentRequestDTO.getId());
+        parent.setFirstName(parentRequestDTO.getFirstName());
+        parent.setLastName(parentRequestDTO.getLastName());
+        parent.setPatronymic(parentRequestDTO.getPatronymic());
+        parent.setEmail(parentRequestDTO.getEmail());
+        parent.setPhoneNumber(parentRequestDTO.getPhoneNumber());
+
+        return ResponseEntity.ok().build();
+    }
 }

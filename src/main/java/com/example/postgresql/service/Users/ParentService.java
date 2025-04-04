@@ -52,5 +52,9 @@ public class ParentService {
         studentParentRepository.deleteById(id);
     }
 
+    public StudentParent findStudentParentById(Long id) {
+        return studentParentRepository.findById(id).orElse(null);
+    }
+
     public ParentType findParentTypeById(Long id) { return  parentTypeRepository.findById(id).orElse(null); }
 }

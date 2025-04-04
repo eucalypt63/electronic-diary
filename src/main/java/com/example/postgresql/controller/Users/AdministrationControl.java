@@ -89,7 +89,7 @@ public class AdministrationControl {
         byte[] hash = userService.hashPassword(administratorRequestDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(2L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
-                getEducationalInstitutionById(administratorRequestDTO.getUniversityId());
+                findEducationalInstitutionById(administratorRequestDTO.getUniversityId());
         User user = new User(administratorRequestDTO.getLogin(), hash, salt, userType);
 
         userService.saveUser(user);
@@ -139,5 +139,18 @@ public class AdministrationControl {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
         }
+    }
+
+    @PostMapping("/changeAdministrator")
+    @ResponseBody
+    public ResponseEntity<String> changeAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
+        Administrator administrator = administratorService.findAdministratorById(administratorRequestDTO.getId());
+        administrator.setFirstName(administratorRequestDTO.getFirstName());
+        administrator.setLastName(administratorRequestDTO.getLastName());
+        administrator.setPatronymic(administratorRequestDTO.getPatronymic());
+        administrator.setEmail(administratorRequestDTO.getEmail());
+        administrator.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
+
+        return ResponseEntity.ok().build();
     }
 }

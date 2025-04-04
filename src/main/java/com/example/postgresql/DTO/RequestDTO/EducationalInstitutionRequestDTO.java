@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class EducationalInstitutionRequestDTO {
+    private Long id;
     private String name;
     private String address;
     private String email;

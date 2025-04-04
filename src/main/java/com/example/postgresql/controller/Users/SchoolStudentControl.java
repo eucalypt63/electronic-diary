@@ -162,4 +162,17 @@ public class SchoolStudentControl {
             return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
         }
     }
+
+    @PostMapping("/changeSchoolStudent")
+    @ResponseBody
+    public ResponseEntity<String> changeSchoolStudent(@RequestBody SchoolStudentRequestDTO schoolStudentRequestDTO) {
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentRequestDTO.getId());
+        schoolStudent.setFirstName(schoolStudentRequestDTO.getFirstName());
+        schoolStudent.setLastName(schoolStudentRequestDTO.getLastName());
+        schoolStudent.setPatronymic(schoolStudentRequestDTO.getPatronymic());
+        schoolStudent.setEmail(schoolStudentRequestDTO.getEmail());
+        schoolStudent.setPhoneNumber(schoolStudentRequestDTO.getPhoneNumber());
+
+        return ResponseEntity.ok().build();
+    }
 }

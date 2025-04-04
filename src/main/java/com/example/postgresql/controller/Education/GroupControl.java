@@ -57,4 +57,12 @@ public class GroupControl {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/changeGroup")
+    @ResponseBody
+    public ResponseEntity<String> changeGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
+        Group group = groupService.findGroupById(groupRequestDTO.getId());
+        group.setGroupName(groupRequestDTO.getGroupName());
+        groupService.saveGroup(group);
+        return ResponseEntity.ok().build();
+    }
 }

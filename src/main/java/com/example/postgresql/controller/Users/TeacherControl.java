@@ -117,7 +117,7 @@ public class TeacherControl {
         byte[] hash = userService.hashPassword(teacherRequestDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(3L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
-                getEducationalInstitutionById(teacherRequestDTO.getUniversityId());
+                findEducationalInstitutionById(teacherRequestDTO.getUniversityId());
         User user = new User(teacherRequestDTO.getLogin(), hash, salt, userType);
         userService.saveUser(user);
 
@@ -166,5 +166,17 @@ public class TeacherControl {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
         }
+    }
+
+    @PostMapping("/changeTeacher")
+    @ResponseBody
+    public ResponseEntity<String> changeTeacher(@RequestBody TeacherRequestDTO teacherRequestDTO) {
+        Teacher teacher = teacherService.findTeacherById(teacherRequestDTO.getId());
+        teacher.setFirstName(teacherRequestDTO.getFirstName());
+        teacher.setLastName(teacherRequestDTO.getLastName());
+        teacher.setPatronymic(teacherRequestDTO.getPatronymic());
+        teacher.setEmail(teacherRequestDTO.getEmail());
+        teacher.setPhoneNumber(teacherRequestDTO.getPhoneNumber());
+        return ResponseEntity.ok().build();
     }
 }

@@ -20,7 +20,7 @@ public class EducationalInstitutionService {
     public List<EducationalInstitution> getAllEducationalInstitution() {
         return educationalInstitutionRepository.findAll();
     }
-    public EducationalInstitution getEducationalInstitutionById(Long id) {
+    public EducationalInstitution findEducationalInstitutionById(Long id) {
         return educationalInstitutionRepository.findById(id).orElse(null);
     }
 
