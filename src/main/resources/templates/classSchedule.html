@@ -17,6 +17,7 @@
         }
         .container {
             margin: 20px;
+            margin-top: 0px;
         }
         .info {
             background: white;
@@ -36,12 +37,12 @@
             background-color: #f7f7f7;
             border-radius: 8px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-            text-align: center; /* Центрирование заголовка */
+            text-align: center;
         }
         .lessons {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Центрирование ячеек */
+            align-items: center;
         }
         .lesson {
             background-color: #ffffff;
@@ -50,21 +51,44 @@
             border-radius: 5px;
             margin-bottom: 10px;
             text-align: center;
-            width: 80%; /* Установка ширины ячеек */
-            min-height: 18px; /* Минимальный размер ячейки */
-            cursor: pointer; /* Изменение курсора на указатель */
-            transition: background-color 0.3s; /* Плавный переход цвета */
+            width: 80%;
+            min-height: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         .lesson:hover {
-            background-color: #f0f0f0; /* Изменение цвета при наведении */
+            background-color: #f0f0f0;
         }
         .lesson:active {
-            background-color: #e0e0e0; /* Цвет при нажатии */
+            background-color: #e0e0e0;
         }
         .schedule {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
-            gap: 20px; /* Промежуток между днями */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .quarter-selector {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .quarter {
+            background: #ddd;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            padding: 10px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .quarter.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+        }
+        .quarter:hover {
+            background: #ccc;
         }
     </style>
 </head>
@@ -75,77 +99,72 @@
     <button class="logout-button">Выйти</button>
 </header>
 
-<div class="profile-header">
-    <div class="profile-picture" id="profile-picture" onclick="uploadPhoto()"></div>
-    <h1 id="fullName"></h1>
-</div>
-
 <div class="container">
     <div class="schedule">
-        <div class="day">
+        <div class="day" id="day-1">
             <h2>Понедельник</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="1-1"></div>
+                <div class="lesson" id="1-2"></div>
+                <div class="lesson" id="1-3"></div>
+                <div class="lesson" id="1-4"></div>
+                <div class="lesson" id="1-5"></div>
+                <div class="lesson" id="1-6"></div>
             </div>
         </div>
-        <div class="day">
+        <div class="day" id="day-2">
             <h2>Вторник</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="2-1"></div>
+                <div class="lesson" id="2-2"></div>
+                <div class="lesson" id="2-3"></div>
+                <div class="lesson" id="2-4"></div>
+                <div class="lesson" id="2-5"></div>
+                <div class="lesson" id="2-6"></div>
             </div>
         </div>
-        <div class="day">
+        <div class="day" id="day-3">
             <h2>Среда</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="3-1"></div>
+                <div class="lesson" id="3-2"></div>
+                <div class="lesson" id="3-3"></div>
+                <div class="lesson" id="3-4"></div>
+                <div class="lesson" id="3-5"></div>
+                <div class="lesson" id="3-6"></div>
             </div>
         </div>
-        <div class="day">
+        <div class="day" id="day-4">
             <h2>Четверг</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="4-1"></div>
+                <div class="lesson" id="4-2"></div>
+                <div class="lesson" id="4-3"></div>
+                <div class="lesson" id="4-4"></div>
+                <div class="lesson" id="4-5"></div>
+                <div class="lesson" id="4-6"></div>
             </div>
         </div>
-        <div class="day">
+        <div class="day" id="day-5">
             <h2>Пятница</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="5-1"></div>
+                <div class="lesson" id="5-2"></div>
+                <div class="lesson" id="5-3"></div>
+                <div class="lesson" id="5-4"></div>
+                <div class="lesson" id="5-5"></div>
+                <div class="lesson" id="5-6"></div>
             </div>
         </div>
-        <div class="day">
+        <div class="day" id="day-6">
             <h2>Суббота</h2>
             <div class="lessons">
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
-                <div class="lesson"></div>
+                <div class="lesson" id="6-1"></div>
+                <div class="lesson" id="6-2"></div>
+                <div class="lesson" id="6-3"></div>
+                <div class="lesson" id="6-4"></div>
+                <div class="lesson" id="6-5"></div>
+                <div class="lesson" id="6-6"></div>
             </div>
         </div>
     </div>
@@ -167,6 +186,24 @@
         })
         .catch(error => console.error('Ошибка при выходе:', error));
     });
+
+    let activeQuarter = 1;
+    const quarters = document.querySelectorAll('.quarter');
+    quarters.forEach(quarter => {
+        quarter.addEventListener('click', function() {
+            quarters.forEach(q => q.classList.remove('active'));
+            this.classList.add('active');
+            activeQuarter = this.getAttribute('data-value');
+        });
+    });
+
+    document.querySelectorAll('.lesson').forEach(lesson => {
+    lesson.addEventListener('click', function() {
+        const id = this.id;
+        const [day, lessonNumber] = id.split('-').map(Number);
+        console.log(`Day: ${day}, Lesson: ${lessonNumber}`);
+    });
+});
 
 </script>
 

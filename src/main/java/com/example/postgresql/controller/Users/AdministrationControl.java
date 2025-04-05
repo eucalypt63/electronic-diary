@@ -90,7 +90,8 @@ public class AdministrationControl {
         UserType userType = userService.findUserTypeById(2L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
                 findEducationalInstitutionById(administratorRequestDTO.getUniversityId());
-        User user = new User(administratorRequestDTO.getLogin(), hash, salt, userType);
+        User user = new User(administratorRequestDTO.getLogin(), hash, salt);
+        user.setUserType(userType);
 
         userService.saveUser(user);
 

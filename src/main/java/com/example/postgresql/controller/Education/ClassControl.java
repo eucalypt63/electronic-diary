@@ -79,10 +79,12 @@ public class ClassControl {
     @ResponseBody
     public ResponseEntity<String> addClass(@RequestBody ClassRequestDTO classRequestDTO) {
         Teacher teacher = teacherService.findTeacherById(classRequestDTO.getTeacherId());
-        Class cl = new Class(classRequestDTO.getName(), teacher);
+        Class cl = new Class(classRequestDTO.getName());
+        cl.setTeacher(teacher);
         classService.saveClass(cl);
 
-        Group group = new Group(cl, "Класс");
+        Group group = new Group("Класс");
+        group.setClassRoom(cl);
         groupService.saveGroup(group);
 
         return ResponseEntity.ok("{\"message\": \"Класс успешно добавлен\"}");

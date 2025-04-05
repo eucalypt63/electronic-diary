@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "ELD_SCHOOL_STUDENTS")
@@ -20,17 +22,19 @@ public class SchoolStudent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "sst_u_id", nullable = false, foreignKey = @ForeignKey(name = "sst_u_id"))
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "sst_u_id", foreignKey = @ForeignKey(name = "sst_u_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "sst_c_id", nullable = false, foreignKey = @ForeignKey(name = "sst_c_id"))
+    @JoinColumn(name = "sst_c_id", foreignKey = @ForeignKey(name = "sst_c_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Class classRoom;
 
     @ManyToOne
-    @JoinColumn(name = "sst_ei_id", nullable = false, foreignKey = @ForeignKey(name = "sst_ei_id"))
+    @JoinColumn(name = "sst_ei_id", foreignKey = @ForeignKey(name = "sst_ei_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)

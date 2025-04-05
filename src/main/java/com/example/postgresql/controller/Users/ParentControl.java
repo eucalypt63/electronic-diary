@@ -152,7 +152,8 @@ public class ParentControl {
         UserType userType = userService.findUserTypeById(5L);
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(parentRequestDTO.getSchoolStudentId());
         EducationalInstitution educationalInstitution = schoolStudent.getEducationalInstitution();
-        User user = new User(parentRequestDTO.getLogin(), hash, salt, userType);
+        User user = new User(parentRequestDTO.getLogin(), hash, salt);
+        user.setUserType(userType);
 
         userService.saveUser(user);
 
@@ -165,7 +166,10 @@ public class ParentControl {
         parentService.saveParent(parent);
 
         ParentType parentType = parentService.findParentTypeById(parentRequestDTO.getParentType());
-        StudentParent studentParent = new StudentParent(schoolStudent, parent, parentType);
+        StudentParent studentParent = new StudentParent();
+        studentParent.setSchoolStudent(schoolStudent);
+        studentParent.setParent(parent);
+        studentParent.setParentType(parentType);
         parentService.saveStudentParent(studentParent);
 
         return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");
@@ -179,7 +183,10 @@ public class ParentControl {
         Parent parent = parentService.findParentById(studentParentRequestDTO.getParentId());
         ParentType parentType = parentService.findParentTypeById(studentParentRequestDTO.getParentTypeId());
 
-        StudentParent studentParent = new StudentParent(schoolStudent, parent, parentType);
+        StudentParent studentParent = new StudentParent();
+        studentParent.setSchoolStudent(schoolStudent);
+        studentParent.setParent(parent);
+        studentParent.setParentType(parentType);
         parentService.saveStudentParent(studentParent);
 
         return ResponseEntity.ok("{\"message\": \"Родитель успешно добавлен\"}");

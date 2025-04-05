@@ -5,6 +5,8 @@ import javax.persistence.*;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "ELD_ADMINISTRATORS")
@@ -17,12 +19,14 @@ public class Administrator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "a_u_id", nullable = false, foreignKey = @ForeignKey(name = "a_u_id"))
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "a_u_id", foreignKey = @ForeignKey(name = "a_u_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "a_ei_id", nullable = false, foreignKey = @ForeignKey(name = "u_ei_id"))
+    @JoinColumn(name = "a_ei_id", foreignKey = @ForeignKey(name = "u_ei_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EducationalInstitution educationalInstitution;
 
     @Column(nullable = false)

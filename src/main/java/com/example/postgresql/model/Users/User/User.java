@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -29,9 +31,9 @@ public class User{
     @NonNull
     private byte[] salt;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "u_ut_id", nullable = false, foreignKey = @ForeignKey(name = "u_ut_id"))
+    @JoinColumn(name = "u_ut_id", foreignKey = @ForeignKey(name = "u_ut_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserType userType;
 
 }

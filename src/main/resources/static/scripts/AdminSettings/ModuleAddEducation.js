@@ -1,4 +1,3 @@
-// Модуль добавления школы
 document.getElementById('addSchoolButton').addEventListener('click', function() {
     if (userRole == "Main admin"){
         const modal = document.getElementById('moduleAddEducation');

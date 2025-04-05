@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "ELD_SETTLEMENTS")
@@ -20,8 +22,8 @@ public class Settlement {
     @NonNull
     private String name;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "s_r_id", nullable = false, foreignKey = @ForeignKey(name = "s_r_id"))
+    @JoinColumn(name = "s_r_id", foreignKey = @ForeignKey(name = "s_r_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Region region;
 }

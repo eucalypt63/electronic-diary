@@ -118,7 +118,8 @@ public class TeacherControl {
         UserType userType = userService.findUserTypeById(3L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
                 findEducationalInstitutionById(teacherRequestDTO.getUniversityId());
-        User user = new User(teacherRequestDTO.getLogin(), hash, salt, userType);
+        User user = new User(teacherRequestDTO.getLogin(), hash, salt);
+        user.setUserType(userType);
         userService.saveUser(user);
 
         Teacher teacher = new Teacher(teacherRequestDTO.getFirstName(), teacherRequestDTO.getLastName());

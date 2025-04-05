@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -20,11 +22,13 @@ public class ScheduleLesson {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sl_g_id", nullable = false, foreignKey = @ForeignKey(name = "sl_g_id"))
+    @JoinColumn(name = "sl_g_id", foreignKey = @ForeignKey(name = "sl_g_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Group group;
 
     @ManyToOne
-    @JoinColumn(name = "sl_ta_id", nullable = false, foreignKey = @ForeignKey(name = "sl_ta_id"))
+    @JoinColumn(name = "sl_ta_id", foreignKey = @ForeignKey(name = "sl_ta_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private TeacherAssignment teacherAssignment;
 
     @Column(nullable = false)

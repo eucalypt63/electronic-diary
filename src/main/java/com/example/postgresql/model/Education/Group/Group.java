@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "ELD_GROUPS")
@@ -20,9 +22,9 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "g_c_id", nullable = false, foreignKey = @ForeignKey(name = "g_c_id"))
+    @JoinColumn(name = "g_c_id", foreignKey = @ForeignKey(name = "g_c_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Class classRoom;
 
     @Column(nullable = false)

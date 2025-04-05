@@ -66,4 +66,6 @@ public class UserService {
 
     public List<Administrator> getAllAdministrators(){ return administratorRepository.findAll(); }
 
+    public void deleteUserById(Long id){userRepository.deleteById(id);}
+
 }

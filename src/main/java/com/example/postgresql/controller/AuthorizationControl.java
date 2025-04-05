@@ -89,7 +89,8 @@ public class AuthorizationControl {
         byte[] salt = {52, 102, 53, 103, 54, 104, 55, 106, 56, 107, 57, 108, 48, 109, 49, 110};
         byte[] hashedPassword = userService.hashPassword("koroley", salt);
 
-        User newUser = new User("admin", hashedPassword, salt, userService.findUserTypeById(1L));
+        User newUser = new User("admin", hashedPassword, salt);
+        newUser.setUserType(userService.findUserTypeById(1L));
         userService.saveUser(newUser);
 
         model.addAttribute("success", "Пользователь успешно зарегистрирован");

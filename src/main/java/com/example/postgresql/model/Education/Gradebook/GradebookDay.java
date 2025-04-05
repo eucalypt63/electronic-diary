@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,11 +23,8 @@ public class GradebookDay {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "gd_ta_id", nullable = false, foreignKey = @ForeignKey(name = "gd_ta_id"))
-    private TeacherAssignment teacherAssignment;
-
-    @ManyToOne
-    @JoinColumn(name = "gd_sl_id", nullable = false, foreignKey = @ForeignKey(name = "gd_sl_id"))
+    @JoinColumn(name = "gd_sl_id",  foreignKey = @ForeignKey(name = "gd_sl_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ScheduleLesson scheduleLesson;
 
     @Column(nullable = false)
@@ -34,8 +33,4 @@ public class GradebookDay {
 
     private String topic;
     private String homework;
-
-    @Column(nullable = false)
-    @NonNull
-    private Long quarterNumber;
 }

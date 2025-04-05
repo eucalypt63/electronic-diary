@@ -39,11 +39,15 @@ public class GroupControl {
     @PostMapping("/addGroup")
     @ResponseBody
     public ResponseEntity<String> addGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
-        Group group = new Group(classService.findClassById(groupRequestDTO.getClassRoom()), groupRequestDTO.getGroupName());
+        Group group = new Group();
+        group.setClassRoom(classService.findClassById(groupRequestDTO.getClassRoom()));
+        group.setGroupName(groupRequestDTO.getGroupName());
         groupService.saveGroup(group);
 
         groupRequestDTO.getGroupMembersId().forEach(groupMemberId -> {
-            GroupMember member = new GroupMember(group, schoolStudentService.findSchoolStudentById(groupMemberId));
+            GroupMember member = new GroupMember();
+            member.setSchoolStudent(schoolStudentService.findSchoolStudentById(groupMemberId));
+            member.setGroup(group);
             groupService.saveGroupMember(member);
         });
         

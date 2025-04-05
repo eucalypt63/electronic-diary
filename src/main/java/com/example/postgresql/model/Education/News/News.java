@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,7 +22,8 @@ public class News {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "n_u_owner_id", nullable = false, foreignKey = @ForeignKey(name = "n_u_owner_id"))
+    @JoinColumn(name = "n_u_owner_id", foreignKey = @ForeignKey(name = "n_u_owner_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User ownerUser;
 
     @Column(nullable = false)

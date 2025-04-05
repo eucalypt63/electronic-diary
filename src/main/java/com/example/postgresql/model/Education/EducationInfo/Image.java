@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -21,8 +23,8 @@ public class Image {
     @NonNull
     private String pathImages;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "i_ei_id", nullable = false, foreignKey = @ForeignKey(name = "i_ei_id"))
+    @JoinColumn(name = "i_ei_id", foreignKey = @ForeignKey(name = "i_ei_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EducationalInstitution educationalInstitution;
 }

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "ELD_CLASSES")
@@ -22,8 +24,8 @@ public class Class {
     @NonNull
     private String name;
 
-    @NonNull
     @OneToOne
-    @JoinColumn(name = "c_t_id", nullable = false, foreignKey = @ForeignKey(name = "c_t_id"))
+    @JoinColumn(name = "c_t_id", foreignKey = @ForeignKey(name = "c_t_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Teacher teacher;
 }

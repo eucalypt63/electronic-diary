@@ -90,11 +90,13 @@ public class SchoolStudentControl {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(schoolStudentRequestDTO.getPassword(), salt);
         UserType userType = userService.findUserTypeById(4L);
-        User user = new User(schoolStudentRequestDTO.getLogin(), hash, salt, userType);
+        User user = new User(schoolStudentRequestDTO.getLogin(), hash, salt);
+        user.setUserType(userType);
         userService.saveUser(user);
 
         Class cl = classService.findClassById(schoolStudentRequestDTO.getClassRoomId());
-        SchoolStudent schoolStudent = new SchoolStudent(cl, schoolStudentRequestDTO.getFirstName(), schoolStudentRequestDTO.getLastName());
+        SchoolStudent schoolStudent = new SchoolStudent(schoolStudentRequestDTO.getFirstName(), schoolStudentRequestDTO.getLastName());
+        schoolStudent.setClassRoom(cl);
         schoolStudent.setPatronymic(schoolStudentRequestDTO.getPatronymic());
         schoolStudent.setEmail(schoolStudentRequestDTO.getEmail());
         schoolStudent.setPhoneNumber(schoolStudentRequestDTO.getPhoneNumber());
@@ -102,7 +104,9 @@ public class SchoolStudentControl {
         schoolStudent.setEducationalInstitution(cl.getTeacher().getEducationalInstitution());
         schoolStudentService.saveSchoolStudent(schoolStudent);
 
-        GroupMember groupMember = new GroupMember(groupService.findGroupByClassRoomIdAndGroupName(cl.getId(), "Класс"), schoolStudent);
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroup(groupService.findGroupByClassRoomIdAndGroupName(cl.getId(), "Класс"));
+        groupMember.setSchoolStudent(schoolStudent);
         groupService.saveGroupMember(groupMember);
 
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен\"}");
@@ -129,7 +133,7 @@ public class SchoolStudentControl {
 
     //Удалить ученика
     @DeleteMapping("/deleteSchoolStudent")
-    public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id) {
+    public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id){
         schoolStudentService.deleteSchoolStudentById(id);
         return ResponseEntity.ok().build();
     }

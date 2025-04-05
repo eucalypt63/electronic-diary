@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -20,11 +22,13 @@ public class QuarterScore {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "qs_ss_id", nullable = false, foreignKey = @ForeignKey(name = "qs_ss_id"))
+    @JoinColumn(name = "qs_ss_id", foreignKey = @ForeignKey(name = "qs_ss_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private SchoolSubject schoolSubject;
 
     @ManyToOne
-    @JoinColumn(name = "qs_sst_id", nullable = false, foreignKey = @ForeignKey(name = "qs_sst_id"))
+    @JoinColumn(name = "qs_sst_id", foreignKey = @ForeignKey(name = "qs_sst_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private SchoolStudent schoolStudent;
 
     @Column(nullable = false)
