@@ -96,4 +96,16 @@ public class ClassControl {
         classService.deleteClassById(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/changeClass")
+    @ResponseBody
+    public ResponseEntity<String> changeClass(@RequestBody ClassRequestDTO classRequestDTO) {
+        Class cl = classService.findClassById(classRequestDTO.getId());
+        cl.setName(classRequestDTO.getName());
+        cl.setTeacher(teacherService.findTeacherById(classRequestDTO.getTeacherId()));
+        classService.saveClass(cl);
+
+        return ResponseEntity.ok("{\"message\": \"Класс успешно обновлён\"}");
+
+    }
 }

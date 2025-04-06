@@ -177,6 +177,18 @@ public class SchoolStudentControl {
         schoolStudent.setEmail(schoolStudentRequestDTO.getEmail());
         schoolStudent.setPhoneNumber(schoolStudentRequestDTO.getPhoneNumber());
 
+        if (schoolStudentRequestDTO.getLogin() != null) {
+            schoolStudent.getUser().setLogin(schoolStudentRequestDTO.getLogin());
+        }
+        if (schoolStudentRequestDTO.getPassword() != null){
+            byte[] salt = userService.generateSalt();
+            byte[] hash = userService.hashPassword(schoolStudentRequestDTO.getPassword(), salt);
+            schoolStudent.getUser().setHash(hash);
+            schoolStudent.getUser().setSalt(salt);
+        }
+
+        schoolStudentService.saveSchoolStudent(schoolStudent);
+
         return ResponseEntity.ok().build();
     }
 }

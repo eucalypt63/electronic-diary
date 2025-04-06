@@ -178,6 +178,19 @@ public class TeacherControl {
         teacher.setPatronymic(teacherRequestDTO.getPatronymic());
         teacher.setEmail(teacherRequestDTO.getEmail());
         teacher.setPhoneNumber(teacherRequestDTO.getPhoneNumber());
+
+        if (teacherRequestDTO.getLogin() != null) {
+            teacher.getUser().setLogin(teacherRequestDTO.getLogin());
+        }
+        if (teacherRequestDTO.getPassword() != null){
+            byte[] salt = userService.generateSalt();
+            byte[] hash = userService.hashPassword(teacherRequestDTO.getPassword(), salt);
+            teacher.getUser().setHash(hash);
+            teacher.getUser().setSalt(salt);
+        }
+
+        teacherService.saveTeacher(teacher);
+
         return ResponseEntity.ok().build();
     }
 }

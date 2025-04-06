@@ -291,6 +291,18 @@ public class ParentControl {
         parent.setEmail(parentRequestDTO.getEmail());
         parent.setPhoneNumber(parentRequestDTO.getPhoneNumber());
 
+        if (parentRequestDTO.getLogin() != null) {
+            parent.getUser().setLogin(parentRequestDTO.getLogin());
+        }
+        if (parentRequestDTO.getPassword() != null){
+            byte[] salt = userService.generateSalt();
+            byte[] hash = userService.hashPassword(parentRequestDTO.getPassword(), salt);
+            parent.getUser().setHash(hash);
+            parent.getUser().setSalt(salt);
+        }
+
+        parentService.saveParent(parent);
+
         return ResponseEntity.ok().build();
     }
 }

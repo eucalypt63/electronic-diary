@@ -152,6 +152,18 @@ public class AdministrationControl {
         administrator.setEmail(administratorRequestDTO.getEmail());
         administrator.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
 
+        if (administratorRequestDTO.getLogin() != null) {
+            administrator.getUser().setLogin(administratorRequestDTO.getLogin());
+        }
+        if (administratorRequestDTO.getPassword() != null){
+            byte[] salt = userService.generateSalt();
+            byte[] hash = userService.hashPassword(administratorRequestDTO.getPassword(), salt);
+            administrator.getUser().setHash(hash);
+            administrator.getUser().setSalt(salt);
+        }
+
+        administratorService.saveAdministrator(administrator);
+
         return ResponseEntity.ok().build();
     }
 }
