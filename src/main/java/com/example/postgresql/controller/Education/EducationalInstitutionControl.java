@@ -8,6 +8,7 @@ import com.example.postgresql.model.Education.EducationInfo.EducationalInstituti
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
+import com.example.postgresql.service.Users.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,8 @@ public class EducationalInstitutionControl {
 
     @Autowired
     private AddressService addressService;
+    @Autowired
+    private AdministratorService administratorService;
 
     //Получить все школы
     @GetMapping("/getSchools")
@@ -44,16 +47,24 @@ public class EducationalInstitutionControl {
     }
 
     //Получить школу текущего пользователя
-    @GetMapping("/getSchoolById")
+    @GetMapping("/getSchoolByAuthorizationAdminId")
     @ResponseBody
-    public ResponseEntity<List<EducationalInstitution>> getSchoolById(HttpSession session) {
-        Administrator administrator = (Administrator) session.getAttribute("user");
+    public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        Administrator administrator = administratorService.findAdministratorById(userId);
         EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrator
                 .getEducationalInstitution()
                 .getId());
         List<EducationalInstitution> institutions = new ArrayList<>();
         institutions.add(institution);
         return ResponseEntity.ok(institutions);
+    }
+
+    @GetMapping("/findSchoolById")
+    @ResponseBody
+    public ResponseEntity<EducationalInstitution> findSchoolById(Long id){
+        EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(id);
+        return  ResponseEntity.ok(educationalInstitution);
     }
 
     //Добавить школу

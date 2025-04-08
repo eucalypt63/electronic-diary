@@ -25,9 +25,6 @@ public class UserService {
     @Autowired
     private UserTypeRepository userTypeRepository;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
-
     public boolean authenticate(User user, String password) {
         byte[] hashedPassword = hashPassword(password, user.getSalt());
         return Arrays.equals(Arrays.toString(hashedPassword).toCharArray(), Arrays.toString(user.getHash()).toCharArray());
@@ -63,8 +60,6 @@ public class UserService {
         return userTypeRepository.findById(id).orElse(null);
     }
 
-
-    public List<Administrator> getAllAdministrators(){ return administratorRepository.findAll(); }
 
     public void deleteUserById(Long id){userRepository.deleteById(id);}
 

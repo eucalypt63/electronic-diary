@@ -22,6 +22,9 @@ public class SchoolStudentService {
     public SchoolStudent findSchoolStudentById(Long id) {
         return schoolStudentRepository.findById(id).orElse(null);
     }
+    public SchoolStudent findSchoolStudentByUserId(Long id) {
+        return schoolStudentRepository.findSchoolStudentByUserId(id);
+    }
     public void deleteSchoolStudentById(Long id) {
         schoolStudentRepository.deleteById(id);
     }

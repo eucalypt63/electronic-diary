@@ -24,7 +24,7 @@ function updateSchoolList() {
                     administratorModule.remove();
                 }
             }
-            const endpoint = (role === "Main admin") ? '/getSchools' : '/getSchoolById';
+            const endpoint = (role === "Main admin") ? '/getSchools' : '/getSchoolByAuthorizationAdminId';
             return fetch(endpoint);
         })
         .then(response => {

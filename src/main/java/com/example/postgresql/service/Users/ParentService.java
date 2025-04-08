@@ -26,9 +26,9 @@ public class ParentService {
     @Autowired
     private StudentParentRepository studentParentRepository;
 
-    public List<Parent> getAllParents() { return parentRepository.findAll(); }
     public List<Parent> findParentsByEducationId(Long id) { return parentRepository.findParentByEducationalInstitutionId(id); }
     public Parent findParentById(Long id) { return  parentRepository.findById(id).orElse(null); }
+    public Parent findParentByUserId(Long id) { return  parentRepository.findParentByUserId(id); }
     public void saveParent(Parent parent) {
         parentRepository.save(parent);
     }

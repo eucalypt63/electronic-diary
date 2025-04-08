@@ -90,6 +90,9 @@
         .quarter:hover {
             background: #ccc;
         }
+        .quarter.active:hover {
+            background: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -98,73 +101,78 @@
     <div class="school-name">Школа</div>
     <button class="logout-button">Выйти</button>
 </header>
-
+<div class="quarter-selector">
+    <div class="quarter active" data-value="1">1</div>
+    <div class="quarter" data-value="2">2</div>
+    <div class="quarter" data-value="3">3</div>
+    <div class="quarter" data-value="4">4</div>
+</div>
 <div class="container">
     <div class="schedule">
         <div class="day" id="day-1">
             <h2>Понедельник</h2>
             <div class="lessons">
-                <div class="lesson" id="1-1"></div>
-                <div class="lesson" id="1-2"></div>
-                <div class="lesson" id="1-3"></div>
-                <div class="lesson" id="1-4"></div>
-                <div class="lesson" id="1-5"></div>
-                <div class="lesson" id="1-6"></div>
+                <div class="lesson free" id="1-1"></div>
+                <div class="lesson free" id="1-2"></div>
+                <div class="lesson free" id="1-3"></div>
+                <div class="lesson free" id="1-4"></div>
+                <div class="lesson free" id="1-5"></div>
+                <div class="lesson free" id="1-6"></div>
             </div>
         </div>
         <div class="day" id="day-2">
             <h2>Вторник</h2>
             <div class="lessons">
-                <div class="lesson" id="2-1"></div>
-                <div class="lesson" id="2-2"></div>
-                <div class="lesson" id="2-3"></div>
-                <div class="lesson" id="2-4"></div>
-                <div class="lesson" id="2-5"></div>
-                <div class="lesson" id="2-6"></div>
+                <div class="lesson free" id="2-1"></div>
+                <div class="lesson free" id="2-2"></div>
+                <div class="lesson free" id="2-3"></div>
+                <div class="lesson free" id="2-4"></div>
+                <div class="lesson free" id="2-5"></div>
+                <div class="lesson free" id="2-6"></div>
             </div>
         </div>
         <div class="day" id="day-3">
             <h2>Среда</h2>
             <div class="lessons">
-                <div class="lesson" id="3-1"></div>
-                <div class="lesson" id="3-2"></div>
-                <div class="lesson" id="3-3"></div>
-                <div class="lesson" id="3-4"></div>
-                <div class="lesson" id="3-5"></div>
-                <div class="lesson" id="3-6"></div>
+                <div class="lesson free" id="3-1"></div>
+                <div class="lesson free" id="3-2"></div>
+                <div class="lesson free" id="3-3"></div>
+                <div class="lesson free" id="3-4"></div>
+                <div class="lesson free" id="3-5"></div>
+                <div class="lesson free" id="3-6"></div>
             </div>
         </div>
         <div class="day" id="day-4">
             <h2>Четверг</h2>
             <div class="lessons">
-                <div class="lesson" id="4-1"></div>
-                <div class="lesson" id="4-2"></div>
-                <div class="lesson" id="4-3"></div>
-                <div class="lesson" id="4-4"></div>
-                <div class="lesson" id="4-5"></div>
-                <div class="lesson" id="4-6"></div>
+                <div class="lesson free" id="4-1"></div>
+                <div class="lesson free" id="4-2"></div>
+                <div class="lesson free" id="4-3"></div>
+                <div class="lesson free" id="4-4"></div>
+                <div class="lesson free" id="4-5"></div>
+                <div class="lesson free" id="4-6"></div>
             </div>
         </div>
         <div class="day" id="day-5">
             <h2>Пятница</h2>
             <div class="lessons">
-                <div class="lesson" id="5-1"></div>
-                <div class="lesson" id="5-2"></div>
-                <div class="lesson" id="5-3"></div>
-                <div class="lesson" id="5-4"></div>
-                <div class="lesson" id="5-5"></div>
-                <div class="lesson" id="5-6"></div>
+                <div class="lesson free" id="5-1"></div>
+                <div class="lesson free" id="5-2"></div>
+                <div class="lesson free" id="5-3"></div>
+                <div class="lesson free" id="5-4"></div>
+                <div class="lesson free" id="5-5"></div>
+                <div class="lesson free" id="5-6"></div>
             </div>
         </div>
         <div class="day" id="day-6">
             <h2>Суббота</h2>
             <div class="lessons">
-                <div class="lesson" id="6-1"></div>
-                <div class="lesson" id="6-2"></div>
-                <div class="lesson" id="6-3"></div>
-                <div class="lesson" id="6-4"></div>
-                <div class="lesson" id="6-5"></div>
-                <div class="lesson" id="6-6"></div>
+                <div class="lesson free" id="6-1"></div>
+                <div class="lesson free" id="6-2"></div>
+                <div class="lesson free" id="6-3"></div>
+                <div class="lesson free" id="6-4"></div>
+                <div class="lesson free" id="6-5"></div>
+                <div class="lesson free" id="6-6"></div>
             </div>
         </div>
     </div>
@@ -194,16 +202,73 @@
             quarters.forEach(q => q.classList.remove('active'));
             this.classList.add('active');
             activeQuarter = this.getAttribute('data-value');
+            fetchLessons();
         });
     });
 
+    function fetchLessons() {
+        fetch(`/findLessonsByClassId?id=${id}&quarter=${activeQuarter}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const entries = Object.entries(data);
+            entries.sort((a, b) => a[0] - b[0]);
+
+            const allLessons = document.querySelectorAll('.lesson');
+            allLessons.forEach(lessonDiv => {
+                if (!lessonDiv.classList.contains('free')) {
+                    lessonDiv.innerHTML = '';
+                    lessonDiv.classList.remove('occupied');
+                    lessonDiv.classList.add('free');
+                }
+            });
+
+            for (const [groupId, lessons] of entries) {
+                lessons.forEach(lesson => {
+                    const dayNumber = lesson.dayNumber;
+                    const lessonNumber = lesson.lessonNumber;
+
+                    const subjectName = lesson.teacherAssignment.schoolSubject.name;
+
+                    const lessonDiv = document.getElementById(`${dayNumber}-${lessonNumber}`);
+                    if (lessonDiv) {
+                        if (lessonDiv.classList.contains('free')){
+                            lessonDiv.classList.remove('free');
+                            lessonDiv.classList.add('occupied');
+                        }
+
+                        lessonDiv.innerHTML += `${subjectName} (lesson.group.groupName)<br>`;
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+    }
+    fetchLessons();
+
     document.querySelectorAll('.lesson').forEach(lesson => {
-    lesson.addEventListener('click', function() {
-        const id = this.id;
-        const [day, lessonNumber] = id.split('-').map(Number);
-        console.log(`Day: ${day}, Lesson: ${lessonNumber}`);
+        lesson.addEventListener('click', function() {
+            const id = this.id;
+            const [day, lessonNumber] = id.split('-').map(Number);
+
+            if (this.classList.contains('free')) {
+
+            } else if (this.classList.contains('occupied')) {
+
+            }
+        });
     });
-});
 
 </script>
 

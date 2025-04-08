@@ -2,6 +2,7 @@ package com.example.postgresql.service;
 
 import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.model.Class;
+import com.example.postgresql.model.Education.Gradebook.ScheduleLesson;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Education.Group.Group;
@@ -115,5 +116,18 @@ public class DTOService {
         teacherAssignmentResponseDTO.setGroup(GroupToDto(teacherAssignment.getGroup()));
 
         return teacherAssignmentResponseDTO;
+    }
+
+    public ScheduleLessonResponseDTO ScheduleLessonToDto (ScheduleLesson scheduleLesson)
+    {
+        ScheduleLessonResponseDTO scheduleLessonResponseDTO = new ScheduleLessonResponseDTO();
+        scheduleLessonResponseDTO.setId(scheduleLesson.getId());
+        scheduleLessonResponseDTO.setGroup(GroupToDto(scheduleLesson.getGroup()));
+        scheduleLessonResponseDTO.setTeacherAssignment(TeacherAssignmentToDto(scheduleLesson.getTeacherAssignment()));
+        scheduleLessonResponseDTO.setQuarterNumber(scheduleLesson.getQuarterNumber());
+        scheduleLessonResponseDTO.setDayNumber(scheduleLesson.getDayNumber());
+        scheduleLessonResponseDTO.setLessonNumber(scheduleLesson.getLessonNumber());
+
+        return scheduleLessonResponseDTO;
     }
 }

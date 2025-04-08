@@ -1,8 +1,10 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.GroupRequestDTO;
+import com.example.postgresql.DTO.ResponseDTO.GroupResponseDTO;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
+import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.ClassService;
 import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Users.SchoolStudentService;
@@ -23,17 +25,24 @@ public class GroupControl {
     private SchoolStudentService schoolStudentService;
     @Autowired
     private ClassService classService;
+    @Autowired
+    private DTOService dtoService;
 
     @GetMapping("/findGroupsByClassId")
     @ResponseBody
-    public ResponseEntity<List<Group>> findGroupsByClassId (Long id){
+    public ResponseEntity<List<GroupResponseDTO>> findGroupsByClassId (Long id){
         List<Group> groups = groupService.findGroupByClassId(id);
 
         if (groups.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        return ResponseEntity.ok(groups);
+        List<GroupResponseDTO> groupResponseDTOS = new ArrayList<>();
+        for (Group group : groups) {
+            groupResponseDTOS.add(dtoService.GroupToDto(group));
+        }
+
+        return ResponseEntity.ok(groupResponseDTOS);
     }
 
     @PostMapping("/addGroup")

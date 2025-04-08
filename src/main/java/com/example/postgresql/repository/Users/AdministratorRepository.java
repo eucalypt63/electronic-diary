@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AdministratorRepository extends JpaRepository<Administrator, Long> {
     List<Administrator> findAdministratorByEducationalInstitutionId(Long educationalInstitutionId);
+    Administrator findAdministratorByUserId(Long userId);
 }

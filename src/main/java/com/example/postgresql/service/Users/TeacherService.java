@@ -17,12 +17,11 @@ public class TeacherService {
     private TeacherRepository teacherRepository;
 
 
-    public List<Teacher> getAllTeacher() {
-        return teacherRepository.findAll();
-    }
-
     public Teacher findTeacherById(Long id) {
         return teacherRepository.findById(id).orElse(null);
+    }
+    public Teacher findTeacherByUserId(Long id) {
+        return teacherRepository.findTeacherByUserId(id);
     }
 
     public void saveTeacher(Teacher teacher) {

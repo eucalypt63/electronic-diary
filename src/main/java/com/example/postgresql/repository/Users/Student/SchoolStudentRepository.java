@@ -10,5 +10,5 @@ import java.util.List;
 public interface SchoolStudentRepository extends JpaRepository<SchoolStudent, Long> {
     List<SchoolStudent> findByClassRoomId(Long classRoomId);
     List<SchoolStudent> findSchoolStudentByEducationalInstitutionId(Long educationalInstitutionId);
-    List<SchoolStudent> findByFirstName(String name);
+    SchoolStudent findSchoolStudentByUserId(Long id);
 }
