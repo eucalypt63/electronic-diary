@@ -1,7 +1,9 @@
 package com.example.postgresql.service.Users;
 
+import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Teacher;
+import com.example.postgresql.repository.TeacherAssignmentRepository;
 import com.example.postgresql.repository.Users.AdministratorRepository;
 import com.example.postgresql.repository.Users.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ public class TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
+    @Autowired
+    private TeacherAssignmentRepository teacherAssignmentRepository;
 
 
     public Teacher findTeacherById(Long id) {
@@ -23,15 +27,12 @@ public class TeacherService {
     public Teacher findTeacherByUserId(Long id) {
         return teacherRepository.findTeacherByUserId(id);
     }
-
     public void saveTeacher(Teacher teacher) {
         teacherRepository.save(teacher);
     }
-
     public void deleteTeacherById(Long id) {
         teacherRepository.deleteById(id);
     }
-
     public List<Teacher> findTeacherByEducationalInstitutionId(Long schoolId) {
         return teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
     }
@@ -40,5 +41,16 @@ public class TeacherService {
         return teachers.stream()
                 .filter(teacher -> !assignedTeacherIds.contains(teacher.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public TeacherAssignment findTeacherAssignmentByGroupIdAndSchoolSubjectIdAndTeacherId(
+            Long groupId,
+            Long schoolSubjectId,
+            Long teacherId){
+        return teacherAssignmentRepository.findTeacherAssignmentByGroupIdAndSchoolSubjectIdAndTeacherId(groupId, schoolSubjectId, teacherId);
+    }
+
+    public void saveTeacherAssignment(TeacherAssignment teacherAssignment) {
+        teacherAssignmentRepository.save(teacherAssignment);
     }
 }

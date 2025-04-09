@@ -93,6 +93,70 @@
         .quarter.active:hover {
             background: #4CAF50;
         }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .modal-select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-button.cancel {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .modal-button.save {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .modal-button:hover {
+            opacity: 0.9;
+        }
+
     </style>
 </head>
 <body>
@@ -177,7 +241,25 @@
         </div>
     </div>
 </div>
+<div class="modal" id="addLessonModal" style="display: none;">
+    <div class="modal-content">
+        <h2>Добавить урок</h2>
 
+        <label for="group-select">Группа:</label>
+        <select id="group-select" class="modal-select"></select>
+
+        <label for="subject-select">Предмет:</label>
+        <select id="subject-select" class="modal-select"></select>
+
+        <label for="teacher-select">Учитель:</label>
+        <select id="teacher-select" class="modal-select"></select>
+
+        <div class="modal-buttons">
+            <button class="modal-button cancel">Отменить</button>
+            <button class="modal-button save">Добавить</button>
+        </div>
+    </div>
+</div>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -246,7 +328,7 @@
                             lessonDiv.classList.add('occupied');
                         }
 
-                        lessonDiv.innerHTML += `${subjectName} (lesson.group.groupName)<br>`;
+                        lessonDiv.innerHTML += `${subjectName} (${lesson.group.groupName})<br>`;
                     }
                 });
             }
@@ -259,13 +341,95 @@
 
     document.querySelectorAll('.lesson').forEach(lesson => {
         lesson.addEventListener('click', function() {
-            const id = this.id;
-            const [day, lessonNumber] = id.split('-').map(Number);
+            const lessonId = this.id;
+            const [day, lessonNumber] = lessonId.split('-').map(Number);
 
             if (this.classList.contains('free')) {
+                const modal = document.getElementById('addLessonModal');
 
+                fetch(`/getLessonAddParams?id=${id}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const groupSelect = document.getElementById('group-select');
+                        const subjectSelect = document.getElementById('subject-select');
+                        const teacherSelect = document.getElementById('teacher-select');
+
+                        groupSelect.innerHTML = '';
+                        subjectSelect.innerHTML = '';
+                        teacherSelect.innerHTML = '';
+
+                        // Заполняем группы
+                        data.groups.forEach(group => {
+                            const option = document.createElement('option');
+                            option.value = group.id;
+                            option.textContent = group.groupName;
+                            groupSelect.appendChild(option);
+                        });
+
+                        // Заполняем предметы
+                        data.schoolSubjects.forEach(subject => {
+                            const option = document.createElement('option');
+                            option.value = subject.id;
+                            option.textContent = subject.name;
+                            subjectSelect.appendChild(option);
+                        });
+
+                        // Заполняем учителей
+                        data.teachers.forEach(teacher => {
+                            const option = document.createElement('option');
+                            option.value = teacher.id;
+                            option.textContent = `${teacher.lastName} ${teacher.firstName} ${teacher.patronymic ?? ''}`;
+                            teacherSelect.appendChild(option);
+                        });
+
+                        modal.style.display = 'flex';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching lesson params:', error);
+                        alert('Ошибка при загрузке параметров урока');
+                    });
+
+                document.querySelector('.modal-button.cancel').onclick = () => {
+                    modal.style.display = 'none';
+                };
+
+                document.querySelector('.modal-button.save').onclick = () => {
+                    const groupId = document.getElementById('group-select').value;
+                    const subjectId = document.getElementById('subject-select').value;
+                    const teacherId = document.getElementById('teacher-select').value;
+
+                    fetch('/addLesson', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            dayNumber: day,
+                            lessonNumber: lessonNumber,
+                            quarter: activeQuarter,
+                            groupId: groupId,
+                            subjectId: subjectId,
+                            teacherId: teacherId
+                        }),
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            modal.style.display = 'none';
+                            fetchLessons();
+                        } else {
+                            alert('Ошибка при сохранении урока');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ошибка при сохранении урока');
+                    });
+                };
             } else if (this.classList.contains('occupied')) {
-
+                //Запрос на получение уроков
             }
         });
     });

@@ -98,8 +98,7 @@ public class TeacherControl {
 
         List<TeacherResponseDTO> teacherResponseDTOS = new ArrayList<>();
         for (Teacher teacher : teachers) {
-            TeacherResponseDTO teacherResponseDTO = dtoService.TeacherToDto(teacher);
-            teacherResponseDTOS.add(teacherResponseDTO);
+            teacherResponseDTOS.add(dtoService.TeacherToDto(teacher));
         }
 
         if (teacherResponseDTOS.isEmpty()) {
