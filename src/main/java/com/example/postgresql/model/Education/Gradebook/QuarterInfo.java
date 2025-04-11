@@ -10,32 +10,27 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ELD_QUARTER_SCORES")
+@Table(name = "ELD_QUARTER_INFO")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class QuarterScore {
+public class QuarterInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "qs_ss_id", foreignKey = @ForeignKey(name = "qs_ss_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private SchoolSubject schoolSubject;
-
-    @ManyToOne
-    @JoinColumn(name = "qs_sst_id", foreignKey = @ForeignKey(name = "qs_sst_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private SchoolStudent schoolStudent;
-
-    @OneToOne
-    @JoinColumn(name = "qs_qi_id", foreignKey = @ForeignKey(name = "qs_qi_id"))
-    private QuarterInfo quarterInfo;
+    @Column(nullable = false)
+    @NonNull
+    private Long quarterNumber;
 
     @Column(nullable = false)
     @NonNull
-    private Long score;
+    private LocalDateTime dateStartTime;
+
+    @Column(nullable = false)
+    @NonNull
+    private LocalDateTime dateEndTime;
 }

@@ -2,6 +2,7 @@ package com.example.postgresql.model;
 
 import javax.persistence.*;
 
+import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Teacher;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.List;
 
 @Entity
 @Table(name = "ELD_CLASSES")
@@ -28,4 +31,5 @@ public class Class {
     @JoinColumn(name = "c_t_id", foreignKey = @ForeignKey(name = "c_t_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Teacher teacher;
+
 }

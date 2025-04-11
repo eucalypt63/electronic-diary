@@ -78,4 +78,11 @@ public class GroupControl {
         groupService.saveGroup(group);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/GAll")
+    @ResponseBody
+    public  ResponseEntity<List<Group>> GAll(){
+        List<Group> groups = groupService.getAllGroup();
+        return ResponseEntity.ok(groups);
+    }
 }

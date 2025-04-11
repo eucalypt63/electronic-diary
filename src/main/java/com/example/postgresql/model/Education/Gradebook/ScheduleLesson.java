@@ -31,9 +31,9 @@ public class ScheduleLesson {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TeacherAssignment teacherAssignment;
 
-    @Column(nullable = false)
-    @NonNull
-    private Long quarterNumber;
+    @OneToOne
+    @JoinColumn(name = "sl_qi_id", foreignKey = @ForeignKey(name = "sl_qi_id"))
+    private QuarterInfo quarterInfo;
 
     @Column(nullable = false)
     @NonNull

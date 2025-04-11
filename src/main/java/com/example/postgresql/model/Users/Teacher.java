@@ -2,6 +2,7 @@ package com.example.postgresql.model.Users;
 
 import javax.persistence.*;
 
+import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "t_u_id", foreignKey = @ForeignKey(name = "t_u_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
@@ -43,4 +44,5 @@ public class Teacher {
     private String pathImage;
     private String email;
     private String phoneNumber;
+
 }

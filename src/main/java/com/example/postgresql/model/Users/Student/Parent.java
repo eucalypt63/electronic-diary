@@ -21,7 +21,7 @@ public class Parent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "p_u_id", foreignKey = @ForeignKey(name = "p_u_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;

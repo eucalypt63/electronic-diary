@@ -22,7 +22,7 @@ public class SchoolStudent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sst_u_id", foreignKey = @ForeignKey(name = "sst_u_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;

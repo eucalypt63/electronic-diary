@@ -5,6 +5,7 @@ import com.example.postgresql.DTO.RequestDTO.ScheduleLessonRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
+import com.example.postgresql.model.Education.Gradebook.QuarterInfo;
 import com.example.postgresql.model.Education.Gradebook.ScheduleLesson;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.SchoolSubject;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +63,7 @@ public class ScheduleControl {
         return ResponseEntity.ok(scheduleMap);
     }
 
+    //Добавить даты для журнала
     @GetMapping("getLessonAddParams")
     @ResponseBody
     public ResponseEntity<LessonParamsResponseDTO> getLessonAddParams(Long id){
@@ -112,16 +115,17 @@ public class ScheduleControl {
 
                 scheduleLesson.setTeacherAssignment(newTeacherAssignment);
             }
-            scheduleLesson.setGroup(groupService.findGroupById(schLesReqDTO.getGroupId()));
 
-            scheduleLesson.setQuarterNumber(schLesReqDTO.getQuarter());
+            scheduleLesson.setGroup(groupService.findGroupById(schLesReqDTO.getGroupId()));
+            scheduleLesson.setQuarterInfo(scheduleService.findQuarterInfoByQuarterNumber(schLesReqDTO.getQuarter()));
             scheduleLesson.setDayNumber(schLesReqDTO.getDayNumber());
             scheduleLesson.setLessonNumber(schLesReqDTO.getLessonNumber());
 
             scheduleService.saveScheduleLesson(scheduleLesson);
+
+            //Добавить GradebookDay
+
             return ResponseEntity.ok("{\"message\": \"Урок успешно добавлен\"}");
         } else {return ResponseEntity.status(500).body("{\"message\": \"Время занято для учителя \"}");}
-
-
     }
 }

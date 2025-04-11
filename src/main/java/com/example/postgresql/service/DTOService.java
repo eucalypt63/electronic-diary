@@ -124,7 +124,7 @@ public class DTOService {
         scheduleLessonResponseDTO.setId(scheduleLesson.getId());
         scheduleLessonResponseDTO.setGroup(GroupToDto(scheduleLesson.getGroup()));
         scheduleLessonResponseDTO.setTeacherAssignment(TeacherAssignmentToDto(scheduleLesson.getTeacherAssignment()));
-        scheduleLessonResponseDTO.setQuarterNumber(scheduleLesson.getQuarterNumber());
+        scheduleLessonResponseDTO.setQuarterInfo(scheduleLesson.getQuarterInfo());
         scheduleLessonResponseDTO.setDayNumber(scheduleLesson.getDayNumber());
         scheduleLessonResponseDTO.setLessonNumber(scheduleLesson.getLessonNumber());
 

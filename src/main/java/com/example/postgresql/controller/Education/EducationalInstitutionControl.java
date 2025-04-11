@@ -60,6 +60,7 @@ public class EducationalInstitutionControl {
         return ResponseEntity.ok(institutions);
     }
 
+    //Найти школу по id
     @GetMapping("/findSchoolById")
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolById(Long id){

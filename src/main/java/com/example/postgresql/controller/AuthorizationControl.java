@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 public class AuthorizationControl {
@@ -126,5 +125,12 @@ public class AuthorizationControl {
 
         model.addAttribute("success", "Пользователь успешно зарегистрирован");
         return "login";
+    }
+
+    @GetMapping("/UAll")
+    @ResponseBody
+    public  ResponseEntity<List<User>> GAll(){
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 }

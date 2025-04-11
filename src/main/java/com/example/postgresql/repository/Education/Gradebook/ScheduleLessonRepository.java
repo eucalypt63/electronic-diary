@@ -8,8 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ScheduleLessonRepository extends JpaRepository<ScheduleLesson, Long> {
-    List<ScheduleLesson> findScheduleLessonByGroupIdAndQuarterNumber(Long groupId, Long quarterNumber);
-    ScheduleLesson findScheduleLessonByQuarterNumberAndDayNumberAndLessonNumberAndTeacherAssignment_Teacher_Id(
+    List<ScheduleLesson> findByGroupIdAndQuarterInfo_QuarterNumber(Long groupId, Long quarterNumber);
+    ScheduleLesson findScheduleLessonByQuarterInfo_QuarterNumberAndDayNumberAndLessonNumberAndTeacherAssignment_Teacher_Id(
             Long quarterNumber,
             Long dayNumber,
             Long lessonNumber,
