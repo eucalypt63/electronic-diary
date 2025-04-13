@@ -33,6 +33,7 @@ public class ScheduleService {
     public SchoolSubject findSchoolSubjectById(Long id){
         return schoolSubjectRepository.findById(id).orElse(null);
     }
+    public ScheduleLesson findScheduleLessonById(Long id) {return scheduleLessonRepository.findById(id).orElse(null);}
 
     public List<SchoolSubject> getAllSchoolSubject(){
         return schoolSubjectRepository.findAll();
@@ -40,6 +41,9 @@ public class ScheduleService {
 
     public void saveScheduleLesson (ScheduleLesson scheduleLesson){
         scheduleLessonRepository.save(scheduleLesson);
+    }
+    public void deleteScheduleLesson (Long id){
+        scheduleLessonRepository.deleteById(id);
     }
 
     public QuarterInfo findQuarterInfoByQuarterNumber(Long id){

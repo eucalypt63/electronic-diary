@@ -154,4 +154,34 @@ public class ScheduleControl {
 
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping("/deleteLesson")
+    public ResponseEntity<String> deleteLesson(@RequestParam Long id) {
+        scheduleService.deleteScheduleLesson(id);
+        return ResponseEntity.ok("{\"message\": \"Урок успешно удалён\"}");
+    }
+
+    @PutMapping("/updateLesson")
+    public ResponseEntity<String> updateLesson(@RequestBody ScheduleLessonRequestDTO requestDTO) {
+        ScheduleLesson scheduleLesson = scheduleService.findScheduleLessonById(requestDTO.getLessonNumber());
+        scheduleLesson.setGroup(groupService.findGroupById(requestDTO.getGroupId()));
+
+        TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentByGroupIdAndSchoolSubjectIdAndTeacherId(requestDTO.getGroupId(),
+                                                                                    requestDTO.getSubjectId(),
+                                                                                    requestDTO.getTeacherId());
+        if (teacherAssignment != null){
+            scheduleLesson.setTeacherAssignment(teacherAssignment);
+        }
+        else {
+            TeacherAssignment newTeacherAssignment = new TeacherAssignment();
+            newTeacherAssignment.setTeacher(teacherService.findTeacherById(requestDTO.getTeacherId()));
+            newTeacherAssignment.setSchoolSubject(scheduleService.findSchoolSubjectById(requestDTO.getSubjectId()));
+            newTeacherAssignment.setGroup(groupService.findGroupById(requestDTO.getGroupId()));
+            teacherService.saveTeacherAssignment(newTeacherAssignment);
+
+            scheduleLesson.setTeacherAssignment(newTeacherAssignment);
+        }
+        scheduleService.saveScheduleLesson(scheduleLesson);
+        return ResponseEntity.ok("{\"message\": \"Урок успешно обновлён\"}");
+    }
 }

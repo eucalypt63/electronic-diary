@@ -261,6 +261,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal" id="addLessonModal" style="display: none;">
     <div class="modal-content">
         <h2>Добавить урок</h2>
@@ -337,6 +338,7 @@
         });
     });
 
+    // Обновить список уроков
     function fetchLessons() {
         fetch(`/findLessonsByClassId?id=${id}&quarter=${activeQuarter}`, {
             method: 'GET',
@@ -469,56 +471,82 @@
             })
             .then(data => {
                 const lessonSelect = document.getElementById('edit-lesson-select');
+                const groupSelect = document.getElementById('edit-group-select');
+                const subjectSelect = document.getElementById('edit-subject-select');
+                const teacherSelect = document.getElementById('edit-teacher-select');
+
                 lessonSelect.innerHTML = '';
+                groupSelect.innerHTML = '';
+                subjectSelect.innerHTML = '';
+                teacherSelect.innerHTML = '';
 
                 window.sortedLessons = Object.entries(data)
                     .map(([id, lesson]) => ({ id, ...lesson }))
                     .sort((a, b) => a.id - b.id);
 
-                window.sortedLessons.forEach(lesson => {
-                    const option = document.createElement('option');
-                    option.value = lesson.id;
-                    option.textContent = `${lesson.teacherAssignment.schoolSubject.name} (${lesson.group.groupName})`;
-                    lessonSelect.appendChild(option);
-                });
+                fetch(`/getLessonAddParams?id=${id}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(selectData => {
 
-                if (window.sortedLessons.length > 0) {
-                    const firstLesson = window.sortedLessons[0];
-                    lessonSelect.value = firstLesson.id;
+                        // Группы
+                        selectData.groups.forEach(group => {
+                            const option = new Option(group.groupName, group.id);
+                            groupSelect.add(option);
+                        });
 
-                    document.getElementById('edit-group-select').innerHTML =
-                        `<option value="${firstLesson.group.id}">${firstLesson.group.groupName}</option>`;
+                        // Предметы
+                        selectData.schoolSubjects.forEach(subject => {
+                            const option = new Option(subject.name, subject.id);
+                            subjectSelect.add(option);
+                        });
 
-                    document.getElementById('edit-subject-select').innerHTML =
-                        `<option value="${firstLesson.teacherAssignment.schoolSubject.id}">
-                            ${firstLesson.teacherAssignment.schoolSubject.name}
-                        </option>`;
+                        // Учителя
+                        selectData.teachers.forEach(teacher => {
+                            const option = new Option(
+                                `${teacher.lastName} ${teacher.firstName}`,
+                                teacher.id
+                            );
+                            teacherSelect.add(option);
+                        });
 
-                    document.getElementById('edit-teacher-select').innerHTML =
-                        `<option value="${firstLesson.teacherAssignment.teacher.id}">
-                            ${firstLesson.teacherAssignment.teacher.lastName} ${firstLesson.teacherAssignment.teacher.firstName}
-                        </option>`;
-                }
+                        // Заполняем селектор уроков
+                        window.sortedLessons.forEach(lesson => {
+                            const option = new Option(
+                                `${lesson.teacherAssignment.schoolSubject.name} (${lesson.group.groupName})`,
+                                lesson.id
+                            );
+                            lessonSelect.add(option);
+                        });
 
-                document.getElementById('edit-lesson-select').onchange = function() {
-                    const lessonId = this.value;
-                    const selectedLesson = window.sortedLessons.find(lesson => lesson.id == lessonId);
+                        // Устанавливаем значения для первого урока
+                        if (window.sortedLessons.length > 0) {
+                            const firstLesson = window.sortedLessons[0];
+                            updateSelectedLesson(firstLesson);
+                        }
 
-                    if (selectedLesson) {
-                        document.getElementById('edit-group-select').innerHTML =
-                            `<option value="${selectedLesson.group.id}">${selectedLesson.group.groupName}</option>`;
+                        // Обработчик изменения выбранного урока
+                        lessonSelect.addEventListener('change', function() {
+                            const lessonId = this.value;
+                            const selectedLesson = window.sortedLessons.find(lesson => lesson.id == lessonId);
+                            if (selectedLesson) {
+                                updateSelectedLesson(selectedLesson);
+                            }
+                        });
 
-                        document.getElementById('edit-subject-select').innerHTML =
-                            `<option value="${selectedLesson.teacherAssignment.schoolSubject.id}">
-                                ${selectedLesson.teacherAssignment.schoolSubject.name}
-                            </option>`;
+                        function updateSelectedLesson(lesson) {
+                            groupSelect.value = lesson.group.id;
+                            subjectSelect.value = lesson.teacherAssignment.schoolSubject.id;
+                            teacherSelect.value = lesson.teacherAssignment.teacher.id;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading select options:', error);
+                        alert('Ошибка загрузки данных для выбора');
+                    });
 
-                        document.getElementById('edit-teacher-select').innerHTML =
-                            `<option value="${selectedLesson.teacherAssignment.teacher.id}">
-                                ${selectedLesson.teacherAssignment.teacher.lastName} ${selectedLesson.teacherAssignment.teacher.firstName}
-                            </option>`;
-                    }
-                };
 
                 document.querySelector('#editLessonModal .modal-button.add-new').onclick = () => {
                     modal.style.display = 'none';
@@ -532,7 +560,21 @@
                 // Удаление
                 document.querySelector('#editLessonModal .modal-button.delete').onclick = () => {
                     const lessonId = document.getElementById('edit-lesson-select').value;
-                    console.log('Удалить урок с ID:', lessonId);
+                    fetch(`/deleteLesson?id=${lessonId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById('editLessonModal').style.display = 'none';
+                            fetchLessons(); // Обновляем список уроков
+                        } else {
+                            throw new Error('Ошибка при удалении урока');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ошибка при удалении урока');
+                    });
                 };
 
                 // Обновление
@@ -541,7 +583,31 @@
                     const groupId = document.getElementById('edit-group-select').value;
                     const subjectId = document.getElementById('edit-subject-select').value;
                     const teacherId = document.getElementById('edit-teacher-select').value;
-                    console.log('Обновить урок с ID:', lessonId, {groupId, subjectId, teacherId});
+
+                    fetch('/updateLesson', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            lessonNumber: lessonId,
+                            groupId: groupId,
+                            subjectId: subjectId,
+                            teacherId: teacherId
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById('editLessonModal').style.display = 'none';
+                            fetchLessons(); // Обновляем список уроков
+                        } else {
+                            throw new Error('Ошибка при обновлении урока');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ошибка при обновлении урока');
+                    });
                 };
 
                 modal.style.display = 'flex';

@@ -1,7 +1,5 @@
 package com.example.postgresql.model.Education.Gradebook;
 
-import com.example.postgresql.model.Education.Group.Group;
-import com.example.postgresql.model.TeacherAssignment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

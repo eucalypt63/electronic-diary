@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class ScheduleLessonRequestDTO {
+    private Long quarter;
     private Long dayNumber;
     private Long lessonNumber;
-    private Long quarter;
     private Long groupId;
     private Long subjectId;
     private Long teacherId;
-
 }
