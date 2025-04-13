@@ -157,6 +157,26 @@
             opacity: 0.9;
         }
 
+        .modal-button.delete {
+            background-color: #f44336;
+            color: white;
+        }
+        .modal-buttons-top {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .modal-button.add-new {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 16px;
+        }
+
+        .modal-button.add-new:hover {
+            background-color: #0b7dda;
+        }
+
     </style>
 </head>
 <body>
@@ -260,6 +280,35 @@
         </div>
     </div>
 </div>
+
+<div class="modal" id="editLessonModal" style="display: none;">
+    <div class="modal-content">
+        <h2>Редактировать урок</h2>
+
+        <div class="modal-buttons-top">
+            <button class="modal-button add-new">Добавить урок</button>
+        </div>
+
+        <label for="edit-lesson-select">Урок:</label>
+        <select id="edit-lesson-select" class="modal-select"></select>
+
+        <label for="edit-group-select">Группа:</label>
+        <select id="edit-group-select" class="modal-select"></select>
+
+        <label for="edit-subject-select">Предмет:</label>
+        <select id="edit-subject-select" class="modal-select"></select>
+
+        <label for="edit-teacher-select">Учитель:</label>
+        <select id="edit-teacher-select" class="modal-select"></select>
+
+        <div class="modal-buttons">
+            <button class="modal-button delete">Удалить</button>
+            <button class="modal-button cancel">Отменить</button>
+            <button class="modal-button save">Обновить</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -318,7 +367,6 @@
                 lessons.forEach(lesson => {
                     const dayNumber = lesson.dayNumber;
                     const lessonNumber = lesson.lessonNumber;
-
                     const subjectName = lesson.teacherAssignment.schoolSubject.name;
 
                     const lessonDiv = document.getElementById(`${dayNumber}-${lessonNumber}`);
@@ -339,64 +387,37 @@
     }
     fetchLessons();
 
-    document.querySelectorAll('.lesson').forEach(lesson => {
-        lesson.addEventListener('click', function() {
-            const lessonId = this.id;
-            const [day, lessonNumber] = lessonId.split('-').map(Number);
+    // Добавление урока
+    function handleAddNewLesson(day, lessonNumber) {
+        const modal = document.getElementById('addLessonModal');
 
-            if (this.classList.contains('free')) {
-                const modal = document.getElementById('addLessonModal');
+        fetch(`/getLessonAddParams?id=${id}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const groupSelect = document.getElementById('group-select');
+                const subjectSelect = document.getElementById('subject-select');
+                const teacherSelect = document.getElementById('teacher-select');
 
-                fetch(`/getLessonAddParams?id=${id}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        const groupSelect = document.getElementById('group-select');
-                        const subjectSelect = document.getElementById('subject-select');
-                        const teacherSelect = document.getElementById('teacher-select');
+                groupSelect.innerHTML = data.groups.map(g =>
+                    `<option value="${g.id}">${g.groupName}</option>`
+                ).join('');
 
-                        groupSelect.innerHTML = '';
-                        subjectSelect.innerHTML = '';
-                        teacherSelect.innerHTML = '';
+                subjectSelect.innerHTML = data.schoolSubjects.map(s =>
+                    `<option value="${s.id}">${s.name}</option>`
+                ).join('');
 
-                        // Заполняем группы
-                        data.groups.forEach(group => {
-                            const option = document.createElement('option');
-                            option.value = group.id;
-                            option.textContent = group.groupName;
-                            groupSelect.appendChild(option);
-                        });
+                teacherSelect.innerHTML = data.teachers.map(t =>
+                    `<option value="${t.id}">${t.lastName} ${t.firstName} ${t.patronymic ?? ''}</option>`
+                ).join('');
 
-                        // Заполняем предметы
-                        data.schoolSubjects.forEach(subject => {
-                            const option = document.createElement('option');
-                            option.value = subject.id;
-                            option.textContent = subject.name;
-                            subjectSelect.appendChild(option);
-                        });
-
-                        // Заполняем учителей
-                        data.teachers.forEach(teacher => {
-                            const option = document.createElement('option');
-                            option.value = teacher.id;
-                            option.textContent = `${teacher.lastName} ${teacher.firstName} ${teacher.patronymic ?? ''}`;
-                            teacherSelect.appendChild(option);
-                        });
-
-                        modal.style.display = 'flex';
-                    })
-                    .catch(error => {
-                        console.error('Error fetching lesson params:', error);
-                        alert('Ошибка при загрузке параметров урока');
-                    });
-
-                document.querySelector('.modal-button.cancel').onclick = () => {
+                document.querySelector('#addLessonModal .modal-button.cancel').onclick = () => {
                     modal.style.display = 'none';
                 };
 
-                document.querySelector('.modal-button.save').onclick = () => {
+                document.querySelector('#addLessonModal .modal-button.save').onclick = () => {
                     const groupId = document.getElementById('group-select').value;
                     const subjectId = document.getElementById('subject-select').value;
                     const teacherId = document.getElementById('teacher-select').value;
@@ -428,12 +449,121 @@
                         alert('Ошибка при сохранении урока');
                     });
                 };
+
+                modal.style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error fetching lesson params:', error);
+                alert('Ошибка при загрузке параметров урока');
+            });
+    }
+
+    // Обновление урока
+    function handleOccupiedLesson(day, lessonNumber) {
+        const modal = document.getElementById('editLessonModal');
+
+        fetch(`/findLessonsByLessonNumber?id=${id}&day=${day}&lessonNumber=${lessonNumber}&quarter=${activeQuarter}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const lessonSelect = document.getElementById('edit-lesson-select');
+                lessonSelect.innerHTML = '';
+
+                window.sortedLessons = Object.entries(data)
+                    .map(([id, lesson]) => ({ id, ...lesson }))
+                    .sort((a, b) => a.id - b.id);
+
+                window.sortedLessons.forEach(lesson => {
+                    const option = document.createElement('option');
+                    option.value = lesson.id;
+                    option.textContent = `${lesson.teacherAssignment.schoolSubject.name} (${lesson.group.groupName})`;
+                    lessonSelect.appendChild(option);
+                });
+
+                if (window.sortedLessons.length > 0) {
+                    const firstLesson = window.sortedLessons[0];
+                    lessonSelect.value = firstLesson.id;
+
+                    document.getElementById('edit-group-select').innerHTML =
+                        `<option value="${firstLesson.group.id}">${firstLesson.group.groupName}</option>`;
+
+                    document.getElementById('edit-subject-select').innerHTML =
+                        `<option value="${firstLesson.teacherAssignment.schoolSubject.id}">
+                            ${firstLesson.teacherAssignment.schoolSubject.name}
+                        </option>`;
+
+                    document.getElementById('edit-teacher-select').innerHTML =
+                        `<option value="${firstLesson.teacherAssignment.teacher.id}">
+                            ${firstLesson.teacherAssignment.teacher.lastName} ${firstLesson.teacherAssignment.teacher.firstName}
+                        </option>`;
+                }
+
+                document.getElementById('edit-lesson-select').onchange = function() {
+                    const lessonId = this.value;
+                    const selectedLesson = window.sortedLessons.find(lesson => lesson.id == lessonId);
+
+                    if (selectedLesson) {
+                        document.getElementById('edit-group-select').innerHTML =
+                            `<option value="${selectedLesson.group.id}">${selectedLesson.group.groupName}</option>`;
+
+                        document.getElementById('edit-subject-select').innerHTML =
+                            `<option value="${selectedLesson.teacherAssignment.schoolSubject.id}">
+                                ${selectedLesson.teacherAssignment.schoolSubject.name}
+                            </option>`;
+
+                        document.getElementById('edit-teacher-select').innerHTML =
+                            `<option value="${selectedLesson.teacherAssignment.teacher.id}">
+                                ${selectedLesson.teacherAssignment.teacher.lastName} ${selectedLesson.teacherAssignment.teacher.firstName}
+                            </option>`;
+                    }
+                };
+
+                document.querySelector('#editLessonModal .modal-button.add-new').onclick = () => {
+                    modal.style.display = 'none';
+                    handleAddNewLesson(day, lessonNumber);
+                };
+
+                document.querySelector('#editLessonModal .modal-button.cancel').onclick = () => {
+                    modal.style.display = 'none';
+                };
+
+                // Удаление
+                document.querySelector('#editLessonModal .modal-button.delete').onclick = () => {
+                    const lessonId = document.getElementById('edit-lesson-select').value;
+                    console.log('Удалить урок с ID:', lessonId);
+                };
+
+                // Обновление
+                document.querySelector('#editLessonModal .modal-button.save').onclick = () => {
+                    const lessonId = document.getElementById('edit-lesson-select').value;
+                    const groupId = document.getElementById('edit-group-select').value;
+                    const subjectId = document.getElementById('edit-subject-select').value;
+                    const teacherId = document.getElementById('edit-teacher-select').value;
+                    console.log('Обновить урок с ID:', lessonId, {groupId, subjectId, teacherId});
+                };
+
+                modal.style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error fetching lesson data:', error);
+                alert('Ошибка при загрузке данных урока');
+            });
+    }
+
+    document.querySelectorAll('.lesson').forEach(lesson => {
+        lesson.addEventListener('click', function() {
+            const lessonId = this.id;
+            const [day, lessonNumber] = lessonId.split('-').map(Number);
+
+            if (this.classList.contains('free')) {
+                handleAddNewLesson(day, lessonNumber);
             } else if (this.classList.contains('occupied')) {
-                //Запрос на получение уроков ---------------------------------------------
+                handleOccupiedLesson(day, lessonNumber);
             }
         });
     });
-
 </script>
 
 </body>

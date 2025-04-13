@@ -26,11 +26,8 @@ public class ScheduleService {
     }
 
     public boolean checkAvailability(Long quarterNumber, Long dayNumber, Long lessonNumber, Long teacherId){
-        if (scheduleLessonRepository.findScheduleLessonByQuarterInfo_QuarterNumberAndDayNumberAndLessonNumberAndTeacherAssignment_Teacher_Id
-                                                                        (quarterNumber, dayNumber, lessonNumber, teacherId) != null){
-            return false;
-        }
-        else {return  true;}
+        return scheduleLessonRepository.findByQuarterInfo_QuarterNumberAndDayNumberAndLessonNumberAndTeacherAssignment_Teacher_Id(
+                quarterNumber, dayNumber, lessonNumber, teacherId) == null;
     }
 
     public SchoolSubject findSchoolSubjectById(Long id){
@@ -47,5 +44,20 @@ public class ScheduleService {
 
     public QuarterInfo findQuarterInfoByQuarterNumber(Long id){
         return quarterInfoRepository.findQuarterInfoByQuarterNumber(id);
+    }
+
+    public List<ScheduleLesson> findScheduleLessonsByClassAndTime(
+            Long classId,
+            Integer day,
+            Integer lessonNumber,
+            Integer quarter) {
+
+        return scheduleLessonRepository
+                .findByGroup_ClassRoom_IdAndDayNumberAndLessonNumberAndQuarterInfo_QuarterNumber(
+                        classId,
+                        day.longValue(),
+                        lessonNumber.longValue(),
+                        quarter.longValue()
+                );
     }
 }

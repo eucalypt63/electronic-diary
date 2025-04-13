@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ScheduleControl {
@@ -120,12 +121,37 @@ public class ScheduleControl {
             scheduleLesson.setQuarterInfo(scheduleService.findQuarterInfoByQuarterNumber(schLesReqDTO.getQuarter()));
             scheduleLesson.setDayNumber(schLesReqDTO.getDayNumber());
             scheduleLesson.setLessonNumber(schLesReqDTO.getLessonNumber());
-
             scheduleService.saveScheduleLesson(scheduleLesson);
 
             //Добавить GradebookDay
 
             return ResponseEntity.ok("{\"message\": \"Урок успешно добавлен\"}");
         } else {return ResponseEntity.status(500).body("{\"message\": \"Время занято для учителя \"}");}
+    }
+
+    @GetMapping("/findLessonsByLessonNumber")
+    @ResponseBody
+    public ResponseEntity<Map<Long, ScheduleLessonsDayResponseDTO>> findLessonsByLessonNumber(
+            @RequestParam Long id,
+            @RequestParam int day,
+            @RequestParam int lessonNumber,
+            @RequestParam int quarter) {
+
+        List<ScheduleLesson> lessons = scheduleService.findScheduleLessonsByClassAndTime(
+                id, day, lessonNumber, quarter);
+
+        Map<Long, ScheduleLessonsDayResponseDTO> result = lessons.stream()
+                .collect(Collectors.toMap(
+                        ScheduleLesson::getId,
+                        lesson -> {
+                            ScheduleLessonsDayResponseDTO dto = new ScheduleLessonsDayResponseDTO();
+                            dto.setId(lesson.getId());
+                            dto.setGroup(dtoService.GroupToDto(lesson.getGroup()));
+                            dto.setTeacherAssignment(dtoService.TeacherAssignmentToDto(lesson.getTeacherAssignment()));
+                            return dto;
+                        }
+                ));
+
+        return ResponseEntity.ok(result);
     }
 }
