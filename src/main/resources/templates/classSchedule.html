@@ -176,6 +176,22 @@
         .modal-button.add-new:hover {
             background-color: #0b7dda;
         }
+        .groups-button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .groups-button:hover {
+            background-color: #3367d6;
+        }
 
     </style>
 </head>
@@ -260,7 +276,10 @@
             </div>
         </div>
     </div>
+    <button id="viewGroupsBtn" class="groups-button">Обзор групп</button>
 </div>
+
+
 
 <div class="modal" id="addLessonModal" style="display: none;">
     <div class="modal-content">
@@ -281,7 +300,6 @@
         </div>
     </div>
 </div>
-
 <div class="modal" id="editLessonModal" style="display: none;">
     <div class="modal-content">
         <h2>Редактировать урок</h2>
@@ -490,20 +508,16 @@
                         return response.json();
                     })
                     .then(selectData => {
-
-                        // Группы
                         selectData.groups.forEach(group => {
                             const option = new Option(group.groupName, group.id);
                             groupSelect.add(option);
                         });
 
-                        // Предметы
                         selectData.schoolSubjects.forEach(subject => {
                             const option = new Option(subject.name, subject.id);
                             subjectSelect.add(option);
                         });
 
-                        // Учителя
                         selectData.teachers.forEach(teacher => {
                             const option = new Option(
                                 `${teacher.lastName} ${teacher.firstName}`,
@@ -512,7 +526,6 @@
                             teacherSelect.add(option);
                         });
 
-                        // Заполняем селектор уроков
                         window.sortedLessons.forEach(lesson => {
                             const option = new Option(
                                 `${lesson.teacherAssignment.schoolSubject.name} (${lesson.group.groupName})`,
@@ -521,13 +534,11 @@
                             lessonSelect.add(option);
                         });
 
-                        // Устанавливаем значения для первого урока
                         if (window.sortedLessons.length > 0) {
                             const firstLesson = window.sortedLessons[0];
                             updateSelectedLesson(firstLesson);
                         }
 
-                        // Обработчик изменения выбранного урока
                         lessonSelect.addEventListener('change', function() {
                             const lessonId = this.value;
                             const selectedLesson = window.sortedLessons.find(lesson => lesson.id == lessonId);
@@ -629,6 +640,10 @@
                 handleOccupiedLesson(day, lessonNumber);
             }
         });
+    });
+
+    document.getElementById('viewGroupsBtn').addEventListener('click', function() {
+        window.location.href = `/classGroups?id=${id}`;
     });
 </script>
 
