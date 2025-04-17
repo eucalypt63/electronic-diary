@@ -38,10 +38,10 @@ public class GroupService {
 
     //___
 
-    public List<GroupMember> getAllGroupMember() {
-        return groupMemberRepository.findAll();
-    }
-
+    public GroupMember findGroupMemberByGroupIdAndSchoolStudentId(Long groupId, Long studentId){ return groupMemberRepository.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);}
+    public void deleteGroupMember(GroupMember groupMember){groupMemberRepository.delete(groupMember);}
     public void saveGroupMember(GroupMember groupMember) { groupMemberRepository.save(groupMember);}
+
+    public List<GroupMember> findGroupMemberByGroupId(Long id){ return groupMemberRepository.findGroupMemberByGroupId(id);}
 
 }

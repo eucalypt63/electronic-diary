@@ -1,6 +1,8 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.GroupRequestDTO;
+import com.example.postgresql.DTO.ResponseDTO.GroupInfoResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.GroupMemberResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.GroupResponseDTO;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,24 +55,19 @@ public class GroupControl {
         group.setClassRoom(classService.findClassById(groupRequestDTO.getClassRoom()));
         group.setGroupName(groupRequestDTO.getGroupName());
         groupService.saveGroup(group);
-
-        groupRequestDTO.getGroupMembersId().forEach(groupMemberId -> {
-            GroupMember member = new GroupMember();
-            member.setSchoolStudent(schoolStudentService.findSchoolStudentById(groupMemberId));
-            member.setGroup(group);
-            groupService.saveGroupMember(member);
-        });
         
         return ResponseEntity.ok("{\"message\": \"Группа успешно добавлена\"}");
     }
 
+    //Пока не используется
     @DeleteMapping("/deleteGroupById")
     @ResponseBody
-    public ResponseEntity<Void> deleteGroupById(Long id) {
+    public ResponseEntity<Void> deleteGroupById(@RequestParam Long id) {
         groupService.deleteGroupById(id);
         return ResponseEntity.ok().build();
     }
 
+    //Пока не используется
     @PostMapping("/changeGroup")
     @ResponseBody
     public ResponseEntity<String> changeGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
@@ -79,10 +77,51 @@ public class GroupControl {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/GAll")
+
+    //Ученики группы
+    @GetMapping("/findGroupMembersByClassId")
     @ResponseBody
-    public  ResponseEntity<List<Group>> GAll(){
-        List<Group> groups = groupService.getAllGroup();
-        return ResponseEntity.ok(groups);
+    public ResponseEntity<List<GroupInfoResponseDTO>> findGroupMembersByClassId (Long id) {
+        List<Group> groups = groupService.findGroupByClassId(id);
+
+        List<GroupInfoResponseDTO> groupInfoResponseDTOS = new ArrayList<>();
+        groups.forEach(group -> {
+            GroupResponseDTO groupResponseDTO = dtoService.GroupToDto(group);
+
+            List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(groupResponseDTO.getId());
+            List<GroupMemberResponseDTO> groupMemberResponseDTOS = new ArrayList<>();
+            groupMembers.forEach(groupMember -> {
+                groupMemberResponseDTOS.add(dtoService.GroupMemberToDto(groupMember));
+            });
+
+            GroupInfoResponseDTO groupInfoResponseDTO = new GroupInfoResponseDTO();
+            groupInfoResponseDTO.setGroup(groupResponseDTO);
+            groupInfoResponseDTO.setGroupMembers(groupMemberResponseDTOS);
+            groupInfoResponseDTOS.add(groupInfoResponseDTO);
+        });
+
+        return ResponseEntity.ok(groupInfoResponseDTOS);
+    }
+
+    @PostMapping("/addGroupMember")
+    @ResponseBody
+    public ResponseEntity<String> addGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroup(groupService.findGroupById(groupId));
+        groupMember.setSchoolStudent(schoolStudentService.findSchoolStudentById(studentId));
+        groupService.saveGroupMember(groupMember);
+
+        return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен в группу\"}");
+    }
+
+    @PostMapping("/deleteGroupMember")
+    @ResponseBody
+    public ResponseEntity<String> deleteGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
+        System.out.println(studentId);
+        System.out.println(groupId);
+        GroupMember groupMember = groupService.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);
+        groupService.deleteGroupMember(groupMember);
+
+        return ResponseEntity.ok("{\"message\": \"Ученик успешно удалён из группы\"}");
     }
 }
