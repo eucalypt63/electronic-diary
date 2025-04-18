@@ -1,5 +1,6 @@
 package com.example.postgresql.service.Education;
 
+import com.example.postgresql.model.Education.Gradebook.GradebookDay;
 import com.example.postgresql.repository.Education.Gradebook.GradebookAttendanceRepository;
 import com.example.postgresql.repository.Education.Gradebook.GradebookDayRepository;
 import com.example.postgresql.repository.Education.Gradebook.GradebookScoreRepository;
@@ -18,6 +19,8 @@ public class GradebookService {
     @Autowired
     private GradebookAttendanceRepository gradebookAttendanceRepository;
 
+    public void saveGradebookDay(GradebookDay gradebookDay){gradebookDayRepository.save(gradebookDay);}
+    public List<GradebookDay>findAllGD(){return gradebookDayRepository.findAll();}
     //Нахождения дня по Group->TA->Id
     //Нахождение по id дня для посещаемости и оценок
 

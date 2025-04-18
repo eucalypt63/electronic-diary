@@ -356,7 +356,6 @@
         });
     });
 
-    // Обновить список уроков
     function fetchLessons() {
         fetch(`/findLessonsByClassId?id=${id}&quarter=${activeQuarter}`, {
             method: 'GET',
@@ -376,30 +375,42 @@
 
             const allLessons = document.querySelectorAll('.lesson');
             allLessons.forEach(lessonDiv => {
-                if (!lessonDiv.classList.contains('free')) {
-                    lessonDiv.innerHTML = '';
-                    lessonDiv.classList.remove('occupied');
-                    lessonDiv.classList.add('free');
-                }
+                lessonDiv.innerHTML = '';
+                lessonDiv.classList.remove('occupied');
+                lessonDiv.classList.add('free');
             });
+
+            const lessonsMap = new Map();
 
             for (const [groupId, lessons] of entries) {
                 lessons.forEach(lesson => {
-                    const dayNumber = lesson.dayNumber;
-                    const lessonNumber = lesson.lessonNumber;
-                    const subjectName = lesson.teacherAssignment.schoolSubject.name;
+                    const key = `${lesson.dayNumber}-${lesson.lessonNumber}`;
 
-                    const lessonDiv = document.getElementById(`${dayNumber}-${lessonNumber}`);
-                    if (lessonDiv) {
-                        if (lessonDiv.classList.contains('free')){
-                            lessonDiv.classList.remove('free');
-                            lessonDiv.classList.add('occupied');
-                        }
-
-                        lessonDiv.innerHTML += `${subjectName} (${lesson.group.groupName})<br>`;
+                    if (!lessonsMap.has(key)) {
+                        lessonsMap.set(key, {
+                            subjects: new Set(),
+                            groups: new Set()
+                        });
                     }
+
+                    const lessonData = lessonsMap.get(key);
+                    lessonData.subjects.add(lesson.teacherAssignment.schoolSubject.name);
+                    lessonData.groups.add(lesson.group.groupName);
                 });
             }
+
+            lessonsMap.forEach((value, key) => {
+                const lessonDiv = document.getElementById(key);
+                if (lessonDiv) {
+                    lessonDiv.classList.remove('free');
+                    lessonDiv.classList.add('occupied');
+
+                    const subjects = Array.from(value.subjects).join(', ');
+                    const groups = Array.from(value.groups).join(', ');
+
+                    lessonDiv.innerHTML = `${subjects} (${groups})`;
+                }
+            });
         })
         .catch(error => {
             console.error('Error fetching data:', error);

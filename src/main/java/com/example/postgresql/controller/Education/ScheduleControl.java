@@ -1,28 +1,24 @@
 package com.example.postgresql.controller.Education;
 
-import com.example.postgresql.DTO.RequestDTO.AdministratorRequestDTO;
 import com.example.postgresql.DTO.RequestDTO.ScheduleLessonRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
+import com.example.postgresql.model.Education.Gradebook.GradebookDay;
 import com.example.postgresql.model.Education.Gradebook.QuarterInfo;
 import com.example.postgresql.model.Education.Gradebook.ScheduleLesson;
 import com.example.postgresql.model.Education.Group.Group;
-import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.DTOService;
-import com.example.postgresql.service.Education.ClassService;
-import com.example.postgresql.service.Education.EducationalInstitutionService;
-import com.example.postgresql.service.Education.GroupService;
-import com.example.postgresql.service.Education.ScheduleService;
+import com.example.postgresql.service.Education.*;
 import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +39,8 @@ public class ScheduleControl {
     @Autowired
     private ClassService classService;
     @Autowired
+    private GradebookService gradebookService;
+    @Autowired
     private DTOService dtoService;
 
     @GetMapping("/findLessonsByClassId")
@@ -56,8 +54,10 @@ public class ScheduleControl {
             List<ScheduleLesson> lessons = scheduleService.findScheduleLessonByGroupIdAndQuarterNumber(group.getId(), quarter);
 
             for (ScheduleLesson scheduleLesson : lessons){
+                System.out.println(lessons);
                 lessonsDTO.add(dtoService.ScheduleLessonToDto(scheduleLesson));
             }
+
             scheduleMap.put(group.getId(), lessonsDTO);
         }
 
@@ -116,17 +116,51 @@ public class ScheduleControl {
 
                 scheduleLesson.setTeacherAssignment(newTeacherAssignment);
             }
+            QuarterInfo quarterInfo = scheduleService.findQuarterInfoByQuarterNumber(schLesReqDTO.getQuarter());
 
             scheduleLesson.setGroup(groupService.findGroupById(schLesReqDTO.getGroupId()));
-            scheduleLesson.setQuarterInfo(scheduleService.findQuarterInfoByQuarterNumber(schLesReqDTO.getQuarter()));
+            scheduleLesson.setQuarterInfo(quarterInfo);
             scheduleLesson.setDayNumber(schLesReqDTO.getDayNumber());
             scheduleLesson.setLessonNumber(schLesReqDTO.getLessonNumber());
             scheduleService.saveScheduleLesson(scheduleLesson);
 
-            //Добавить GradebookDay
+            createGradebookDaysForQuarter(scheduleLesson, quarterInfo, schLesReqDTO.getDayNumber());
 
             return ResponseEntity.ok("{\"message\": \"Урок успешно добавлен\"}");
         } else {return ResponseEntity.status(500).body("{\"message\": \"Время занято для учителя \"}");}
+    }
+
+    private void createGradebookDaysForQuarter(ScheduleLesson scheduleLesson, QuarterInfo quarterInfo, Long dayNumber) {
+        LocalDateTime now = LocalDateTime.now();
+        int currentYear = now.getYear();
+        int targetYear;
+
+        if (quarterInfo.getQuarterNumber() <= 2) {
+            targetYear = (now.getMonthValue() <= 8) ? currentYear - 1 : currentYear;
+        } else {
+            targetYear = currentYear;
+        }
+
+        LocalDateTime startDate = quarterInfo.getDateStartTime()
+                .withYear(targetYear);
+        LocalDateTime endDate = quarterInfo.getDateEndTime()
+                .withYear(targetYear);
+
+        DayOfWeek targetDayOfWeek = DayOfWeek.of(dayNumber.intValue());
+
+        LocalDateTime currentDate = startDate;
+        while (currentDate.getDayOfWeek() != targetDayOfWeek) {
+            currentDate = currentDate.plusDays(1);
+        }
+
+        while (!currentDate.isAfter(endDate)) {
+            GradebookDay gradebookDay = new GradebookDay();
+            gradebookDay.setScheduleLesson(scheduleLesson);
+            gradebookDay.setDateTime(currentDate);
+            gradebookService.saveGradebookDay(gradebookDay);
+
+            currentDate = currentDate.plusWeeks(1);
+        }
     }
 
     @GetMapping("/findLessonsByLessonNumber")
