@@ -1,7 +1,9 @@
 package com.example.postgresql.controller.Education;
 
-import com.example.postgresql.DTO.RequestDTO.NewsRequestDTO;
-import com.example.postgresql.DTO.ResponseDTO.NewsResponseDTO;
+import com.example.postgresql.DTO.RequestDTO.News.NewsCommentRequestDTO;
+import com.example.postgresql.DTO.RequestDTO.News.NewsRequestDTO;
+import com.example.postgresql.DTO.ResponseDTO.News.NewsResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.News.NewsCommentResponseDTO;
 import com.example.postgresql.model.Education.News.News;
 import com.example.postgresql.model.Education.News.NewsComment;
 import com.example.postgresql.service.DTOService;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
@@ -53,7 +56,7 @@ public class NewsControl {
     }
 
     //Добавить новость
-    @GetMapping("/addNews")
+    @PostMapping("/addNews")
     @ResponseBody
     public ResponseEntity<String> addNews(NewsRequestDTO newsRequestDTO) {
         News news = new News();
@@ -77,6 +80,44 @@ public class NewsControl {
     }
 
     //---
+
+    //Найти комментарий к новости по id
+    @GetMapping("findNewsCommentById")
+    @ResponseBody
+    public ResponseEntity<NewsCommentResponseDTO> findNewsCommentById(Long id){
+        NewsCommentResponseDTO newsCommentResponseDTO = dtoService.NewsCommentToDto(newsService.findNewsCommentById(id));
+        return ResponseEntity.ok(newsCommentResponseDTO);
+    }
+
+    //Найти все комментарии к новости по id новости
+    @GetMapping("findNewsCommentByNewsId")
+    @ResponseBody
+    public ResponseEntity<List<NewsCommentResponseDTO>> findNewsCommentByNewsId(Long id){
+        List<NewsComment> newsComments = newsService.findNewsCommentByNewsId(id);
+        List<NewsCommentResponseDTO> newsCommentResponseDTOS = new ArrayList<>();
+
+        newsComments.forEach(newsComment -> {
+            NewsCommentResponseDTO newsCommentResponseDTO = dtoService.NewsCommentToDto(newsService.findNewsCommentById(id));
+            newsCommentResponseDTOS.add(newsCommentResponseDTO);
+        });
+        return ResponseEntity.ok(newsCommentResponseDTOS);
+    }
+
+    //Добавить комментарий к новости
+    @PostMapping("addNewsComment")
+    @ResponseBody
+    public ResponseEntity<String> addNewsComment(NewsCommentRequestDTO newsCommentRequestDTO){
+        NewsComment newsComment = new NewsComment();
+        newsComment.setId(newsCommentRequestDTO.getId());
+        newsComment.setNews(newsService.findNewsById(newsCommentRequestDTO.getNewsId()));
+        newsComment.setUser(userService.findUserById(newsCommentRequestDTO.getUserId()));
+        newsComment.setContent(newsCommentRequestDTO.getContent());
+        newsComment.setDateTime(newsCommentRequestDTO.getDateTime());
+        newsService.saveNewsComment(newsComment);
+
+        return ResponseEntity.ok("{\"message\": \"Комментарий к новости успешно добавлена\"}");
+    }
+
 
     //Удалить комментарий по id
     @DeleteMapping("/deleteNewsCommentById")

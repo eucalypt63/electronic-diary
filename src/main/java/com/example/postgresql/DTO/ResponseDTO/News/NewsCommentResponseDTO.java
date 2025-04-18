@@ -1,4 +1,4 @@
-package com.example.postgresql.DTO.ResponseDTO;
+package com.example.postgresql.DTO.ResponseDTO.News;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-public class NewsResponseDTO {
+public class NewsCommentResponseDTO {
     private Long id;
 
     private Long userId;
@@ -16,7 +16,8 @@ public class NewsResponseDTO {
     private String lastName;
     private String patronymic;
 
-    private String title;
+    private NewsResponseDTO newsResponseDTO;
+
     private String content;
     private LocalDateTime dateTime;
 }

@@ -38,8 +38,16 @@ public class NewsService {
 
     //----------
 
-    public List<NewsComment> findAllNewsCommentByNewsId(Long id){
-        return newsCommentRepository.findAllByNewsId(id);
+    public NewsComment findNewsCommentById(Long id){
+        return newsCommentRepository.findById(id).orElse(null);
+    }
+
+    public List<NewsComment> findNewsCommentByNewsId(Long id){
+        return newsCommentRepository.findNewsCommentByNewsId(id);
+    }
+
+    public void saveNewsComment(NewsComment newsComment) {
+        newsCommentRepository.save(newsComment);
     }
 
     public void deleteNewsCommentById(Long id){

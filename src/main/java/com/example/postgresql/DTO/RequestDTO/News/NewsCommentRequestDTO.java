@@ -1,4 +1,4 @@
-package com.example.postgresql.DTO.RequestDTO;
+package com.example.postgresql.DTO.RequestDTO.News;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -7,11 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-public class NewsRequestDTO {
+public class NewsCommentRequestDTO {
     private Long id;
-    private Long educationalInstitutionId;
-    private Long ownerUserId;
-    private String title;
+    private Long userId;
+    private Long newsId;
     private String content;
     private LocalDateTime dateTime;
 }

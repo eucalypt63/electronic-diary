@@ -3,15 +3,15 @@ package com.example.postgresql.service;
 import com.example.postgresql.DTO.ResponseDTO.*;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupMemberResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.News.NewsCommentResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.News.NewsResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.Users.AdministratorResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.Users.ParentResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.Users.SchoolStudentResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.*;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.Gradebook.ScheduleLesson;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.News.News;
+import com.example.postgresql.model.Education.News.NewsComment;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Education.Group.Group;
@@ -180,7 +180,7 @@ public class DTOService {
         Teacher teacher = teacherRepository.findTeacherByUserId(news.getOwnerUser().getId());
 
         if (administrator != null) {
-            setUserData(newsResponseDTO,
+            setUserDatForNews(newsResponseDTO,
                     administrator.getUser().getId(),
                     administrator.getEducationalInstitution().getId(),
                     administrator.getFirstName(),
@@ -188,7 +188,7 @@ public class DTOService {
                     administrator.getPatronymic());
         }
         else if (schoolStudent != null) {
-            setUserData(newsResponseDTO,
+            setUserDatForNews(newsResponseDTO,
                     schoolStudent.getUser().getId(),
                     schoolStudent.getEducationalInstitution().getId(),
                     schoolStudent.getFirstName(),
@@ -196,7 +196,7 @@ public class DTOService {
                     schoolStudent.getPatronymic());
         }
         else if (parent != null) {
-            setUserData(newsResponseDTO,
+            setUserDatForNews(newsResponseDTO,
                     parent.getUser().getId(),
                     parent.getEducationalInstitution().getId(),
                     parent.getFirstName(),
@@ -204,7 +204,7 @@ public class DTOService {
                     parent.getPatronymic());
         }
         else if (teacher != null) {
-            setUserData(newsResponseDTO,
+            setUserDatForNews(newsResponseDTO,
                     teacher.getUser().getId(),
                     teacher.getEducationalInstitution().getId(),
                     teacher.getFirstName(),
@@ -214,12 +214,74 @@ public class DTOService {
 
         return newsResponseDTO;
     }
-    private void setUserData(NewsResponseDTO dto,
-                             Long userId,
-                             Long educationId,
-                             String firstName,
-                             String lastName,
-                             String patronymic) {
+
+    public NewsCommentResponseDTO NewsCommentToDto(NewsComment newsComment){
+        NewsCommentResponseDTO newsCommentResponseDTO = new NewsCommentResponseDTO();
+        newsCommentResponseDTO.setId(newsComment.getId());
+        newsCommentResponseDTO.setContent(newsComment.getContent());
+        newsCommentResponseDTO.setDateTime(newsComment.getDateTime());
+        newsCommentResponseDTO.setNewsResponseDTO(NewsToDto(newsComment.getNews()));
+
+        Administrator administrator = administratorRepository.findAdministratorByUserId(newsComment.getUser().getId());
+        SchoolStudent schoolStudent = schoolStudentRepository.findSchoolStudentByUserId(newsComment.getUser().getId());
+        Parent parent = parentRepository.findParentByUserId(newsComment.getUser().getId());
+        Teacher teacher = teacherRepository.findTeacherByUserId(newsComment.getUser().getId());
+
+        if (administrator != null) {
+            setUserDatForNewsComment(newsCommentResponseDTO,
+                    administrator.getUser().getId(),
+                    administrator.getEducationalInstitution().getId(),
+                    administrator.getFirstName(),
+                    administrator.getLastName(),
+                    administrator.getPatronymic());
+        }
+        else if (schoolStudent != null) {
+            setUserDatForNewsComment(newsCommentResponseDTO,
+                    schoolStudent.getUser().getId(),
+                    schoolStudent.getEducationalInstitution().getId(),
+                    schoolStudent.getFirstName(),
+                    schoolStudent.getLastName(),
+                    schoolStudent.getPatronymic());
+        }
+        else if (parent != null) {
+            setUserDatForNewsComment(newsCommentResponseDTO,
+                    parent.getUser().getId(),
+                    parent.getEducationalInstitution().getId(),
+                    parent.getFirstName(),
+                    parent.getLastName(),
+                    parent.getPatronymic());
+        }
+        else if (teacher != null) {
+            setUserDatForNewsComment(newsCommentResponseDTO,
+                    teacher.getUser().getId(),
+                    teacher.getEducationalInstitution().getId(),
+                    teacher.getFirstName(),
+                    teacher.getLastName(),
+                    teacher.getPatronymic());
+        }
+
+        return newsCommentResponseDTO;
+    }
+
+    private void setUserDatForNews(NewsResponseDTO dto,
+                                   Long userId,
+                                   Long educationId,
+                                   String firstName,
+                                   String lastName,
+                                   String patronymic) {
+        dto.setUserId(userId);
+        dto.setEducationId(educationId);
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setPatronymic(patronymic);
+    }
+
+    private void setUserDatForNewsComment(NewsCommentResponseDTO dto,
+                                   Long userId,
+                                   Long educationId,
+                                   String firstName,
+                                   String lastName,
+                                   String patronymic) {
         dto.setUserId(userId);
         dto.setEducationId(educationId);
         dto.setFirstName(firstName);
