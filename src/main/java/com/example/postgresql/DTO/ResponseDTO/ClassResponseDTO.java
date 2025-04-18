@@ -1,5 +1,6 @@
 package com.example.postgresql.DTO.ResponseDTO;
 
+import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 

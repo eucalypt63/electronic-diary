@@ -1,9 +1,9 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.GroupRequestDTO;
-import com.example.postgresql.DTO.ResponseDTO.GroupInfoResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.GroupMemberResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.GroupResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Group.GroupInfoResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Group.GroupMemberResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.service.DTOService;
@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -48,6 +48,7 @@ public class UserService {
     }
 
     public User findUserByLogin(String login){ return userRepository.findUserByLogin(login); }
+    public User findUserById(Long id){ return userRepository.findById(id).orElse(null); }
 
     public void saveUser(User user) {userRepository.save(user);}
 

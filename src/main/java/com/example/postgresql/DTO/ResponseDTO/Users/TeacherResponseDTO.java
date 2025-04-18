@@ -1,15 +1,14 @@
-package com.example.postgresql.DTO.ResponseDTO;
+package com.example.postgresql.DTO.ResponseDTO.Users;
 
-import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class SchoolStudentResponseDTO {
+public class TeacherResponseDTO {
     private Long id;
-    private Class classRoom;
+    private Long userid;
     private EducationalInstitution educationalInstitution;
 
     private String firstName;

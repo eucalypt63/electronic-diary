@@ -2,7 +2,7 @@ package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.ClassRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.ClassResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.TeacherResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Teacher;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class ClassControl {

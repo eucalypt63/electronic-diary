@@ -22,8 +22,12 @@ public class NewsService {
         return newsRepository.findById(id).orElse(null);
     }
 
-    public List<News> findAllNews(){
-        return newsRepository.findAll();
+    public List<News> findNewsByEducationalInstitutionId(Long id){
+        return newsRepository.findNewsByEducationalInstitutionId(id);
+    }
+
+    public void saveNews(News news) {
+        newsRepository.save(news);
     }
 
     public void deleteNewsById(Long id){

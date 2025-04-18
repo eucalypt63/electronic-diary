@@ -2,8 +2,8 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.ParentRequestDTO;
 import com.example.postgresql.DTO.RequestDTO.StudentParentRequestDTO;
-import com.example.postgresql.DTO.ResponseDTO.ParentResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.SchoolStudentResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.ParentResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.SchoolStudentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.StudentParentResponseDTO;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Student.Parent;

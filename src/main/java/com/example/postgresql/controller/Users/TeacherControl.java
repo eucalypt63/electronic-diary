@@ -1,7 +1,7 @@
 package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.TeacherRequestDTO;
-import com.example.postgresql.DTO.ResponseDTO.TeacherResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Teacher;

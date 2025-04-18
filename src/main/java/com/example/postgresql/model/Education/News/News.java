@@ -1,5 +1,6 @@
 package com.example.postgresql.model.Education.News;
 
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,11 @@ public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "n_ei_id", foreignKey = @ForeignKey(name = "n_ei_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private EducationalInstitution educationalInstitution;
 
     @ManyToOne
     @JoinColumn(name = "n_u_owner_id", foreignKey = @ForeignKey(name = "n_u_owner_id"))

@@ -1,7 +1,11 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.ScheduleLessonRequestDTO;
-import com.example.postgresql.DTO.ResponseDTO.*;
+import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Schedule.LessonParamsResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonsDayResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.Gradebook.GradebookDay;

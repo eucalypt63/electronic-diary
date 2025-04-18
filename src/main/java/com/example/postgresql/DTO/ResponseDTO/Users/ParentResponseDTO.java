@@ -1,4 +1,4 @@
-package com.example.postgresql.DTO.ResponseDTO;
+package com.example.postgresql.DTO.ResponseDTO.Users;
 
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import lombok.Data;
@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParentResponseDTO {
     private Long id;
+    private Long userid;
     private EducationalInstitution educationalInstitution;
 
     private String firstName;
