@@ -1,16 +1,19 @@
 package com.example.postgresql.controller.Education;
 
+import com.example.postgresql.DTO.RequestDTO.MessageRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.MessageResponseDTO;
 import com.example.postgresql.model.Education.Message;
 import com.example.postgresql.model.Education.UserComment;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.MessageService;
+import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
@@ -25,7 +28,24 @@ public class MessageControl {
     @Autowired
     private MessageService messageService;
     @Autowired
+    private UserService userService;
+    @Autowired
     private DTOService dtoService;
+
+    //Добавление сообщения
+    @PostMapping("addMessage")
+    @ResponseBody
+    public ResponseEntity<String> addMessage(MessageRequestDTO messageRequestDTO){
+        Message message = new Message();
+        message.setId(messageRequestDTO.getId());
+        message.setGetterUser(userService.findUserById(messageRequestDTO.getGetterUserId()));
+        message.setSenderUser(userService.findUserById(messageRequestDTO.getSenderUserId()));
+        message.setMessage(messageRequestDTO.getMessage());
+        message.setDateTime(messageRequestDTO.getDateTime());
+        messageService.saveMessage(message);
+
+        return ResponseEntity.ok("{\"message\": \"Сообщение успешно отправлено\"}");
+    }
 
     //Получение конкретного сообщения
     @GetMapping("/getMessageById")

@@ -31,4 +31,6 @@ public class UserCommentService {
         userCommentRepository.deleteById(id);
     }
 
+    public void saveUserComment(UserComment userComment){userCommentRepository.save(userComment);}
+
 }
