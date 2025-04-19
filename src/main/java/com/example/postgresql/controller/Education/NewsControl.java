@@ -61,7 +61,6 @@ public class NewsControl {
     @ResponseBody
     public ResponseEntity<String> addNews(NewsRequestDTO newsRequestDTO) {
         News news = new News();
-        news.setId(newsRequestDTO.getId());
         news.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(newsRequestDTO.getEducationalInstitutionId()));
         news.setOwnerUser(userService.findUserById(newsRequestDTO.getId()));
         news.setTitle(newsRequestDTO.getTitle());
@@ -70,6 +69,18 @@ public class NewsControl {
 
         newsService.saveNews(news);
         return ResponseEntity.ok("{\"message\": \"Новость успешно добавлена\"}");
+    }
+
+    //Обновить новость
+    @PostMapping("/changeNews")
+    @ResponseBody
+    public ResponseEntity<String> changeNews(NewsRequestDTO newsRequestDTO) {
+        News news = newsService.findNewsById(newsRequestDTO.getId());
+        news.setTitle(newsRequestDTO.getTitle());
+        news.setContent(newsRequestDTO.getContent());
+
+        newsService.saveNews(news);
+        return ResponseEntity.ok("{\"message\": \"Новость успешно обновлена\"}");
     }
 
     //Удалить новость по id
@@ -109,7 +120,6 @@ public class NewsControl {
     @ResponseBody
     public ResponseEntity<String> addNewsComment(NewsCommentRequestDTO newsCommentRequestDTO){
         NewsComment newsComment = new NewsComment();
-        newsComment.setId(newsCommentRequestDTO.getId());
         newsComment.setNews(newsService.findNewsById(newsCommentRequestDTO.getNewsId()));
         newsComment.setUser(userService.findUserById(newsCommentRequestDTO.getUserId()));
         newsComment.setContent(newsCommentRequestDTO.getContent());
@@ -119,6 +129,16 @@ public class NewsControl {
         return ResponseEntity.ok("{\"message\": \"Комментарий к новости успешно добавлена\"}");
     }
 
+    //Обновить комментарий к новости
+    @PostMapping("changeNewsComment")
+    @ResponseBody
+    public ResponseEntity<String> changeNewsComment(NewsCommentRequestDTO newsCommentRequestDTO){
+        NewsComment newsComment = newsService.findNewsCommentById(newsCommentRequestDTO.getId());
+        newsComment.setContent(newsCommentRequestDTO.getContent());
+        newsService.saveNewsComment(newsComment);
+
+        return ResponseEntity.ok("{\"message\": \"Комментарий к новости успешно обновлён\"}");
+    }
 
     //Удалить комментарий по id
     @DeleteMapping("/deleteNewsCommentById")

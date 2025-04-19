@@ -34,7 +34,6 @@ public class UserCommentControl {
     @ResponseBody
     public ResponseEntity<String> addUserComment(UserCommentRequestDTO userCommentRequestDTO){
         UserComment userComment = new UserComment();
-        userComment.setId(userCommentRequestDTO.getId());
         userComment.setGetterUser(userService.findUserById(userCommentRequestDTO.getGetterUserId()));
         userComment.setSenderUser(userService.findUserById(userCommentRequestDTO.getSenderUserId()));
         userComment.setContent(userCommentRequestDTO.getContent());
@@ -42,6 +41,17 @@ public class UserCommentControl {
         userCommentService.saveUserComment(userComment);
 
         return ResponseEntity.ok("{\"message\": \"Комментарий пользователю успешно добавлен\"}");
+    }
+
+    //Обновление комментария к пользователю
+    @PostMapping("changeUserComment")
+    @ResponseBody
+    public ResponseEntity<String> changeUserComment(UserCommentRequestDTO userCommentRequestDTO){
+        UserComment userComment = userCommentService.findUserCommentById(userCommentRequestDTO.getId());
+        userComment.setContent(userCommentRequestDTO.getContent());
+        userCommentService.saveUserComment(userComment);
+
+        return ResponseEntity.ok("{\"message\": \"Комментарий пользователю успешно обновлён\"}");
     }
 
     //Получение конкретного комментария

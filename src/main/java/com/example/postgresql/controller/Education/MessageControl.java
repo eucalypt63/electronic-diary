@@ -37,7 +37,6 @@ public class MessageControl {
     @ResponseBody
     public ResponseEntity<String> addMessage(MessageRequestDTO messageRequestDTO){
         Message message = new Message();
-        message.setId(messageRequestDTO.getId());
         message.setGetterUser(userService.findUserById(messageRequestDTO.getGetterUserId()));
         message.setSenderUser(userService.findUserById(messageRequestDTO.getSenderUserId()));
         message.setMessage(messageRequestDTO.getMessage());
@@ -45,6 +44,17 @@ public class MessageControl {
         messageService.saveMessage(message);
 
         return ResponseEntity.ok("{\"message\": \"Сообщение успешно отправлено\"}");
+    }
+
+    //Обновить сообщение
+    @PostMapping("changeMessage")
+    @ResponseBody
+    public ResponseEntity<String> changeMessage(MessageRequestDTO messageRequestDTO){
+        Message message = messageService.findMessageById(messageRequestDTO.getId());
+        message.setMessage(messageRequestDTO.getMessage());
+        messageService.saveMessage(message);
+
+        return ResponseEntity.ok("{\"message\": \"Сообщение успешно обновлено\"}");
     }
 
     //Получение конкретного сообщения
