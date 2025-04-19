@@ -19,8 +19,12 @@ public class UserCommentService {
         return userCommentRepository.findById(id).orElse(null);
     }
 
-    public List<UserComment> findAllUserComments(){
-        return userCommentRepository.findAll();
+    public List<UserComment> findUserCommentByGetterUserId(Long id){
+        return userCommentRepository.findUserCommentByGetterUserId(id);
+    }
+
+    public List<UserComment> findUserCommentBySenderUserIdAndGetterUserId(Long senderId, Long getterId){
+        return userCommentRepository.findUserCommentBySenderUserIdAndGetterUserId(senderId, getterId);
     }
 
     public void deleteUserCommentById(Long id){

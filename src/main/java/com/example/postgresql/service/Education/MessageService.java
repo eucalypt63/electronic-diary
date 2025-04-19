@@ -18,8 +18,11 @@ public class MessageService {
         return messageRepository.findById(id).orElse(null);
     }
 
-    public List<Message> findAllMessages(){
-        return messageRepository.findAll();
+    public List<Message> findMessageByGetterUserId(Long id){
+        return messageRepository.findMessageByGetterUserId(id);
+    }
+    public List<Message> findMessageBySenderUserIdAndGetterUserId(Long senderId, Long getterId){
+        return messageRepository.findMessageBySenderUserIdAndGetterUserId(senderId, getterId);
     }
 
     public void deleteMessageById(Long id){

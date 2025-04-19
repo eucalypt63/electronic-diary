@@ -21,14 +21,6 @@ public class UserComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @NonNull
-    private LocalDateTime dateTime;
-
-    @Column(nullable = false)
-    @NonNull
-    private String content;
-
     @ManyToOne
     @JoinColumn(name = "uc_u_getter_id", foreignKey = @ForeignKey(name = "uc_u_getter_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -38,4 +30,12 @@ public class UserComment {
     @JoinColumn(name = "uc_u_sender_id", foreignKey = @ForeignKey(name = "uc_u_sender_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User senderUser;
+
+    @Column(nullable = false)
+    @NonNull
+    private String content;
+
+    @Column(nullable = false)
+    @NonNull
+    private LocalDateTime dateTime;
 }

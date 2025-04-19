@@ -21,21 +21,21 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @NonNull
-    private LocalDateTime dateTime;
-
-    @Column(nullable = false)
-    @NonNull
-    private String message;
+    @ManyToOne
+    @JoinColumn(name = "m_u_getter_id", foreignKey = @ForeignKey(name = "m_u_getter_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User getterUser;
 
     @ManyToOne
     @JoinColumn(name = "m_u_sender_id", foreignKey = @ForeignKey(name = "m_u_sender_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User senderUser;
 
-    @ManyToOne
-    @JoinColumn(name = "m_u_getter_id", foreignKey = @ForeignKey(name = "m_u_getter_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User getterUser;
+    @Column(nullable = false)
+    @NonNull
+    private String message;
+
+    @Column(nullable = false)
+    @NonNull
+    private LocalDateTime dateTime;
 }
