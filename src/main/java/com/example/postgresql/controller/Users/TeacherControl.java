@@ -94,7 +94,7 @@ public class TeacherControl {
                 .map(classEntity -> classEntity.getTeacher().getId())
                 .collect(Collectors.toSet());
 
-        List<Teacher> teachers = teacherService.getTeachersBySchoolId(schoolId, new ArrayList<>(assignedTeacherIds));
+        List<Teacher> teachers = teacherService.findTeachersBySchoolId(schoolId, new ArrayList<>(assignedTeacherIds));
 
         List<TeacherResponseDTO> teacherResponseDTOS = new ArrayList<>();
         for (Teacher teacher : teachers) {

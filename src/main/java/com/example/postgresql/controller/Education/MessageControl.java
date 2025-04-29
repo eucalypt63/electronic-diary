@@ -11,10 +11,7 @@ import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +32,7 @@ public class MessageControl {
     //Добавление сообщения
     @PostMapping("addMessage")
     @ResponseBody
-    public ResponseEntity<String> addMessage(MessageRequestDTO messageRequestDTO){
+    public ResponseEntity<String> addMessage(@RequestBody MessageRequestDTO messageRequestDTO){
         Message message = new Message();
         message.setGetterUser(userService.findUserById(messageRequestDTO.getGetterUserId()));
         message.setSenderUser(userService.findUserById(messageRequestDTO.getSenderUserId()));
@@ -49,7 +46,7 @@ public class MessageControl {
     //Обновить сообщение
     @PostMapping("changeMessage")
     @ResponseBody
-    public ResponseEntity<String> changeMessage(MessageRequestDTO messageRequestDTO){
+    public ResponseEntity<String> changeMessage(@RequestBody MessageRequestDTO messageRequestDTO){
         Message message = messageService.findMessageById(messageRequestDTO.getId());
         message.setMessage(messageRequestDTO.getMessage());
         messageService.saveMessage(message);
@@ -60,14 +57,14 @@ public class MessageControl {
     //Получение конкретного сообщения
     @GetMapping("/getMessageById")
     @ResponseBody
-    public ResponseEntity<Message> getMessageById(Long id) {
+    public ResponseEntity<Message> getMessageById(@RequestParam Long id) {
         return ResponseEntity.ok(messageService.findMessageById(id));
     }
 
     //Получить сообщения получателя
     @GetMapping("findMessageByGetterUserId")
     @ResponseBody
-    public ResponseEntity<List<MessageResponseDTO>> findMessageByGetterUserId(Long id){
+    public ResponseEntity<List<MessageResponseDTO>> findMessageByGetterUserId(@RequestParam Long id){
         List<Message> messages = messageService.findMessageByGetterUserId(id);
         List<MessageResponseDTO> messageResponseDTOS = new ArrayList<>();
 
@@ -81,7 +78,7 @@ public class MessageControl {
     //Получить сообщения от конкретного отправителя
     @GetMapping("findMessageBySenderUserIdAndGetterUserId")
     @ResponseBody
-    public ResponseEntity<List<MessageResponseDTO>> findMessageBySenderUserIdAndGetterUserId(Long senderId, Long getterId){
+    public ResponseEntity<List<MessageResponseDTO>> findMessageBySenderUserIdAndGetterUserId(@RequestParam Long senderId,@RequestParam Long getterId){
         List<Message> messages = messageService.findMessageBySenderUserIdAndGetterUserId(senderId, getterId);
         List<MessageResponseDTO> messageResponseDTOS = new ArrayList<>();
 
@@ -95,7 +92,7 @@ public class MessageControl {
     //Получить последних сообщений от каждого отправителя
     @GetMapping("findLatestMessageByGetterUserId")
     @ResponseBody
-    public ResponseEntity<List<MessageResponseDTO>> findLatestMessageByGetterUserId(Long id){
+    public ResponseEntity<List<MessageResponseDTO>> findLatestMessageByGetterUserId(@RequestParam Long id){
         List<Message> messages = messageService.findMessageByGetterUserId(id);
         List<MessageResponseDTO> messageResponseDTOS = new ArrayList<>();
 
@@ -117,7 +114,7 @@ public class MessageControl {
     //Удалить сообщение по id
     @DeleteMapping("/deleteMessageById")
     @ResponseBody
-    public ResponseEntity<Void> deleteMessageById(Long id) {
+    public ResponseEntity<Void> deleteMessageById(@RequestParam Long id) {
         messageService.deleteMessageById(id);
         return ResponseEntity.ok().build();
     }

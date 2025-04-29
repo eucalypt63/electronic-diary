@@ -36,7 +36,7 @@ public class News {
     @NonNull
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     @NonNull
     private String content;
 

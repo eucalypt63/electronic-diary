@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал</title>
+    <link rel="stylesheet" type="text/css" href="/style/Header.css">
+    <style>
+        /* Стили остаются без изменений */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .journal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            margin: 20px;
+        }
+        .journal-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1px;
+            background-color: #ddd;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            margin: 20px;
+        }
+        .grid-header.student-name {
+            background-color: #4285f4;
+        }
+        .grid-header {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .student-name {
+            background-color: #f5f5f5;
+            padding: 10px;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+        .grade-cell {
+            background-color: white;
+            padding: 10px;
+            text-align: center;
+            min-height: 40px;
+            cursor: pointer;
+        }
+        .absent {
+            color: red;
+            font-weight: bold;
+        }
+
+        .date-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+            white-space: nowrap;
+            font-weight: normal;
+            color: #333;
+            text-align: left;
+        }
+
+        .date-tooltip div {
+            margin: 3px 0;
+        }
+
+        .grid-header.has-tooltip:hover {
+            background-color: #3367d6; /* Немного темнее при наведении */
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-textarea {
+            width: 95%;
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-button.cancel {
+            background-color: #f1f1f1;
+        }
+
+        .modal-button.save {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .modal-button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="school-name">Школа</div>
+    <button class="logout-button">Выйти</button>
+</header>
+
+<h1 id="journalTitle">Журнал</h1>
+
+<div class="journal-header">
+    <div><strong>Учитель:</strong> <span id="teacherName"></span></div>
+    <div><strong>Четверть:</strong> <span id="quarterNumber"></span></div>
+</div>
+
+<div class="journal-grid" id="journalGrid">
+    <!-- Здесь будет динамически создаваться таблица -->
+</div>
+
+
+<div class="modal" id="editDayModal" style="display: none;">
+    <div class="modal-content">
+        <h2>Редактировать урок</h2>
+
+        <label for="edit-topic">Тема урока:</label>
+        <textarea id="edit-topic" class="modal-textarea" rows="3"></textarea>
+
+        <label for="edit-homework">Домашнее задание:</label>
+        <textarea id="edit-homework" class="modal-textarea" rows="3"></textarea>
+
+        <div class="modal-buttons">
+            <button class="modal-button cancel">Отменить</button>
+            <button class="modal-button save">Обновить</button>
+        </div>
+    </div>
+</div>
+
+<div id="editScoreModal" class="modal">
+    <div class="modal-content">
+        <h3>Редактирование оценки/посещаемости</h3>
+        <div class="modal-body">
+            <label for="edit-score">Оценка (1-10) или "N" для отсутствия:</label>
+            <input type="text" id="edit-score" maxlength="2">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button cancel">Отменить</button>
+            <button class="modal-button save">Обновить</button>
+        </div>
+    </div>
+</div>
+<script>
+    let gradebookDataTemp;
+    let groupDataTemp;
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const teacherAssignmentId = urlParams.get('teacherAssignmentId');
+        const quarterId = urlParams.get('quarterId');
+
+        if (!teacherAssignmentId || !quarterId) {
+            console.error('Не указаны необходимые параметры в URL');
+            return;
+        }
+
+        // Получаем данные журнала с учётом четверти
+        fetch(`/findGradebookDayByScheduleLessonTeacherAssignmentId?id=${teacherAssignmentId}&quarterId=${quarterId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке данных журнала');
+                }
+                return response.json();
+            })
+            .then(gradebookData => {
+                if (!gradebookData.gradebookDayResponseDTOS || gradebookData.gradebookDayResponseDTOS.length === 0) {
+                    throw new Error('Нет данных о днях журнала для выбранной четверти');
+                }
+
+                // 2. Получаем данные о группе
+                const groupId = gradebookData.gradebookDayResponseDTOS[0].scheduleLesson.group.id;
+                return Promise.all([
+                    Promise.resolve(gradebookData),
+                    fetch(`/findGroupMemberByGroupId?id=${groupId}`).then(res => res.json())
+                ]);
+            })
+            .then(([gradebookData, groupData]) => {
+                gradebookDataTemp = gradebookData;
+                groupDataTemp = groupData;
+                renderGradebook(gradebookData, groupData);
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+
+        function renderGradebook(gradebookData, groupData) {
+            const firstDay = gradebookData.gradebookDayResponseDTOS[0];
+            document.getElementById('journalTitle').textContent =
+                `Журнал - ${firstDay.scheduleLesson.teacherAssignment.schoolSubject.name}
+                (${firstDay.scheduleLesson.group.groupName})`;
+
+            document.getElementById('teacherName').textContent =
+                `${firstDay.scheduleLesson.teacherAssignment.teacher.lastName}
+                 ${firstDay.scheduleLesson.teacherAssignment.teacher.firstName}
+                 ${firstDay.scheduleLesson.teacherAssignment.teacher.patronymic || ''}`;
+
+            document.getElementById('quarterNumber').textContent =
+                firstDay.scheduleLesson.quarterInfo.quarterNumber;
+
+            const sortedDays = [...gradebookData.gradebookDayResponseDTOS].sort((a, b) =>
+                new Date(a.dateTime) - new Date(b.dateTime));
+
+            const attendanceMap = createRecordMap(gradebookData.gradebookAttendanceResponseDTOS);
+            const scoreMap = createRecordMap(gradebookData.gradebookScoreResponseDTOS);
+
+            const grid = document.getElementById('journalGrid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `200px repeat(${sortedDays.length}, minmax(100px, 1fr))`;
+
+            // Добавляем заголовки
+            const studentNameHeader = document.createElement('div');
+            studentNameHeader.className = 'grid-header student-name';
+            studentNameHeader.textContent = 'Ученик';
+            grid.appendChild(studentNameHeader);
+
+            sortedDays.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'grid-header';
+                dayHeader.textContent = formatDate(day.dateTime);
+                dayHeader.style.cursor = 'pointer';
+
+                // Обработчик клика для открытия модального окна
+                dayHeader.addEventListener('click', () => {
+                    openEditDayModal(day);
+                });
+
+                grid.appendChild(dayHeader);
+            });
+
+            // Добавляем строки для каждого студента
+            groupData.groupMembers.forEach(member => {
+                const student = member.schoolStudent;
+
+                const studentNameCell = document.createElement('div');
+                studentNameCell.className = 'student-name';
+                studentNameCell.textContent = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
+                grid.appendChild(studentNameCell);
+
+                // Ячейки с оценками/посещаемостью для каждого дня
+                sortedDays.forEach(day => {
+                    const cell = document.createElement('div');
+                    cell.className = 'grade-cell';
+
+                    // Сохраняем данные для удобного доступа
+                    cell.dataset.dayId = day.id;
+                    cell.dataset.studentId = student.id;
+
+                    // Проверяем оценки
+                    const score = scoreMap.get(`${day.id}_${student.id}`);
+                    if (score) {
+                        cell.textContent = score.score;
+                    }
+                    // Проверяем посещаемость
+                    else if (attendanceMap.has(`${day.id}_${student.id}`)) {
+                        cell.textContent = 'N';
+                        cell.classList.add('absent');
+                    }
+
+                    // Добавляем обработчик клика
+                    cell.addEventListener('click', () => {
+                        openEditScoreModal(cell, day, student);
+                    });
+
+                    grid.appendChild(cell);
+                });
+            });
+
+        }
+
+        // Создает карту для быстрого поиска записей по ключу "dayId_studentId"
+        function createRecordMap(records) {
+            const map = new Map();
+            if (!records) return map;
+
+            records.forEach(record => {
+                const key = `${record.gradebookDay.id}_${record.schoolStudent.id}`;
+                map.set(key, record);
+            });
+
+            return map;
+        }
+
+        // Форматирует дату в формате "dd.MM"
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${day}.${month}`;
+        }
+    });
+
+    function openEditDayModal(day) {
+        const modal = document.getElementById('editDayModal');
+        const topicInput = document.getElementById('edit-topic');
+        const homeworkInput = document.getElementById('edit-homework');
+
+        // Заполняем поля текущими значениями
+        topicInput.value = day.topic || '';
+        homeworkInput.value = day.homework || '';
+
+        // Обработчик кнопки "Отменить"
+        document.querySelector('#editDayModal .modal-button.cancel').onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // Обработчик кнопки "Обновить"
+        document.querySelector('#editDayModal .modal-button.save').onclick = () => {
+            const newTopic = topicInput.value.trim();
+            const newHomework = homeworkInput.value.trim();
+
+            fetch('/updateGradebookDay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id=${day.id}&topic=${encodeURIComponent(newTopic)}&homework=${encodeURIComponent(newHomework)}`
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка обновления');
+                return response.json();
+            })
+            .then(data => {
+                modal.style.display = 'none';
+
+                day.topic = newTopic;
+                day.homework = newHomework;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при обновлении: ' + error.message);
+            });
+        };
+
+        modal.style.display = 'flex';
+    }
+
+    function openEditScoreModal(cell, day, student) {
+        const modal = document.getElementById('editScoreModal');
+        const scoreInput = document.getElementById('edit-score');
+        const currentValue = cell.textContent;
+
+        // Заполняем поле текущим значением
+        scoreInput.value = currentValue === 'N' ? '' : currentValue;
+
+        // Обработчик кнопки "Отменить"
+        document.querySelector('#editScoreModal .modal-button.cancel').onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // Обработчик кнопки "Обновить"
+        document.querySelector('#editScoreModal .modal-button.save').onclick = () => {
+            const newValue = scoreInput.value.trim().toUpperCase();
+
+            // Проверяем, что введено допустимое значение (1-10 или N)
+            if (newValue === 'N' || (!isNaN(newValue) && parseInt(newValue) >= 1 && parseInt(newValue) <= 10)) {
+                const isAttendance = newValue === 'N';
+                const endpoint = isAttendance ? '/updateGradebookAttendance' : '/updateGradebookScore';
+                const params = `gradebookDayId=${day.id}&schoolStudentId=${student.id}` +
+                               (isAttendance ? '' : `&score=${newValue}`);
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка обновления');
+                    return response.json();
+                })
+                .then(data => {
+                    modal.style.display = 'none';
+
+                    // Обновляем ячейку в DOM
+                    cell.textContent = newValue;
+                    if (isAttendance) {
+                        cell.classList.add('absent');
+                    } else {
+                        cell.classList.remove('absent');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при обновлении: ' + error.message);
+                });
+            } else {
+                alert('Пожалуйста, введите оценку от 1 до 10 или "N" для отсутствия');
+            }
+        };
+
+        modal.style.display = 'flex';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('editDayModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -34,8 +34,6 @@ public class NewsService {
         newsRepository.deleteById(id);
     }
 
-    //добавление
-
     //----------
 
     public NewsComment findNewsCommentById(Long id){
@@ -54,5 +52,4 @@ public class NewsService {
         newsCommentRepository.deleteById(id);
     }
 
-    //добавление
 }

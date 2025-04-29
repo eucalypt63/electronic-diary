@@ -31,7 +31,7 @@ public class UserComment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User senderUser;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     @NonNull
     private String content;
 

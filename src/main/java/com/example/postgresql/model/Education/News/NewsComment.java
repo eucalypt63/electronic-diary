@@ -31,7 +31,7 @@ public class NewsComment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private News news;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     @NonNull
     private String content;
 

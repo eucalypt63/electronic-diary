@@ -13,7 +13,6 @@ public class MessageService {
     @Autowired
     private MessageRepository messageRepository;
 
-
     public Message findMessageById(Long id){
         return messageRepository.findById(id).orElse(null);
     }

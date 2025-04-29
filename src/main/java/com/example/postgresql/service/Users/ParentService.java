@@ -36,25 +36,22 @@ public class ParentService {
         parentRepository.deleteById(id);
     }
 
-    public List<ParentType> getAllParentTypes() { return parentTypeRepository.findAll(); }
-
-    public List<StudentParent> getAllStudentParent() { return studentParentRepository.findAll(); }
 
     public List<StudentParent> findStudentParentByParentId(Long id) { return studentParentRepository.findStudentParentByParentId(id); }
     public List<StudentParent> findStudentParentBySchoolStudentId(Long id) {
         return studentParentRepository.findStudentParentBySchoolStudentId(id);
     }
-
     public void saveStudentParent(StudentParent studentParent) {
         studentParentRepository.save(studentParent);
     }
     public void deleteStudentParentById(Long id) {
         studentParentRepository.deleteById(id);
     }
-
     public StudentParent findStudentParentById(Long id) {
         return studentParentRepository.findById(id).orElse(null);
     }
 
+
+    public List<ParentType> getAllParentTypes() { return parentTypeRepository.findAll(); }
     public ParentType findParentTypeById(Long id) { return  parentTypeRepository.findById(id).orElse(null); }
 }

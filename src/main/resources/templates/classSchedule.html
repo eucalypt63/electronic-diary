@@ -193,6 +193,21 @@
             background-color: #3367d6;
         }
 
+        .modal-buttons-top {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-button.open-journal {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .modal-button.open-journal:hover {
+            background-color: #3367d6;
+        }
+
     </style>
 </head>
 <body>
@@ -300,12 +315,14 @@
         </div>
     </div>
 </div>
+
 <div class="modal" id="editLessonModal" style="display: none;">
     <div class="modal-content">
         <h2>Редактировать урок</h2>
 
         <div class="modal-buttons-top">
             <button class="modal-button add-new">Добавить урок</button>
+            <button class="modal-button open-journal">Открыть журнал</button>
         </div>
 
         <label for="edit-lesson-select">Урок:</label>
@@ -381,34 +398,41 @@
             });
 
             const lessonsMap = new Map();
-
             for (const [groupId, lessons] of entries) {
                 lessons.forEach(lesson => {
                     const key = `${lesson.dayNumber}-${lesson.lessonNumber}`;
+                    const subjectName = lesson.teacherAssignment.schoolSubject.name;
+                    const groupName = lesson.group.groupName;
 
                     if (!lessonsMap.has(key)) {
-                        lessonsMap.set(key, {
-                            subjects: new Set(),
-                            groups: new Set()
-                        });
+                        lessonsMap.set(key, new Map());
                     }
 
-                    const lessonData = lessonsMap.get(key);
-                    lessonData.subjects.add(lesson.teacherAssignment.schoolSubject.name);
-                    lessonData.groups.add(lesson.group.groupName);
+                    const subjectGroupsMap = lessonsMap.get(key);
+
+                    if (!subjectGroupsMap.has(subjectName)) {
+                        subjectGroupsMap.set(subjectName, new Set());
+                    }
+
+                    subjectGroupsMap.get(subjectName).add(groupName);
                 });
             }
 
-            lessonsMap.forEach((value, key) => {
+            lessonsMap.forEach((subjectGroupsMap, key) => {
                 const lessonDiv = document.getElementById(key);
                 if (lessonDiv) {
                     lessonDiv.classList.remove('free');
                     lessonDiv.classList.add('occupied');
 
-                    const subjects = Array.from(value.subjects).join(', ');
-                    const groups = Array.from(value.groups).join(', ');
+                    let htmlContent = '';
 
-                    lessonDiv.innerHTML = `${subjects} (${groups})`;
+                    subjectGroupsMap.forEach((groups, subject) => {
+                        const groupsList = Array.from(groups).join(', ');
+                        htmlContent += `${subject} (${groupsList})<br>`;
+                    });
+
+                    htmlContent = htmlContent.replace(/<br>$/, '');
+                    lessonDiv.innerHTML = htmlContent;
                 }
             });
         })
@@ -421,6 +445,7 @@
     // Добавление урока
     function handleAddNewLesson(day, lessonNumber) {
         const modal = document.getElementById('addLessonModal');
+        let activeTeacherAssignment = 0;
 
         fetch(`/getLessonAddParams?id=${id}`)
             .then(response => {
@@ -562,12 +587,22 @@
                             groupSelect.value = lesson.group.id;
                             subjectSelect.value = lesson.teacherAssignment.schoolSubject.id;
                             teacherSelect.value = lesson.teacherAssignment.teacher.id;
+                            activeTeacherAssignment = lesson.teacherAssignment.id;
                         }
                     })
                     .catch(error => {
                         console.error('Error loading select options:', error);
                         alert('Ошибка загрузки данных для выбора');
                     });
+
+                document.querySelector('#editLessonModal .modal-button.open-journal').onclick = () => {
+                    if (activeTeacherAssignment) {
+                        window.location.href = `/groupGradebook?teacherAssignmentId=${activeTeacherAssignment}&quarterId=${activeQuarter}`;
+                    } else {
+                        alert('Не выбран активный урок для открытия журнала');
+                    }
+                };
+
 
 
                 document.querySelector('#editLessonModal .modal-button.add-new').onclick = () => {

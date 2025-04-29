@@ -56,11 +56,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-
     public UserType findUserTypeById(Long id) {
         return userTypeRepository.findById(id).orElse(null);
     }
-
 
     public void deleteUserById(Long id){userRepository.deleteById(id);}
 

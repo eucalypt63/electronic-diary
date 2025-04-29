@@ -11,13 +11,11 @@ public class MessageResponseDTO {
     private Long id;
 
     private Long getterUserId;
-    private Long getterEducationId;
     private String getterFirstName;
     private String getterLastName;
     private String getterPatronymic;
 
     private Long senderUserId;
-    private Long senderEducationId;
     private String senderFirstName;
     private String senderLastName;
     private String senderPatronymic;

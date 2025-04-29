@@ -116,7 +116,7 @@ public class SchoolStudentControl {
     @GetMapping("/getStudentsOfClass")
     @ResponseBody
     public ResponseEntity<List<SchoolStudentResponseDTO>> getStudentsOfClass(@RequestParam Long ObjectId) {
-        List<SchoolStudent> schoolStudents = schoolStudentService.getAllSchoolStudentByClassId(ObjectId);
+        List<SchoolStudent> schoolStudents = schoolStudentService.findAllSchoolStudentByClassId(ObjectId);
 
         List<SchoolStudentResponseDTO> schoolStudentResponseDTOS = new ArrayList<>();
         for (SchoolStudent schoolStudent : schoolStudents) {

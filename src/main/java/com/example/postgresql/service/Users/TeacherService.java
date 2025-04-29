@@ -1,10 +1,8 @@
 package com.example.postgresql.service.Users;
 
 import com.example.postgresql.model.TeacherAssignment;
-import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.repository.TeacherAssignmentRepository;
-import com.example.postgresql.repository.Users.AdministratorRepository;
 import com.example.postgresql.repository.Users.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,8 @@ public class TeacherService {
     public List<Teacher> findTeacherByEducationalInstitutionId(Long schoolId) {
         return teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
     }
-    public List<Teacher> getTeachersBySchoolId(Long schoolId, List<Long> assignedTeacherIds) {
+
+    public List<Teacher> findTeachersBySchoolId(Long schoolId, List<Long> assignedTeacherIds) {
         List<Teacher> teachers = teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
         return teachers.stream()
                 .filter(teacher -> !assignedTeacherIds.contains(teacher.getId()))

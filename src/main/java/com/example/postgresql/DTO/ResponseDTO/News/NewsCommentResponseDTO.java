@@ -11,7 +11,6 @@ public class NewsCommentResponseDTO {
     private Long id;
 
     private Long userId;
-    private Long educationId;
     private String firstName;
     private String lastName;
     private String patronymic;

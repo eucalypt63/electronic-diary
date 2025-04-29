@@ -52,6 +52,11 @@ public class PageControl {
         return "classGroups";
     }
 
+    @GetMapping("/groupGradebook")
+    public String getGroupGradebook(@RequestParam String teacherAssignmentId, @RequestParam String quarterId) {
+        return "groupGradebook";
+    }
+
     @GetMapping("/test")
     public String getTest() {
         return "test";

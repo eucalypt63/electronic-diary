@@ -15,9 +15,6 @@ public class AdministratorService {
     @Autowired
     private AdministratorRepository administratorRepository;
 
-    public List<Administrator> getAllAdministrators() {
-        return administratorRepository.findAll();
-    }
     public Administrator findAdministratorByUserId(Long id) {
         return administratorRepository.findAdministratorByUserId(id);
     }

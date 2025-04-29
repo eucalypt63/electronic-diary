@@ -11,12 +11,10 @@ import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.NewsService;
 import com.example.postgresql.service.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +31,10 @@ public class NewsControl {
     @Autowired
     private DTOService dtoService;
 
-
     //Найти новость по id
     @GetMapping("/findNewsById")
     @ResponseBody
-    public ResponseEntity<NewsResponseDTO> findNewsById(Long id) {
+    public ResponseEntity<NewsResponseDTO> findNewsById(@RequestParam Long id) {
         NewsResponseDTO news = dtoService.NewsToDto(newsService.findNewsById(id));
 
         return ResponseEntity.ok(news);
@@ -46,7 +43,7 @@ public class NewsControl {
     //Найти все новости по id школы
     @GetMapping("/findNewsByEducationId")
     @ResponseBody
-    public ResponseEntity<List<NewsResponseDTO>> findNewsByEducationId(Long id) {
+    public ResponseEntity<List<NewsResponseDTO>> findNewsByEducationId(@RequestParam Long id) {
         List<News> newsList = newsService.findNewsByEducationalInstitutionId(id);
         List<NewsResponseDTO> newsResponseDTOS = new ArrayList<>();
 
@@ -59,10 +56,10 @@ public class NewsControl {
     //Добавить новость
     @PostMapping("/addNews")
     @ResponseBody
-    public ResponseEntity<String> addNews(NewsRequestDTO newsRequestDTO) {
+    public ResponseEntity<String> addNews(@RequestBody NewsRequestDTO newsRequestDTO) {
         News news = new News();
         news.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(newsRequestDTO.getEducationalInstitutionId()));
-        news.setOwnerUser(userService.findUserById(newsRequestDTO.getId()));
+        news.setOwnerUser(userService.findUserById(newsRequestDTO.getOwnerUserId()));
         news.setTitle(newsRequestDTO.getTitle());
         news.setContent(newsRequestDTO.getContent());
         news.setDateTime(newsRequestDTO.getDateTime());
@@ -74,7 +71,7 @@ public class NewsControl {
     //Обновить новость
     @PostMapping("/changeNews")
     @ResponseBody
-    public ResponseEntity<String> changeNews(NewsRequestDTO newsRequestDTO) {
+    public ResponseEntity<String> changeNews(@RequestBody NewsRequestDTO newsRequestDTO) {
         News news = newsService.findNewsById(newsRequestDTO.getId());
         news.setTitle(newsRequestDTO.getTitle());
         news.setContent(newsRequestDTO.getContent());
@@ -86,7 +83,7 @@ public class NewsControl {
     //Удалить новость по id
     @DeleteMapping("/deleteNewsById")
     @ResponseBody
-    public ResponseEntity<Void> deleteNewsById(Long id) {
+    public ResponseEntity<Void> deleteNewsById(@RequestParam Long id) {
         newsService.deleteNewsById(id);
         return ResponseEntity.ok().build();
     }
@@ -96,7 +93,7 @@ public class NewsControl {
     //Найти комментарий к новости по id
     @GetMapping("findNewsCommentById")
     @ResponseBody
-    public ResponseEntity<NewsCommentResponseDTO> findNewsCommentById(Long id){
+    public ResponseEntity<NewsCommentResponseDTO> findNewsCommentById(@RequestParam Long id){
         NewsCommentResponseDTO newsCommentResponseDTO = dtoService.NewsCommentToDto(newsService.findNewsCommentById(id));
         return ResponseEntity.ok(newsCommentResponseDTO);
     }
@@ -104,7 +101,7 @@ public class NewsControl {
     //Найти все комментарии к новости по id новости
     @GetMapping("findNewsCommentByNewsId")
     @ResponseBody
-    public ResponseEntity<List<NewsCommentResponseDTO>> findNewsCommentByNewsId(Long id){
+    public ResponseEntity<List<NewsCommentResponseDTO>> findNewsCommentByNewsId(@RequestParam Long id){
         List<NewsComment> newsComments = newsService.findNewsCommentByNewsId(id);
         List<NewsCommentResponseDTO> newsCommentResponseDTOS = new ArrayList<>();
 
@@ -118,7 +115,7 @@ public class NewsControl {
     //Добавить комментарий к новости
     @PostMapping("addNewsComment")
     @ResponseBody
-    public ResponseEntity<String> addNewsComment(NewsCommentRequestDTO newsCommentRequestDTO){
+    public ResponseEntity<String> addNewsComment(@RequestBody NewsCommentRequestDTO newsCommentRequestDTO){
         NewsComment newsComment = new NewsComment();
         newsComment.setNews(newsService.findNewsById(newsCommentRequestDTO.getNewsId()));
         newsComment.setUser(userService.findUserById(newsCommentRequestDTO.getUserId()));
@@ -132,7 +129,7 @@ public class NewsControl {
     //Обновить комментарий к новости
     @PostMapping("changeNewsComment")
     @ResponseBody
-    public ResponseEntity<String> changeNewsComment(NewsCommentRequestDTO newsCommentRequestDTO){
+    public ResponseEntity<String> changeNewsComment(@RequestBody NewsCommentRequestDTO newsCommentRequestDTO){
         NewsComment newsComment = newsService.findNewsCommentById(newsCommentRequestDTO.getId());
         newsComment.setContent(newsCommentRequestDTO.getContent());
         newsService.saveNewsComment(newsComment);
@@ -143,7 +140,7 @@ public class NewsControl {
     //Удалить комментарий по id
     @DeleteMapping("/deleteNewsCommentById")
     @ResponseBody
-    public ResponseEntity<Void> deleteNewsCommentById(Long id) {
+    public ResponseEntity<Void> deleteNewsCommentById(@RequestParam Long id) {
         newsService.deleteNewsCommentById(id);
         return ResponseEntity.ok().build();
     }

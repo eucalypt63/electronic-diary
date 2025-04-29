@@ -18,10 +18,6 @@ public class GroupService {
     @Autowired
     private GroupMemberRepository groupMemberRepository;
 
-    public List<Group> getAllGroup() {
-        return groupRepository.findAll();
-    }
-
     public Group findGroupByClassRoomIdAndGroupName(Long classRoomId, String groupName) {
         return groupRepository.findGroupByClassRoomIdAndGroupName(classRoomId, groupName);
     }

@@ -16,19 +16,20 @@ public class SchoolStudentService {
     public List<SchoolStudent> findSchoolStudentByEducationalInstitutionId(Long id) {
         return schoolStudentRepository.findSchoolStudentByEducationalInstitutionId(id);
     }
-    public void saveSchoolStudent(SchoolStudent schoolStudent) {
-        schoolStudentRepository.save(schoolStudent);
-    }
+
     public SchoolStudent findSchoolStudentById(Long id) {
         return schoolStudentRepository.findById(id).orElse(null);
     }
     public SchoolStudent findSchoolStudentByUserId(Long id) {
         return schoolStudentRepository.findSchoolStudentByUserId(id);
     }
+    public void saveSchoolStudent(SchoolStudent schoolStudent) {
+        schoolStudentRepository.save(schoolStudent);
+    }
     public void deleteSchoolStudentById(Long id) {
         schoolStudentRepository.deleteById(id);
     }
-    public List<SchoolStudent> getAllSchoolStudentByClassId(Long id) {
+    public List<SchoolStudent> findAllSchoolStudentByClassId(Long id) {
         return schoolStudentRepository.findByClassRoomId(id);
     }
 

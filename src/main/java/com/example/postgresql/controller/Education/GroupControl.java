@@ -102,6 +102,25 @@ public class GroupControl {
         return ResponseEntity.ok(groupInfoResponseDTOS);
     }
 
+    @GetMapping("/findGroupMemberByGroupId")
+    @ResponseBody
+    public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByGroupId (Long id) {
+        Group group = groupService.findGroupById(id);
+        GroupResponseDTO groupResponseDTO = dtoService.GroupToDto(group);
+
+        List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(groupResponseDTO.getId());
+        List<GroupMemberResponseDTO> groupMemberResponseDTOS = new ArrayList<>();
+        groupMembers.forEach(groupMember -> {
+            groupMemberResponseDTOS.add(dtoService.GroupMemberToDto(groupMember));
+        });
+
+        GroupInfoResponseDTO groupInfoResponseDTO = new GroupInfoResponseDTO();
+        groupInfoResponseDTO.setGroup(groupResponseDTO);
+        groupInfoResponseDTO.setGroupMembers(groupMemberResponseDTOS);
+
+        return ResponseEntity.ok(groupInfoResponseDTO);
+    }
+
     @PostMapping("/addGroupMember")
     @ResponseBody
     public ResponseEntity<String> addGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
@@ -116,8 +135,6 @@ public class GroupControl {
     @PostMapping("/deleteGroupMember")
     @ResponseBody
     public ResponseEntity<String> deleteGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
-        System.out.println(studentId);
-        System.out.println(groupId);
         GroupMember groupMember = groupService.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);
         groupService.deleteGroupMember(groupMember);
 
