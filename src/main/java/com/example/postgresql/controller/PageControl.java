@@ -47,6 +47,11 @@ public class PageControl {
         return "classSchedule";
     }
 
+    @GetMapping("/schoolStudentSchedule")
+    public String getSchoolStudentSchedule(@RequestParam String id) {
+        return "schoolStudentSchedule";
+    }
+
     @GetMapping("/classGroups")
     public String getClassGroups(@RequestParam String id) {
         return "classGroups";

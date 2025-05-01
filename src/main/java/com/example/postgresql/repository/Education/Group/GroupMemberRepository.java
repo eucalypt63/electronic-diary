@@ -10,4 +10,5 @@ import java.util.List;
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> {
     List<GroupMember> findGroupMemberByGroupId(Long id);
     GroupMember findGroupMemberByGroupIdAndSchoolStudentId(Long groupId, Long studentId);
+    List<GroupMember> findGroupMemberBySchoolStudentId(Long studentId);
 }

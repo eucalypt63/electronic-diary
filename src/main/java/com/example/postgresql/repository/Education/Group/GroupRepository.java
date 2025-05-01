@@ -10,4 +10,5 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findGroupByClassRoomId(Long id);
     Group findGroupByClassRoomIdAndGroupName(Long classRoomId, String groupName);
+
 }

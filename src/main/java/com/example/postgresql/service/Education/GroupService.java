@@ -35,6 +35,7 @@ public class GroupService {
     //___
 
     public GroupMember findGroupMemberByGroupIdAndSchoolStudentId(Long groupId, Long studentId){ return groupMemberRepository.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);}
+    public List<GroupMember> findGroupMemberBySchoolStudentId(Long studentId){ return groupMemberRepository.findGroupMemberBySchoolStudentId(studentId);}
     public void deleteGroupMember(GroupMember groupMember){groupMemberRepository.delete(groupMember);}
     public void saveGroupMember(GroupMember groupMember) { groupMemberRepository.save(groupMember);}
 
