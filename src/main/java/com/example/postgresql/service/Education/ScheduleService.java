@@ -25,6 +25,10 @@ public class ScheduleService {
         return scheduleLessonRepository.findByGroupIdAndQuarterInfo_QuarterNumber(groupId, quarterNumber);
     }
 
+    public List<ScheduleLesson> findScheduleLessonByTeacherAssignmentIdAndQuarterNumber(Long teacherId, Long quarterNumber){
+        return scheduleLessonRepository.findScheduleLessonByTeacherAssignmentIdAndQuarterInfo_QuarterNumber(teacherId, quarterNumber);
+    }
+
     public boolean checkAvailability(Long quarterNumber, Long dayNumber, Long lessonNumber, Long teacherId){
         return scheduleLessonRepository.findByQuarterInfo_QuarterNumberAndDayNumberAndLessonNumberAndTeacherAssignment_Teacher_Id(
                 quarterNumber, dayNumber, lessonNumber, teacherId) == null;
@@ -59,6 +63,21 @@ public class ScheduleService {
         return scheduleLessonRepository
                 .findByGroup_ClassRoom_IdAndDayNumberAndLessonNumberAndQuarterInfo_QuarterNumber(
                         classId,
+                        day.longValue(),
+                        lessonNumber.longValue(),
+                        quarter.longValue()
+                );
+    }
+
+    public List<ScheduleLesson> findScheduleLessonsByTeacherAssignmentIdAndTime(
+            Long teacherAssignmentId,
+            Integer day,
+            Integer lessonNumber,
+            Integer quarter) {
+
+        return scheduleLessonRepository
+                .findByTeacherAssignmentIdAndDayNumberAndLessonNumberAndQuarterInfo_QuarterNumber(
+                        teacherAssignmentId,
                         day.longValue(),
                         lessonNumber.longValue(),
                         quarter.longValue()

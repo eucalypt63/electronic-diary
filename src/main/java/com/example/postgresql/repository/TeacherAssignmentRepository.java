@@ -13,4 +13,6 @@ public interface TeacherAssignmentRepository extends JpaRepository<TeacherAssign
             Long schoolSubjectId,
             Long teacherId
     );
+
+    List<TeacherAssignment> findTeacherAssignmentByTeacherId(Long teacherId);
 }

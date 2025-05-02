@@ -7,6 +7,7 @@ import com.example.postgresql.repository.Education.News.NewsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -26,10 +27,12 @@ public class NewsService {
         return newsRepository.findNewsByEducationalInstitutionId(id);
     }
 
+    @Transactional
     public void saveNews(News news) {
         newsRepository.save(news);
     }
 
+    @Transactional
     public void deleteNewsById(Long id){
         newsRepository.deleteById(id);
     }

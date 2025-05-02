@@ -100,6 +100,29 @@ public class ScheduleControl {
         return ResponseEntity.ok(scheduleMap);
     }
 
+    @GetMapping("/findLessonsByTeacherId")
+    @ResponseBody
+    public ResponseEntity<Map<Long, List<ScheduleLessonResponseDTO>>> findLessonsByLessonNumberAndTeacherId(@RequestParam Long id, @RequestParam Long quarter) {
+
+        List<TeacherAssignment> teacherAssignments = teacherService.findTeacherAssignmentByTeacherId(id);
+        Map<Long, List<ScheduleLessonResponseDTO>> scheduleMap = new HashMap<>();
+        List<ScheduleLessonResponseDTO> lessonsDTO = new ArrayList<>();
+
+        teacherAssignments.forEach(teacherAssignment -> {
+            List<ScheduleLesson> lessons = scheduleService.findScheduleLessonByTeacherAssignmentIdAndQuarterNumber(teacherAssignment.getId(), quarter);
+
+            for (ScheduleLesson scheduleLesson : lessons){
+                System.out.println(lessons);
+                lessonsDTO.add(dtoService.ScheduleLessonToDto(scheduleLesson));
+            }
+
+            scheduleMap.put(teacherAssignment.getId(), lessonsDTO);
+        });
+
+
+        return ResponseEntity.ok(scheduleMap);
+    }
+
     //Добавить даты для журнала
     @GetMapping("getLessonAddParams")
     @ResponseBody
@@ -149,6 +172,33 @@ public class ScheduleControl {
         for (Teacher teacher : teachers) {
             teacherResponseDTOS.add(dtoService.TeacherToDto(teacher));
         }
+        lessonParamsResponseDTO.setTeachers(teacherResponseDTOS);
+
+        lessonParamsResponseDTO.setSchoolSubjects(scheduleService.getAllSchoolSubject());
+
+        return  ResponseEntity.ok(lessonParamsResponseDTO);
+    }
+
+    @GetMapping("getLessonAddParamsByTeacherId")
+    @ResponseBody
+    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsByTeacherId(Long id){
+        LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
+        Teacher teacher = teacherService.findTeacherById(id);
+
+        List<TeacherAssignment> teacherAssignments = teacherService.findTeacherAssignmentByTeacherId(id);
+        List<Group> groups = teacherAssignments.stream()
+                .map(TeacherAssignment::getGroup)
+                .toList();
+
+        List<GroupResponseDTO> groupResponseDTOS = new ArrayList<>();
+        for (Group group : groups) {
+            groupResponseDTOS.add(dtoService.GroupToDto(group));
+        }
+        lessonParamsResponseDTO.setGroups(groupResponseDTOS);
+
+        List<TeacherResponseDTO> teacherResponseDTOS = new ArrayList<>();
+        teacherResponseDTOS.add(dtoService.TeacherToDto(teacher));
+
         lessonParamsResponseDTO.setTeachers(teacherResponseDTOS);
 
         lessonParamsResponseDTO.setSchoolSubjects(scheduleService.getAllSchoolSubject());
@@ -278,6 +328,37 @@ public class ScheduleControl {
                 .toList();
 
         Map<Long, ScheduleLessonsDayResponseDTO> result = filteredLessons.stream()
+                .collect(Collectors.toMap(
+                        ScheduleLesson::getId,
+                        lesson -> {
+                            ScheduleLessonsDayResponseDTO dto = new ScheduleLessonsDayResponseDTO();
+                            dto.setId(lesson.getId());
+                            dto.setGroup(dtoService.GroupToDto(lesson.getGroup()));
+                            dto.setTeacherAssignment(dtoService.TeacherAssignmentToDto(lesson.getTeacherAssignment()));
+                            return dto;
+                        }
+                ));
+
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/findLessonsByLessonNumberAndTeacherId")
+    @ResponseBody
+    public ResponseEntity<Map<Long, ScheduleLessonsDayResponseDTO>> findLessonsByLessonNumberAndTeacherId(
+            @RequestParam Long id,
+            @RequestParam int day,
+            @RequestParam int lessonNumber,
+            @RequestParam int quarter) {
+
+        List<TeacherAssignment> teacherAssignments = teacherService.findTeacherAssignmentByTeacherId(id);
+
+        List<ScheduleLesson> lessons = new ArrayList<>();
+        teacherAssignments.forEach(teacherAssignment -> {
+            lessons.addAll(scheduleService.findScheduleLessonsByTeacherAssignmentIdAndTime(
+                    teacherAssignment.getId(), day, lessonNumber, quarter));
+        });
+
+        Map<Long, ScheduleLessonsDayResponseDTO> result = lessons.stream()
                 .collect(Collectors.toMap(
                         ScheduleLesson::getId,
                         lesson -> {

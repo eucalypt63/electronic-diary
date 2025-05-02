@@ -21,4 +21,11 @@ public interface ScheduleLessonRepository extends JpaRepository<ScheduleLesson, 
             Long dayNumber,
             Long lessonNumber,
             Long quarterNumber);
+
+    List<ScheduleLesson> findScheduleLessonByTeacherAssignmentIdAndQuarterInfo_QuarterNumber(Long teacherId, Long quarterNumber);
+    List<ScheduleLesson> findByTeacherAssignmentIdAndDayNumberAndLessonNumberAndQuarterInfo_QuarterNumber(
+            Long teacherAssignmentId,
+            Long dayNumber,
+            Long lessonNumber,
+            Long quarterNumber);
 }
