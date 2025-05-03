@@ -51,20 +51,24 @@ public class AuthorizationControl {
             session = request.getSession(true);
 
             UserType userType = user.getUserType();
-            if (userType.getName().equals("Main admin")) {
-                session.setAttribute("userId", user.getId());
-            } else if (userType.getName().equals("Local admin")){
-                Administrator administrator = administratorService.findAdministratorByUserId(user.getId());
-                session.setAttribute("userId", administrator.getId());
-            } else if (userType.getName().equals("Teacher")){
-                Teacher teacher = teacherService.findTeacherByUserId(user.getId());
-                session.setAttribute("userId", teacher.getId());
-            } else if (userType.getName().equals("School student")){
-                SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentByUserId(user.getId());
-                session.setAttribute("userId", schoolStudent.getId());
-            } else if (userType.getName().equals("Parent")){
-                Parent parent = parentService.findParentByUserId(user.getId());
-                session.setAttribute("userId", parent.getId());
+            switch (userType.getName()) {
+                case "Main admin" -> session.setAttribute("userId", user.getId());
+                case "Local admin" -> {
+                    Administrator administrator = administratorService.findAdministratorByUserId(user.getId());
+                    session.setAttribute("userId", administrator.getId());
+                }
+                case "Teacher" -> {
+                    Teacher teacher = teacherService.findTeacherByUserId(user.getId());
+                    session.setAttribute("userId", teacher.getId());
+                }
+                case "School student" -> {
+                    SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentByUserId(user.getId());
+                    session.setAttribute("userId", schoolStudent.getId());
+                }
+                case "Parent" -> {
+                    Parent parent = parentService.findParentByUserId(user.getId());
+                    session.setAttribute("userId", parent.getId());
+                }
             }
             session.setAttribute("role", userType.getName());
             return ResponseEntity.ok(userType.getName());

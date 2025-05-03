@@ -80,7 +80,7 @@ public class GroupControl {
     //Ученики группы
     @GetMapping("/findGroupMembersByClassId")
     @ResponseBody
-    public ResponseEntity<List<GroupInfoResponseDTO>> findGroupMembersByClassId (Long id) {
+    public ResponseEntity<List<GroupInfoResponseDTO>> findGroupMembersByClassId (@RequestParam Long id) {
         List<Group> groups = groupService.findGroupByClassId(id);
 
         List<GroupInfoResponseDTO> groupInfoResponseDTOS = new ArrayList<>();
@@ -104,7 +104,7 @@ public class GroupControl {
 
     @GetMapping("/findGroupMemberByGroupId")
     @ResponseBody
-    public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByGroupId (Long id) {
+    public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByGroupId (@RequestParam Long id) {
         Group group = groupService.findGroupById(id);
         GroupResponseDTO groupResponseDTO = dtoService.GroupToDto(group);
 

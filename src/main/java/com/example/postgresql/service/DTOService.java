@@ -19,6 +19,7 @@ import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Message;
 import com.example.postgresql.model.Education.News.News;
 import com.example.postgresql.model.Education.News.NewsComment;
+import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.Education.UserComment;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Administrator;
@@ -420,5 +421,16 @@ public class DTOService {
         gradebookScoreResponseDTO.setSchoolStudent(SchoolStudentToDto(gradebookAttendance.getSchoolStudent()));
         gradebookScoreResponseDTO.setScore(gradebookAttendance.getScore());
         return gradebookScoreResponseDTO;
+    }
+
+    public NotificationResponseDTO NotificationToDto(Notification notification){
+        NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO();
+        notificationResponseDTO.setId(notification.getId());
+        notificationResponseDTO.setUserId(notification.getUser().getId());
+        notificationResponseDTO.setTitle(notification.getTitle());
+        notificationResponseDTO.setContent(notification.getContent());
+        notificationResponseDTO.setLink(notification.getLink());
+        notificationResponseDTO.setDateTime(notification.getDateTime());
+        return notificationResponseDTO;
     }
 }

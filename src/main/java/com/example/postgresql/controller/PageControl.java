@@ -11,42 +11,34 @@ public class PageControl {
     public String getProfileSchoolStudent(@RequestParam String id) {
         return "profile/profileSchoolStudent";
     }
-
     @GetMapping("/profileTeacher")
     public String getProfileTeacher(@RequestParam String id) {
         return "profile/profileTeacher";
     }
-
     @GetMapping("/profileParent")
     public String getProfileParent(@RequestParam String id) {
         return "profile/profileParent";
     }
-
     @GetMapping("/profileAdministrator")
     public String getProfileAdministrator(@RequestParam String id) {
         return "profile/profileAdministrator";
     }
-
     @GetMapping("/parentPage")
     public String getParentPage(@RequestParam String id) {
         return "lists/listParents";
     }
-
     @GetMapping("/parentsSchoolStudents")
     public String getParentsSchoolStudents(@RequestParam String id) {
         return "lists/listParentsSchoolStudents";
     }
-
     @GetMapping("/classPage")
     public String getClassPage(@RequestParam String id) {
         return "lists/classPage";
     }
-
     @GetMapping("/classSchedule")
     public String getClassSchedule(@RequestParam String id) {
         return "classSchedule";
     }
-
     @GetMapping("/schoolStudentSchedule")
     public String getSchoolStudentSchedule(@RequestParam String id) {
         return "schoolStudentSchedule";
@@ -59,12 +51,10 @@ public class PageControl {
     public String getClassGroups(@RequestParam String id) {
         return "classGroups";
     }
-
     @GetMapping("/groupGradebook")
     public String getGroupGradebook(@RequestParam String teacherAssignmentId, @RequestParam String quarterId) {
         return "groupGradebook";
     }
-
     @GetMapping("/test")
     public String getTest() {
         return "test";

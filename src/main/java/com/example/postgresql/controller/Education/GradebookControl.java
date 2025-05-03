@@ -5,14 +5,18 @@ import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookScoreResponseDTO;
 import com.example.postgresql.model.Education.Gradebook.*;
+import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.GradebookService;
+import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +24,8 @@ import java.util.List;
 public class GradebookControl {
     @Autowired
     private GradebookService gradebookService;
+    @Autowired
+    private NotificationService notificationService;
     @Autowired
     private SchoolStudentService schoolStudentService;
     @Autowired
@@ -73,13 +79,16 @@ public class GradebookControl {
         GradebookScore gradebookScore = gradebookService.findScoresByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);
         GradebookAttendance gradebookAttendance = gradebookService.findAttendancesByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);
 
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
+        GradebookDay gradebookDay = gradebookService.findGradebookDayById(gradebookDayId);
+
         if (gradebookScore != null) {
             gradebookScore.setScore(score);
             gradebookService.saveGradebookScore(gradebookScore);
         } else {
             GradebookScore gradebookScore1 = new GradebookScore();
-            gradebookScore1.setGradebookDay(gradebookService.findGradebookDayById(gradebookDayId));
-            gradebookScore1.setSchoolStudent(schoolStudentService.findSchoolStudentById(schoolStudentId));
+            gradebookScore1.setGradebookDay(gradebookDay);
+            gradebookScore1.setSchoolStudent(schoolStudent);
             gradebookScore1.setScore(score);
             gradebookService.saveGradebookScore(gradebookScore1);
         }
@@ -88,6 +97,28 @@ public class GradebookControl {
             gradebookService.deleteGradebookAttendances(gradebookAttendance);
         }
 
+        Notification notification = new Notification();
+        notification.setUser(schoolStudent.getUser());
+        notification.setLink(
+                String.format(
+                        "/groupGradebook?teacherAssignmentId=%d&quarterId=%d",
+                        gradebookDay.getScheduleLesson().getTeacherAssignment().getId(),
+                        gradebookDay.getScheduleLesson().getQuarterInfo().getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Успеваемость");
+        notification.setContent(
+                String.format(
+                        "Вам была поставлена оценка %d по предмету %s на %02d.%02d",
+                        score,
+                        gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                        gradebookDay.getDateTime().getMonthValue(),
+                        gradebookDay.getDateTime().getDayOfMonth()
+                )
+        );
+        notificationService.saveNotification(notification);
+
         return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
     }
 
@@ -95,18 +126,43 @@ public class GradebookControl {
     @ResponseBody
     public ResponseEntity<String> updateGradebookAttendance(@RequestParam Long gradebookDayId, @RequestParam Long schoolStudentId) {
         GradebookAttendance gradebookAttendance = gradebookService.findAttendancesByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);
+
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
+        GradebookDay gradebookDay = gradebookService.findGradebookDayById(gradebookDayId);
+
         if (gradebookAttendance != null){
             return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
         } else {
             GradebookAttendance gradebookAttendance1 = new GradebookAttendance();
-            gradebookAttendance1.setGradebookDay(gradebookService.findGradebookDayById(gradebookDayId));
-            gradebookAttendance1.setSchoolStudent(schoolStudentService.findSchoolStudentById(schoolStudentId));
+            gradebookAttendance1.setGradebookDay(gradebookDay);
+            gradebookAttendance1.setSchoolStudent(schoolStudent);
             gradebookService.saveGradebookAttendance(gradebookAttendance1);
         }
         GradebookScore gradebookScore = gradebookService.findScoresByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);
         if (gradebookScore != null){
             gradebookService.deleteGradebookScore(gradebookScore);
         }
+
+        Notification notification = new Notification();
+        notification.setUser(schoolStudent.getUser());
+        notification.setLink(
+                String.format(
+                        "/groupGradebook?teacherAssignmentId=%d&quarterId=%d",
+                        gradebookDay.getScheduleLesson().getTeacherAssignment().getId(),
+                        gradebookDay.getScheduleLesson().getQuarterInfo().getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Посещаемость");
+        notification.setContent(
+                String.format(
+                        "Вам был поставлен пропуск по предмету %s на %02d.%02d",
+                        gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                        gradebookDay.getDateTime().getMonthValue(),
+                        gradebookDay.getDateTime().getDayOfMonth()
+                )
+        );
+        notificationService.saveNotification(notification);
 
         return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
     }

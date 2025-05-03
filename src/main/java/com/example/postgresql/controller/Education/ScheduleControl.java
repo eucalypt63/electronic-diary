@@ -44,8 +44,6 @@ public class ScheduleControl {
     @Autowired
     private TeacherService teacherService;
     @Autowired
-    private EducationalInstitutionService educationalInstitutionService;
-    @Autowired
     private ClassService classService;
     @Autowired
     private GradebookService gradebookService;
@@ -126,7 +124,7 @@ public class ScheduleControl {
     //Добавить даты для журнала
     @GetMapping("getLessonAddParams")
     @ResponseBody
-    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParams(Long id){
+    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParams(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
         Class cl = classService.findClassById(id);
         EducationalInstitution educationalInstitution = cl.getTeacher().getEducationalInstitution();
@@ -153,7 +151,7 @@ public class ScheduleControl {
     //Исправить
     @GetMapping("getLessonAddParamsBySchoolStudentId")
     @ResponseBody
-    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsBySchoolStudentId(Long id){
+    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsBySchoolStudentId(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
 
@@ -181,7 +179,7 @@ public class ScheduleControl {
 
     @GetMapping("getLessonAddParamsByTeacherId")
     @ResponseBody
-    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsByTeacherId(Long id){
+    public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsByTeacherId(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
         Teacher teacher = teacherService.findTeacherById(id);
 
