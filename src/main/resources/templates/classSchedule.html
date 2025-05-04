@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Расписание</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/style/Header.css}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -212,10 +211,8 @@
 </head>
 <body>
 
-<header>
-    <div class="school-name">Школа</div>
-    <button class="logout-button">Выйти</button>
-</header>
+<div th:replace="~{header}"></div>
+
 <div class="quarter-selector">
     <div class="quarter active" data-value="1">1</div>
     <div class="quarter" data-value="2">2</div>
@@ -348,19 +345,6 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
-
-    document.querySelector('.logout-button').addEventListener('click', function() {
-        fetch('/logout', {
-            method: 'GET',
-            credentials: 'include'
-        })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            }
-        })
-        .catch(error => console.error('Ошибка при выходе:', error));
-    });
 
     let activeQuarter = 1;
     const quarters = document.querySelectorAll('.quarter');

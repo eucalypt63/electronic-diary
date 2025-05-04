@@ -141,8 +141,8 @@ public class GradebookControl {
                         "Вам была поставлена оценка %d по предмету %s на %02d.%02d",
                         score,
                         gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
-                        gradebookDay.getDateTime().getMonthValue(),
-                        gradebookDay.getDateTime().getDayOfMonth()
+                        gradebookDay.getDateTime().getDayOfMonth(),
+                        gradebookDay.getDateTime().getMonthValue()
                 )
         );
         notificationService.saveNotification(notification);
@@ -186,8 +186,8 @@ public class GradebookControl {
                 String.format(
                         "Вам был поставлен пропуск по предмету %s на %02d.%02d",
                         gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
-                        gradebookDay.getDateTime().getMonthValue(),
-                        gradebookDay.getDateTime().getDayOfMonth()
+                        gradebookDay.getDateTime().getDayOfMonth(),
+                        gradebookDay.getDateTime().getMonthValue()
                 )
         );
         notificationService.saveNotification(notification);

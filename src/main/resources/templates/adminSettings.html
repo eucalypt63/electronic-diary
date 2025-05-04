@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/Style.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/ModuleAdd.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/style/Header.css}">
 </head>
 <body>
 
-<header>
-    <div>Админ</div>
-    <button class="logout-button">Выйти</button>
-</header>
+<div th:replace="~{header}"></div>
 
 <div class="container">
     <div class="column">

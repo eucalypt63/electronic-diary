@@ -1,5 +1,6 @@
 package com.example.postgresql.DTO.ResponseDTO.Users;
 
+import com.example.postgresql.DTO.ResponseDTO.ClassResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 public class SchoolStudentResponseDTO {
     private Long id;
     private Long userid;
-    private Class classRoom;
+    private ClassResponseDTO classRoom;
     private EducationalInstitution educationalInstitution;
 
     private String firstName;

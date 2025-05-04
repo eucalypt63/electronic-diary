@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль</title>
     <link rel="stylesheet" type="text/css" th:href="@{/style/ProfileStyle.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/style/Header.css}">
 </head>
 <body>
 
-<header>
-    <div class="school-name">Школа</div>
-    <button class="logout-button">Выйти</button>
-</header>
+<div th:replace="~{header}"></div>
 
 <div class="profile-header">
     <div class="profile-picture" id="profile-picture" onclick="uploadPhoto()"></div>
@@ -69,19 +65,6 @@
                 cconsole.error('There was a problem with the fetch operation:', error);
             });
     }
-
-    document.querySelector('.logout-button').addEventListener('click', function() {
-        fetch('/logout', {
-            method: 'GET',
-            credentials: 'include'
-        })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            }
-        })
-        .catch(error => console.error('Ошибка при выходе:', error));
-    });
 
     function uploadPhoto() {
         const fileInput = document.createElement('input');

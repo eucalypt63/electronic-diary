@@ -6,6 +6,11 @@ header {
     justify-content: space-between;
     align-items: center;
 }
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
 .school-name {
     padding: 10px;
     cursor: pointer;
@@ -15,6 +20,7 @@ header {
     background-color: #e0e0e0;
     color: orange;
 }
+
 .logout-button {
     background-color: #dc3545;
     color: white;
@@ -25,4 +31,91 @@ header {
 }
 .logout-button:hover {
     background-color: #c82333;
+}
+
+.notifications-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.notification-bell {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-bell:hover {
+    background-color: #5a6268;
+}
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    z-index: 1000;
+}
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    position: relative;
+    padding-right: 40px;
+}
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #343a40;
+}
+.notification-content {
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+.notification-time {
+    font-size: 12px;
+    color: #adb5bd;
+    text-align: right;
+}
+.notification-empty {
+    padding: 15px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.delete-notification {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 16px;
+}
+.delete-notification:hover {
+    color: #c82333;
 }

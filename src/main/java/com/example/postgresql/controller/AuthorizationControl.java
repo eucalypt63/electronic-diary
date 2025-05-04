@@ -55,19 +55,19 @@ public class AuthorizationControl {
                 case "Main admin" -> session.setAttribute("userId", user.getId());
                 case "Local admin" -> {
                     Administrator administrator = administratorService.findAdministratorByUserId(user.getId());
-                    session.setAttribute("userId", administrator.getId());
+                    session.setAttribute("userId", administrator.getUser().getId());
                 }
                 case "Teacher" -> {
                     Teacher teacher = teacherService.findTeacherByUserId(user.getId());
-                    session.setAttribute("userId", teacher.getId());
+                    session.setAttribute("userId", teacher.getUser().getId());
                 }
                 case "School student" -> {
                     SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentByUserId(user.getId());
-                    session.setAttribute("userId", schoolStudent.getId());
+                    session.setAttribute("userId", schoolStudent.getUser().getId());
                 }
                 case "Parent" -> {
                     Parent parent = parentService.findParentByUserId(user.getId());
-                    session.setAttribute("userId", parent.getId());
+                    session.setAttribute("userId", parent.getUser().getId());
                 }
             }
             session.setAttribute("role", userType.getName());
@@ -85,13 +85,13 @@ public class AuthorizationControl {
     }
 
     //Получить роль в сессии
-    @PostMapping("/getRole")
+    @GetMapping("/getRole")
     @ResponseBody
     public ResponseEntity<String> getRole(HttpSession session) {
         return ResponseEntity.ok((String) session.getAttribute("role"));
     }
 
-    @PostMapping("/getAuthorizationUserInfo")
+    @GetMapping("/getAuthorizationUserInfo")
     @ResponseBody
     public ResponseEntity<AuthorizationUserResponseDTO> getAuthorizationUserInfo(HttpSession session) {
         AuthorizationUserResponseDTO authorizationUserResponseDTO = new AuthorizationUserResponseDTO();

@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Журнал</title>
-    <link rel="stylesheet" type="text/css" href="/style/Header.css">
     <style>
         /* Стили остаются без изменений */
         body {
@@ -146,10 +145,8 @@
     </style>
 </head>
 <body>
-<header>
-    <div class="school-name">Школа</div>
-    <button class="logout-button">Выйти</button>
-</header>
+
+<div th:replace="~{header}"></div>
 
 <h1 id="journalTitle">Журнал</h1>
 
@@ -445,7 +442,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Закрытие модального окна при клике вне его
         window.addEventListener('click', function(event) {
             const modal = document.getElementById('editDayModal');
             if (event.target === modal) {

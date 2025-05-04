@@ -14,35 +14,6 @@
             flex-direction: column;
             height: 100vh;
         }
-        header {
-            background-color: #343a40;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .school-name {
-            padding: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .school-name:hover {
-            background-color: #e0e0e0;
-            color: orange;
-        }
-        .logout-button {
-            background-color: #dc3545;
-            color: white;
-            padding: 8px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
-
         .container {
             flex: 1;
             display: flex;
@@ -100,10 +71,7 @@
 </head>
 <body>
 
-<header>
-    <div class="school-name">Школа</div>
-    <button class="logout-button">Выйти</button>
-</header>
+<div th:replace="~{header}"></div>
 
 <div class="container">
     <h1>Список детей</h1>
@@ -118,96 +86,96 @@
 <script>
 
     function updateObjectList() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
 
-      fetch(`/getStudentsOfParent?ObjectId=${id}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
-      .then(response => response.json())
-      .then(students => {
-          const userList = document.querySelector('.user-list');
-          userList.innerHTML = '';
+          fetch(`/getStudentsOfParent?ObjectId=${id}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          })
+          .then(response => response.json())
+          .then(students => {
+              const userList = document.querySelector('.user-list');
+              userList.innerHTML = '';
 
-          students.forEach(student => {
-              const fullName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
+              students.forEach(student => {
+                  const fullName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
 
-              const userDiv = document.createElement('div');
-              userDiv.className = 'user';
-              userDiv.id = student.id;
-              userDiv.innerHTML = `
-                  <h3>${fullName}</h3>
+                  const userDiv = document.createElement('div');
+                  userDiv.className = 'user';
+                  userDiv.id = student.id;
+                  userDiv.innerHTML = `
+                      <h3>${fullName}</h3>
 
-                  <p><strong>Школа:</strong> ${student.educationalInstitution.name}</p>
-                  <p><strong>Email:</strong> ${student.email}</p>
-                  <p><strong>Телефон:</strong> ${student.phoneNumber}</p>
-              `;
+                      <p><strong>Школа:</strong> ${student.educationalInstitution.name}</p>
+                      <p><strong>Email:</strong> ${student.email}</p>
+                      <p><strong>Телефон:</strong> ${student.phoneNumber}</p>
+                  `;
 
-              userDiv.addEventListener('dblclick', () => {
-                  window.location.href = `/profileSchoolStudent?id=${student.id}`;
+                  userDiv.addEventListener('dblclick', () => {
+                      window.location.href = `/profileSchoolStudent?id=${student.id}`;
+                  });
+
+                  userDiv.addEventListener('mousedown', () => {
+                      userDiv.style.backgroundColor = 'lightgray';
+                  });
+
+                  userDiv.addEventListener('mouseup', () => {
+                      userDiv.style.backgroundColor = '';
+                  });
+
+                  userList.appendChild(userDiv);
               });
-
-              userDiv.addEventListener('mousedown', () => {
-                  userDiv.style.backgroundColor = 'lightgray';
-              });
-
-              userDiv.addEventListener('mouseup', () => {
-                  userDiv.style.backgroundColor = '';
-              });
-
-              userList.appendChild(userDiv);
-          });
-      })
-      .catch(error => console.error('Ошибка при получении данных:', error));
+          })
+          .catch(error => console.error('Ошибка при получении данных:', error));
     }
     updateObjectList();
 
 
     function updateParent() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
 
-      fetch(`/findParentById?id=${id}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
-      .then(response => response.json())
-      .then(parent => {
-            const parentDiv = document.querySelector('.parent-div');
-            parentDiv.innerHTML = '';
+          fetch(`/findParentById?id=${id}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          })
+          .then(response => response.json())
+          .then(parent => {
+                const parentDiv = document.querySelector('.parent-div');
+                parentDiv.innerHTML = '';
 
-            const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
+                const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
 
-            const parentElement = document.createElement('div');
-            parentElement.className = 'parent';
-            parentElement.id = parent.id;
-            parentElement.innerHTML = `
-                <h3 class="parent-name">${fullName}</h3>
-                <p><strong>Школа:</strong> ${parent.educationalInstitution.name}</p>
-                <p><strong>Email:</strong> ${parent.email}</p>
-                <p><strong>Телефон:</strong> ${parent.phoneNumber}</p>
-            `;
+                const parentElement = document.createElement('div');
+                parentElement.className = 'parent';
+                parentElement.id = parent.id;
+                parentElement.innerHTML = `
+                    <h3 class="parent-name">${fullName}</h3>
+                    <p><strong>Школа:</strong> ${parent.educationalInstitution.name}</p>
+                    <p><strong>Email:</strong> ${parent.email}</p>
+                    <p><strong>Телефон:</strong> ${parent.phoneNumber}</p>
+                `;
 
-            parentElement.addEventListener('dblclick', () => {
-                window.location.href = `/profileParent?id=${parent.id}`;
-            });
+                parentElement.addEventListener('dblclick', () => {
+                    window.location.href = `/profileParent?id=${parent.id}`;
+                });
 
-            parentElement.addEventListener('mousedown', () => {
-                parentElement.style.backgroundColor = 'lightgray';
-            });
+                parentElement.addEventListener('mousedown', () => {
+                    parentElement.style.backgroundColor = 'lightgray';
+                });
 
-            parentElement.addEventListener('mouseup', () => {
-                parentElement.style.backgroundColor = '';
-            });
+                parentElement.addEventListener('mouseup', () => {
+                    parentElement.style.backgroundColor = '';
+                });
 
-            parentDiv.appendChild(parentElement);
-        })
-      .catch(error => console.error('Ошибка при получении данных:', error));
+                parentDiv.appendChild(parentElement);
+            })
+          .catch(error => console.error('Ошибка при получении данных:', error));
     }
     updateParent();
 

@@ -12,6 +12,8 @@ async function submitLoginForm(event) {
             window.location.href = '/adminSettings';
         } else if (userRole === "Local admin" ){
             window.location.href = '/adminSettings';
+        } else if (userRole === "School student" ){
+            window.location.href = '/profileSchoolStudent?id=41'; // Получить id пользователя
         }
     } else {
         const errorMessage = await response.text();

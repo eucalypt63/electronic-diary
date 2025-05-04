@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/Header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="school-name">Школа</div>
+    <div class="header-right">
+        <div class="notifications-container">
+            <button class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notification-count">0</span>
+            </button>
+            <div class="notification-dropdown" id="notification-dropdown">
+                <div class="notification-empty">Нет новых уведомлений</div>
+            </div>
+        </div>
+        <button class="logout-button">Выйти</button>
+    </div>
+</header>
+
+<script>
+    // Функция для удаления уведомления
+    async function deleteNotification(notificationId, element) {
+        try {
+            const response = await fetch(`/deleteNotificationById?id=${notificationId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                element.parentElement.remove();
+                updateNotificationCount();
+
+                // Если уведомлений не осталось, показываем сообщение
+                const dropdown = document.getElementById('notification-dropdown');
+                if (dropdown.children.length === 0) {
+                    dropdown.innerHTML = '<div class="notification-empty">Нет новых уведомлений</div>';
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка при удалении уведомления:', error);
+        }
+    }
+
+    // Обновляем счетчик уведомлений
+    function updateNotificationCount() {
+        const dropdown = document.getElementById('notification-dropdown');
+        const count = dropdown.querySelectorAll('.notification-item').length;
+        document.getElementById('notification-count').textContent = count;
+    }
+
+    // Функция обновления интерфейса уведомлений
+    function updateNotificationUI(notifications) {
+        const dropdown = document.getElementById('notification-dropdown');
+        const countBadge = document.getElementById('notification-count');
+
+        // Проверяем, что notifications существует и является массивом
+        if (!Array.isArray(notifications)) {
+            console.error('Получены некорректные данные уведомлений');
+            dropdown.innerHTML = '<div class="notification-empty">Ошибка загрузки уведомлений</div>';
+            countBadge.textContent = '0';
+            return;
+        }
+
+        // Если уведомлений нет
+        if (notifications.length === 0) {
+            dropdown.innerHTML = '<div class="notification-empty">Нет новых уведомлений</div>';
+            countBadge.textContent = '0';
+            return;
+        }
+
+        // Очищаем dropdown
+        dropdown.innerHTML = '';
+
+        // Добавляем каждое уведомление
+        notifications.forEach(notification => {
+            const notificationDate = new Date(notification.dateTime);
+            const formattedDate = notificationDate.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+
+            item.innerHTML = `
+                <div class="notification-title">${notification.title}</div>
+                <div class="notification-content">${notification.content}</div>
+                <div class="notification-time">${formattedDate}</div>
+                <button class="delete-notification" onclick="deleteNotification(${notification.id}, this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            // Обработчик клика по уведомлению (кроме кнопки удаления)
+            item.addEventListener('click', (e) => {
+                if (!e.target.closest('.delete-notification')) {
+                    window.location.href = notification.link;
+                }
+            });
+
+            dropdown.appendChild(item);
+        });
+
+        // Обновляем счетчик
+        countBadge.textContent = notifications.length;
+    }
+
+    // Функция загрузки уведомлений
+    async function loadNotifications() {
+        try {
+            const userResponse = await fetch('/getAuthorizationUserInfo', {
+                credentials: 'include'
+            });
+
+            if (!userResponse.ok) throw new Error('Ошибка получения данных пользователя');
+
+            const userData = await userResponse.json();
+            const notificationsResponse = await fetch(`/findNotificationByUserId?id=${userData.id}`, {
+                credentials: 'include'
+            });
+
+            if (!notificationsResponse.ok) throw new Error('Ошибка получения уведомлений');
+
+            const notifications = await notificationsResponse.json();
+            console.log('Получены уведомления:', notifications);
+
+            updateNotificationUI(notifications);
+
+        } catch (error) {
+            console.error('Ошибка при загрузке уведомлений:', error);
+            const dropdown = document.getElementById('notification-dropdown');
+            dropdown.innerHTML = '<div class="notification-empty">Ошибка загрузки уведомлений</div>';
+            document.getElementById('notification-count').textContent = '0';
+        }
+    }
+
+    // Обработчик кнопки выхода
+    document.querySelector('.logout-button')?.addEventListener('click', () => {
+        fetch('/logout', {
+            method: 'GET',
+            credentials: 'include'
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        }).catch(console.error);
+    });
+
+    // Обработчик уведомлений
+    document.querySelector('.notification-bell')?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('notification-dropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Закрытие dropdown при клике вне его
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.notifications-container')) {
+            document.getElementById('notification-dropdown').style.display = 'none';
+        }
+    });
+
+    // Загружаем уведомления при загрузке страницы
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+</script>
+</body>
+</html>

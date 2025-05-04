@@ -100,7 +100,7 @@ public class DTOService {
         schoolStudentResponseDTO.setId(schoolStudent.getId());
         schoolStudentResponseDTO.setUserid(schoolStudent.getUser().getId());
         schoolStudentResponseDTO.setEducationalInstitution(schoolStudent.getEducationalInstitution());
-        schoolStudentResponseDTO.setClassRoom(schoolStudent.getClassRoom());
+        schoolStudentResponseDTO.setClassRoom(ClassToDto(schoolStudent.getClassRoom()));
         schoolStudentResponseDTO.setFirstName(schoolStudent.getFirstName());
         schoolStudentResponseDTO.setLastName(schoolStudent.getLastName());
         schoolStudentResponseDTO.setPatronymic(schoolStudent.getPatronymic());

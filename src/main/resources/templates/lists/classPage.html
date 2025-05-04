@@ -14,35 +14,6 @@
             flex-direction: column;
             height: 100vh;
         }
-        header {
-            background-color: #343a40;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .school-name {
-            padding: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .school-name:hover {
-            background-color: #e0e0e0;
-            color: orange;
-        }
-        .logout-button {
-            background-color: #dc3545;
-            color: white;
-            padding: 8px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
-
         .container {
             flex: 1;
             display: flex;
@@ -110,10 +81,7 @@
 </head>
 <body>
 
-<header>
-    <div class="school-name">Школа</div>
-    <button class="logout-button">Выйти</button>
-</header>
+<div th:replace="~{header}"></div>
 
 <div class="container">
     <h1>Класс: <span id="class-name"></span></h1>

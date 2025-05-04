@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function updateSchoolList() {
     fetch('/getRole', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -60,19 +60,6 @@ function updateSchoolList() {
 function updateHeader(content) {
     document.getElementById('secondColumnHeader').innerText = content;
 }
-
-document.querySelector('.logout-button').addEventListener('click', function() {
-    fetch('/logout', {
-        method: 'GET',
-        credentials: 'include'
-    })
-    .then(response => {
-        if (response.redirected) {
-            window.location.href = response.url;
-        }
-    })
-    .catch(error => console.error('Ошибка при выходе:', error));
-});
 
 let selectedElementId = null;
 let selectedModule = null;

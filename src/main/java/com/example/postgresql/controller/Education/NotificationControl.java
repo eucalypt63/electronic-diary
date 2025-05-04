@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.ResponseDTO.NotificationResponseDTO;
 import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
