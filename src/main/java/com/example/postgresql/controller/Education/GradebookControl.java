@@ -5,10 +5,12 @@ import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookScoreResponseDTO;
 import com.example.postgresql.model.Education.Gradebook.*;
+import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.GradebookService;
+import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ import java.util.List;
 public class GradebookControl {
     @Autowired
     private GradebookService gradebookService;
+    @Autowired
+    private GroupService groupService;
     @Autowired
     private NotificationService notificationService;
     @Autowired
@@ -69,6 +73,30 @@ public class GradebookControl {
         gradebookDay.setTopic(topic);
         gradebookDay.setHomework(homework);
         gradebookService.saveGradebookDay(gradebookDay);
+
+        List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(gradebookDay.getScheduleLesson().getGroup().getId());
+        groupMembers.forEach(groupMember -> {
+            Notification notification = new Notification();
+            notification.setUser(groupMember.getSchoolStudent().getUser());
+            notification.setLink(
+                    String.format(
+                            "/groupGradebook?teacherAssignmentId=%d&quarterId=%d",
+                            gradebookDay.getScheduleLesson().getTeacherAssignment().getId(),
+                            gradebookDay.getScheduleLesson().getQuarterInfo().getId()
+                    )
+            );
+            notification.setDateTime(LocalDateTime.now());
+            notification.setTitle("Домашнее заданее");
+            notification.setContent(
+                    String.format(
+                            "Домашнее задание по предмету %s на %02d.%02d было обновлено",
+                            gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                            gradebookDay.getDateTime().getMonthValue(),
+                            gradebookDay.getDateTime().getDayOfMonth()
+                    )
+            );
+            notificationService.saveNotification(notification);
+        });
 
         return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
     }
