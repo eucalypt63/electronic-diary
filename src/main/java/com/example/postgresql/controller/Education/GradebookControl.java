@@ -1,10 +1,12 @@
 package com.example.postgresql.controller.Education;
 
+import com.example.postgresql.DTO.ResponseDTO.DiaryInfoResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookAttendanceResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookScoreResponseDTO;
 import com.example.postgresql.model.Education.Gradebook.*;
+import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
@@ -12,6 +14,7 @@ import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.GradebookService;
 import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Education.NotificationService;
+import com.example.postgresql.service.Education.ScheduleService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class GradebookControl {
@@ -33,17 +38,19 @@ public class GradebookControl {
     @Autowired
     private SchoolStudentService schoolStudentService;
     @Autowired
+    private ScheduleService scheduleService;
+    @Autowired
     private DTOService dtoService;
 
     @GetMapping("findGradebookDayByScheduleLessonTeacherAssignmentId")
     @ResponseBody
     public ResponseEntity<GradebookResponseDTO>findGradebookDayByScheduleLessonTeacherAssignmentId(@RequestParam Long id, @RequestParam Long quarterId){
         List<GradebookDay> gradebookDays = gradebookService.findGradebookDayByScheduleLessonTeacherAssignmentId(id, quarterId);
-        List<GradebookDayResponseDTO> gradebookDayResponseDTOS = new ArrayList<>();
-        List<GradebookAttendanceResponseDTO> attendanceResponseDTOS = new ArrayList<>();
-        List<GradebookScoreResponseDTO> scoreResponseDTOS = new ArrayList<>();
+        List<GradebookDayResponseDTO> gradebookDayResponseDTOS = Collections.synchronizedList(new ArrayList<>());
+        List<GradebookAttendanceResponseDTO> attendanceResponseDTOS = Collections.synchronizedList(new ArrayList<>());
+        List<GradebookScoreResponseDTO> scoreResponseDTOS = Collections.synchronizedList(new ArrayList<>());
 
-        for (GradebookDay gradebookDay : gradebookDays) {
+        gradebookDays.parallelStream().forEach(gradebookDay ->{
             gradebookDayResponseDTOS.add(dtoService.GradebookDayToDto(gradebookDay));
 
             List<GradebookAttendance> attendances = gradebookService.findAttendancesByGradebookDayId(gradebookDay.getId());
@@ -55,7 +62,7 @@ public class GradebookControl {
             scores.forEach(score -> {
                 scoreResponseDTOS.add(dtoService.GradebookScoreToDto(score));
             });
-        }
+        });
 
         GradebookResponseDTO responseDTO = new GradebookResponseDTO();
         responseDTO.setGradebookDayResponseDTOS(gradebookDayResponseDTOS);
@@ -63,7 +70,40 @@ public class GradebookControl {
         responseDTO.setGradebookScoreResponseDTOS(scoreResponseDTOS);
 
         return ResponseEntity.ok(responseDTO);
+    }
 
+    @GetMapping("findDiaryInfoBySchoolStudentIdAndQuarter")
+    @ResponseBody
+    public ResponseEntity<List<DiaryInfoResponseDTO>>findDiaryInfoBySchoolStudentIdAndQuarter(@RequestParam Long id, @RequestParam(defaultValue = "1") Long quarterNumber){
+        List<GroupMember> groupMembers = groupService.findGroupMemberBySchoolStudentId(id);
+        List<Group> groups = groupMembers.stream()
+                .map(GroupMember::getGroup)
+                .distinct()
+                .toList();
+
+        List<DiaryInfoResponseDTO> diaryInfoResponseDTOS = Collections.synchronizedList(new ArrayList<>());
+
+        groups.forEach(group -> {
+            List<ScheduleLesson> scheduleLessons = scheduleService.findScheduleLessonByGroupIdAndQuarterNumber(group.getId(), quarterNumber);
+            scheduleLessons.parallelStream().forEach(scheduleLesson -> {
+                List<GradebookDay> gradebookDays = gradebookService.findGradebookDayByScheduleLessonId(scheduleLesson.getId());
+                gradebookDays.parallelStream().forEach(gradebookDay -> {
+                    GradebookAttendance gradebookAttendance = gradebookService.findAttendancesByGradebookDayIdAndSchoolStudentId(gradebookDay.getId(), id);
+                    GradebookScore gradebookScore = gradebookService.findScoresByGradebookDayIdAndSchoolStudentId(gradebookDay.getId(), id);
+
+                    DiaryInfoResponseDTO diaryInfoResponseDTO = new DiaryInfoResponseDTO();
+                    if (gradebookScore != null) {diaryInfoResponseDTO.setScore(gradebookScore.getScore());}
+
+                    diaryInfoResponseDTO.setAttendance(gradebookAttendance != null);
+                    diaryInfoResponseDTO.setDateTime(gradebookDay.getDateTime());
+                    diaryInfoResponseDTO.setSchoolSubject(scheduleLesson.getTeacherAssignment().getSchoolSubject());
+
+                    diaryInfoResponseDTOS.add(diaryInfoResponseDTO);
+                });
+            });
+        });
+
+        return ResponseEntity.ok(diaryInfoResponseDTOS);
     }
 
     @PostMapping("updateGradebookDay")

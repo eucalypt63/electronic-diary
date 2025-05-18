@@ -128,6 +128,15 @@
             font-size: 14px;
         }
 
+        .modal-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
         .modal-buttons {
             display: flex;
             justify-content: space-between;
@@ -306,6 +315,9 @@
         <label for="teacher-select">Учитель:</label>
         <select id="teacher-select" class="modal-select"></select>
 
+        <label for="room-text">Кабинет:</label>
+        <input type="text" id="room-text" class="modal-input">
+
         <div class="modal-buttons">
             <button class="modal-button cancel">Отменить</button>
             <button class="modal-button save">Добавить</button>
@@ -387,6 +399,7 @@
                     const key = `${lesson.dayNumber}-${lesson.lessonNumber}`;
                     const subjectName = lesson.teacherAssignment.schoolSubject.name;
                     const groupName = lesson.group.groupName;
+                    const roomNumber = lesson.room;
 
                     if (!lessonsMap.has(key)) {
                         lessonsMap.set(key, new Map());
@@ -395,10 +408,13 @@
                     const subjectGroupsMap = lessonsMap.get(key);
 
                     if (!subjectGroupsMap.has(subjectName)) {
-                        subjectGroupsMap.set(subjectName, new Set());
+                        subjectGroupsMap.set(subjectName, {
+                            groups: new Set(),
+                            room: roomNumber
+                        });
                     }
 
-                    subjectGroupsMap.get(subjectName).add(groupName);
+                    subjectGroupsMap.get(subjectName).groups.add(groupName);
                 });
             }
 
@@ -410,9 +426,9 @@
 
                     let htmlContent = '';
 
-                    subjectGroupsMap.forEach((groups, subject) => {
-                        const groupsList = Array.from(groups).join(', ');
-                        htmlContent += `${subject} (${groupsList})<br>`;
+                    subjectGroupsMap.forEach((data, subject) => {
+                        const groupsList = Array.from(data.groups).join(', ');
+                        htmlContent += `${subject} - ${data.room} (${groupsList})<br>`;
                     });
 
                     htmlContent = htmlContent.replace(/<br>$/, '');
@@ -461,6 +477,7 @@
                     const groupId = document.getElementById('group-select').value;
                     const subjectId = document.getElementById('subject-select').value;
                     const teacherId = document.getElementById('teacher-select').value;
+                    const room = document.getElementById('room-text').value;
 
                     fetch('/addLesson', {
                         method: 'POST',
@@ -473,7 +490,8 @@
                             quarter: activeQuarter,
                             groupId: groupId,
                             subjectId: subjectId,
-                            teacherId: teacherId
+                            teacherId: teacherId,
+                            room: room
                         }),
                     })
                     .then(response => {

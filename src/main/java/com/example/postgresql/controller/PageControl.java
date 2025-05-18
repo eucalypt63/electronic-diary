@@ -5,8 +5,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
 public class PageControl {
+    @GetMapping("/adminSettings")
+    public String adminSettings(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        System.out.println(role);
+        if ("Main admin".equals(role) || "Local admin".equals(role)) {
+            return "adminSettings";
+        }
+        System.out.println("Неверная роль");
+        return "redirect:/login";
+    }
+
     @GetMapping("/profileSchoolStudent")
     public String getProfileSchoolStudent(@RequestParam String id) {
         return "profile/profileSchoolStudent";
@@ -54,6 +67,10 @@ public class PageControl {
     @GetMapping("/groupGradebook")
     public String getGroupGradebook(@RequestParam String teacherAssignmentId, @RequestParam String quarterId) {
         return "groupGradebook";
+    }
+    @GetMapping("/schoolStudentDiary")
+    public String getSchoolStudentDiary(@RequestParam String id) {
+        return "schoolStudentDiary";
     }
     @GetMapping("/test")
     public String getTest() {

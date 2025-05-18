@@ -25,7 +25,9 @@ public class GradebookService {
     public List<GradebookDay> findGradebookDayByScheduleLessonTeacherAssignmentId(Long id, Long quarterId){
         return gradebookDayRepository.findGradebookDayByScheduleLessonTeacherAssignmentIdAndScheduleLessonQuarterInfoId(id, quarterId);
     }
-
+    public List<GradebookDay> findGradebookDayByScheduleLessonId(Long id){
+        return gradebookDayRepository.findGradebookDayByScheduleLessonId(id);
+    }
     public GradebookDay findGradebookDayById(Long id){
         return gradebookDayRepository.findById(id).orElse(null);
     }

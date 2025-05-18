@@ -235,6 +235,7 @@ public class ScheduleControl {
             scheduleLesson.setQuarterInfo(quarterInfo);
             scheduleLesson.setDayNumber(schLesReqDTO.getDayNumber());
             scheduleLesson.setLessonNumber(schLesReqDTO.getLessonNumber());
+            scheduleLesson.setRoom(schLesReqDTO.getRoom());
             scheduleService.saveScheduleLesson(scheduleLesson);
 
             createGradebookDaysForQuarter(scheduleLesson, quarterInfo, schLesReqDTO.getDayNumber());

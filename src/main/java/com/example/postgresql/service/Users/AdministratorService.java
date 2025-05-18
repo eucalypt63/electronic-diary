@@ -1,9 +1,7 @@
 package com.example.postgresql.service.Users;
 
-import com.example.postgresql.model.Users.Administrator;
-import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Administrations;
 import com.example.postgresql.repository.Users.AdministratorRepository;
-import com.example.postgresql.repository.Users.Student.SchoolStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +13,20 @@ public class AdministratorService {
     @Autowired
     private AdministratorRepository administratorRepository;
 
-    public Administrator findAdministratorByUserId(Long id) {
+    public Administrations findAdministratorByUserId(Long id) {
         return administratorRepository.findAdministratorByUserId(id);
     }
 
-    public List<Administrator> findAdministratorByEducationalInstitutionId(Long id) {
+    public List<Administrations> findAdministratorByEducationalInstitutionId(Long id) {
         return administratorRepository.findAdministratorByEducationalInstitutionId(id);
     }
 
-    public Administrator findAdministratorById(Long id) {
+    public Administrations findAdministratorById(Long id) {
         return administratorRepository.findById(id).orElse(null);
     }
 
-    public void saveAdministrator(Administrator administrator) {
-        administratorRepository.save(administrator);
+    public void saveAdministrator(Administrations administrations) {
+        administratorRepository.save(administrations);
     }
 
     public void deleteAdministratorById(Long id) {

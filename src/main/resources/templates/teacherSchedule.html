@@ -332,8 +332,8 @@
                     const key = `${lesson.dayNumber}-${lesson.lessonNumber}`;
                     const subjectName = lesson.teacherAssignment.schoolSubject.name;
                     const groupName = lesson.group.groupName;
-
                     const className = lesson.group.classRoom.name;
+                    const roomNumber = lesson.room;
 
                     if (!lessonsMap.has(key)) {
                         lessonsMap.set(key, new Map());
@@ -342,10 +342,13 @@
                     const subjectGroupsMap = lessonsMap.get(key);
 
                     if (!subjectGroupsMap.has(subjectName)) {
-                        subjectGroupsMap.set(subjectName, new Map());
+                        subjectGroupsMap.set(subjectName, {
+                            groupsClasses: new Map(),
+                            room: roomNumber
+                        });
                     }
 
-                    subjectGroupsMap.get(subjectName).set(groupName, className);
+                    subjectGroupsMap.get(subjectName).groupsClasses.set(groupName, className);
                 });
             }
 
@@ -357,12 +360,11 @@
 
                     let htmlContent = '';
 
-                    subjectGroupsMap.forEach((groupsClassesMap, subject) => {
-                        const groupsList = Array.from(groupsClassesMap.entries())
-                            .map(([group, cls]) => `${group} (${cls})`)
+                    subjectGroupsMap.forEach((data, subject) => {
+                        const groupsList = Array.from(data.groupsClasses.entries())
+                            .map(([group, cls]) => `${cls} - ${group}`)
                             .join(', ');
-
-                        htmlContent += `${subject} - ${groupsList}<br>`;
+                        htmlContent += `${subject} - ${data.room} (${groupsList})<br>`;
                     });
 
                     htmlContent = htmlContent.replace(/<br>$/, '');

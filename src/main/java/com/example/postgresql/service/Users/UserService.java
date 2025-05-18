@@ -1,9 +1,7 @@
 package com.example.postgresql.service.Users;
 
-import com.example.postgresql.model.Users.Administrator;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
-import com.example.postgresql.repository.Users.AdministratorRepository;
 import com.example.postgresql.repository.Users.User.UserRepository;
 import com.example.postgresql.repository.Users.User.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Группы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            margin: 20px;
+        }
+        .groups-container {
+            margin-top: 20px;
+            overflow-x: auto;
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .groups-grid {
+            display: grid;
+            min-width: fit-content;
+        }
+
+        .header-cell {
+            background-color: #4285f4;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* "Ученик \ Группа" */
+        .header-cell.student-header {
+            left: 0;
+            z-index: 20;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .student-name {
+            padding: 12px;
+            background-color: #f5f5f5;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
+        }
+
+        .checkbox-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            background-color: #f9f9f9;
+            min-width: 100px;
+            border-bottom: 1px solid #eee;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .checkbox-cell:last-child {
+            border-right: none;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.3);
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .save-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .save-button:hover {
+            background-color: #45a049;
+        }
+
+        .groups-container::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .groups-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .groups-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .groups-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .add-group-button {
+            padding: 12px 24px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .add-group-button:hover {
+            background-color: #0b7dda;
+        }
+
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 400px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{header}"></div>
+
+<div class="container">
+    <h1>Распределение учащихся по группам</h1>
+
+    <div class="groups-container">
+        <div class="groups-grid" id="groupsTable">
+
+        </div>
+    </div>
+
+    <button class="add-group-button">Добавить группу</button>
+</div>
+
+<div id="addGroupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Добавить новую группу</span>
+            <span class="close">&times;</span>
+        </div>
+        <div class="form-group">
+            <label for="groupName">Название группы:</label>
+            <input type="text" id="groupName" placeholder="Введите название группы">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelAddGroup">Отмена</button>
+            <button class="btn btn-primary" id="confirmAddGroup">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateGroupMembership(studentId, groupId, isMember) {
+        const endpoint = isMember ? '/addGroupMember' : '/deleteGroupMember';
+
+        fetch(`${endpoint}?studentId=${studentId}&groupId=${groupId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            showNotification('Произошла ошибка: ' + error.message, 'error');
+            const checkbox = document.querySelector(`input[type="checkbox"][data-student-id="${studentId}"][data-group-id="${groupId}"]`);
+            if (checkbox) {
+                checkbox.checked = !isMember;
+            }
+        });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('id');
+
+        Promise.all([
+            fetch(`/getStudentsOfClass?ObjectId=${classId}`).then(res => res.json()),
+            fetch(`/findGroupMembersByClassId?id=${classId}`).then(res => res.json())
+        ])
+        .then(([students, groupsInfo]) => {
+            renderTable(students, groupsInfo);
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке данных:', error);
+        });
+
+        function renderTable(students, groupsInfo) {
+            const table = document.getElementById('groupsTable');
+            table.innerHTML = '';
+
+            const groupCount = groupsInfo.length;
+            table.style.gridTemplateColumns = `200px repeat(${groupCount}, minmax(150px, 1fr))`;
+
+            // Создаем заголовки
+            const studentHeader = document.createElement('div');
+            studentHeader.className = 'header-cell student-header';
+            studentHeader.textContent = 'Ученик \\ Группа';
+            table.appendChild(studentHeader);
+
+            // Добавляем заголовки групп
+            groupsInfo.forEach(groupInfo => {
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'header-cell';
+                groupHeader.textContent = groupInfo.group.groupName;
+                table.appendChild(groupHeader);
+            });
+
+            // Создаем карту студентов для быстрого поиска
+            const studentsMap = new Map();
+            students.forEach(student => {
+                studentsMap.set(student.id, student);
+            });
+
+            // Создаем карту групп и их участников
+            const groupsMap = new Map();
+            groupsInfo.forEach(groupInfo => {
+                const members = new Set();
+                groupInfo.groupMembers.forEach(member => {
+                    members.add(member.schoolStudent.id);
+                });
+                groupsMap.set(groupInfo.group.id, members);
+            });
+
+            // Добавляем строки для каждого студента
+            students.forEach(student => {
+                // Имя студента
+                const studentNameCell = document.createElement('div');
+                studentNameCell.className = 'student-name';
+                studentNameCell.textContent = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
+                table.appendChild(studentNameCell);
+
+                // Чекбоксы для групп
+                groupsInfo.forEach(groupInfo => {
+                    const checkboxCell = document.createElement('div');
+                    checkboxCell.className = 'checkbox-cell';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.dataset.studentId = student.id;
+                    checkbox.dataset.groupId = groupInfo.group.id;
+
+                    // Проверяем, есть ли студент в этой группе
+                    const groupMembers = groupsMap.get(groupInfo.group.id);
+                    if (groupMembers && groupMembers.has(student.id)) {
+                        checkbox.checked = true;
+                    }
+
+                    // Добавляем обработчик события для сохранения изменений
+                    checkbox.addEventListener('change', function() {
+                         updateGroupMembership(this.dataset.studentId, this.dataset.groupId, this.checked);
+                    });
+
+                    checkboxCell.appendChild(checkbox);
+                    table.appendChild(checkboxCell);
+                });
+            });
+        }
+    });
+
+
+    document.querySelector('.add-group-button').addEventListener('click', function() {
+        document.getElementById('addGroupModal').style.display = 'block';
+    });
+
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('addGroupModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelAddGroup').addEventListener('click', function() {
+        document.getElementById('addGroupModal').style.display = 'none';
+    });
+
+    document.getElementById('confirmAddGroup').addEventListener('click', function() {
+        const groupName = document.getElementById('groupName').value.trim();
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('id');
+
+        if (!groupName) {
+            alert('Пожалуйста, введите название группы');
+            return;
+        }
+
+        const groupData = {
+            classRoom: classId,
+            groupName: groupName
+        };
+
+        fetch('/addGroup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(groupData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data.message);
+            document.getElementById('addGroupModal').style.display = 'none';
+            document.getElementById('groupName').value = '';
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при добавлении группы: ' + error.message);
+        });
+    });
+</script>
+</body>
+</html>

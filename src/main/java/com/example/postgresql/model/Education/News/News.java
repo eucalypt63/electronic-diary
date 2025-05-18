@@ -36,8 +36,7 @@ public class News {
     @NonNull
     private String title;
 
-    @Lob
-    @Column(nullable = false, length = 10000, columnDefinition = "CLOB")
+    @Column(nullable = false, length = 4000)
     @NonNull
     private String content;
 

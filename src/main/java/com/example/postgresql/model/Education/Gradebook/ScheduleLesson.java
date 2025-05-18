@@ -42,4 +42,8 @@ public class ScheduleLesson {
     @Column(nullable = false)
     @NonNull
     private Long lessonNumber;
+
+    @Column(nullable = false)
+    @NonNull
+    private String room;
 }

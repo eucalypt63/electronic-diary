@@ -12,4 +12,5 @@ public class ScheduleLessonRequestDTO {
     private Long groupId;
     private Long subjectId;
     private Long teacherId;
+    private String room;
 }

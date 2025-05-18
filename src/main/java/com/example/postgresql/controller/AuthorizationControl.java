@@ -1,12 +1,13 @@
 package com.example.postgresql.controller;
 
 import com.example.postgresql.DTO.ResponseDTO.AuthorizationUserResponseDTO;
-import com.example.postgresql.model.Users.Administrator;
+import com.example.postgresql.model.Users.Administrations;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
+import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Users.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,9 @@ public class AuthorizationControl {
     @Autowired
     private TeacherService teacherService;
 
+    @Autowired
+    private DTOService dtoService;
+
     @GetMapping("/login")
     public String getAuthorization(Model model) {
         return "login";
@@ -52,22 +56,26 @@ public class AuthorizationControl {
 
             UserType userType = user.getUserType();
             switch (userType.getName()) {
-                case "Main admin" -> session.setAttribute("userId", user.getId());
-                case "Local admin" -> {
-                    Administrator administrator = administratorService.findAdministratorByUserId(user.getId());
-                    session.setAttribute("userId", administrator.getUser().getId());
+                case "Main admin", "Local admin", "Ministry" -> session.setAttribute("userId", user.getId());
+                case "Administration" -> {
+                    Administrations administrations = administratorService.findAdministratorByUserId(user.getId());
+                    session.setAttribute("userId", administrations.getUser().getId());
+                    session.setAttribute("id", administrations.getId());
                 }
                 case "Teacher" -> {
                     Teacher teacher = teacherService.findTeacherByUserId(user.getId());
                     session.setAttribute("userId", teacher.getUser().getId());
+                    session.setAttribute("id", teacher.getId());
                 }
                 case "School student" -> {
                     SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentByUserId(user.getId());
                     session.setAttribute("userId", schoolStudent.getUser().getId());
+                    session.setAttribute("id", schoolStudent.getId());
                 }
                 case "Parent" -> {
                     Parent parent = parentService.findParentByUserId(user.getId());
                     session.setAttribute("userId", parent.getUser().getId());
+                    session.setAttribute("id", parent.getId());
                 }
             }
             session.setAttribute("role", userType.getName());
@@ -97,25 +105,15 @@ public class AuthorizationControl {
         AuthorizationUserResponseDTO authorizationUserResponseDTO = new AuthorizationUserResponseDTO();
 
         String role = (String) session.getAttribute("role");
-        Long id = (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
+        Long id = (Long) session.getAttribute("id");
 
         authorizationUserResponseDTO.setId(id);
+        authorizationUserResponseDTO.setUserId(userId);
         authorizationUserResponseDTO.setRole(role);
 
         return ResponseEntity.ok(authorizationUserResponseDTO);
     }
-
-    @GetMapping("/adminSettings")
-    public String adminSettings(Model model, HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        System.out.println(role);
-        if ("Main admin".equals(role) || "Local admin".equals(role)) {
-            return "adminSettings";
-        }
-        System.out.println("Неверная роль");
-        return "redirect:/login";
-    }
-
 
     //временно
     @GetMapping("/reg")

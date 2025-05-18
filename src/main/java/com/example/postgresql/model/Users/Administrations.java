@@ -9,12 +9,12 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "ELD_ADMINISTRATORS")
+@Table(name = "ELD_ADMINISTRATIONS")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Administrator {
+public class Administrations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

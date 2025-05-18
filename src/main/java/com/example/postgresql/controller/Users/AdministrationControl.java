@@ -2,7 +2,7 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.Users.AdministratorRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.AdministratorResponseDTO;
-import com.example.postgresql.model.Users.Administrator;
+import com.example.postgresql.model.Users.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.model.Users.User.UserType;
@@ -41,10 +41,10 @@ public class AdministrationControl {
     @GetMapping("/getAdministrators")
     @ResponseBody
     public ResponseEntity<List<AdministratorResponseDTO>> getAdministrators(@RequestParam Long schoolId) {
-        List<Administrator> administrators = administratorService.findAdministratorByEducationalInstitutionId(schoolId);
+        List<Administrations> administrations = administratorService.findAdministratorByEducationalInstitutionId(schoolId);
 
         List<AdministratorResponseDTO> administratorResponse = new ArrayList<>();
-        for (Administrator admin : administrators) {
+        for (Administrations admin : administrations) {
             AdministratorResponseDTO dto = dtoService.AdministratorToDto(admin);
             administratorResponse.add(dto);
         }
@@ -61,8 +61,8 @@ public class AdministrationControl {
     @GetMapping("/findAdministratorById")
     @ResponseBody
     public ResponseEntity<AdministratorResponseDTO> findAdministratorById(@RequestParam Long id) {
-        Administrator administrator = administratorService.findAdministratorById(id);
-        AdministratorResponseDTO administratorResponse = dtoService.AdministratorToDto(administrator);
+        Administrations administrations = administratorService.findAdministratorById(id);
+        AdministratorResponseDTO administratorResponse = dtoService.AdministratorToDto(administrations);
 
         return ResponseEntity.ok(administratorResponse);
     }
@@ -71,8 +71,8 @@ public class AdministrationControl {
     @GetMapping("/findSchoolByAdministratorId")
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByAdministratorId(@RequestParam Long id) {
-        Administrator administrator = administratorService.findAdministratorById(id);
-        EducationalInstitution educationalInstitution = administrator.getEducationalInstitution();
+        Administrations administrations = administratorService.findAdministratorById(id);
+        EducationalInstitution educationalInstitution = administrations.getEducationalInstitution();
 
         if (educationalInstitution == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -87,7 +87,7 @@ public class AdministrationControl {
     public ResponseEntity<String> addAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
         byte[] salt = userService.generateSalt();
         byte[] hash = userService.hashPassword(administratorRequestDTO.getPassword(), salt);
-        UserType userType = userService.findUserTypeById(2L);
+        UserType userType = userService.findUserTypeById(21L);
         EducationalInstitution educationalInstitution = educationalInstitutionService.
                 findEducationalInstitutionById(administratorRequestDTO.getUniversityId());
         User user = new User(administratorRequestDTO.getLogin(), hash, salt);
@@ -95,13 +95,13 @@ public class AdministrationControl {
 
         userService.saveUser(user);
 
-        Administrator administrator = new Administrator(administratorRequestDTO.getFirstName(), administratorRequestDTO.getLastName());
-        administrator.setPatronymic(administratorRequestDTO.getPatronymic());
-        administrator.setEmail(administratorRequestDTO.getEmail());
-        administrator.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
-        administrator.setUser(user);
-        administrator.setEducationalInstitution(educationalInstitution);
-        administratorService.saveAdministrator(administrator);
+        Administrations administrations = new Administrations(administratorRequestDTO.getFirstName(), administratorRequestDTO.getLastName());
+        administrations.setPatronymic(administratorRequestDTO.getPatronymic());
+        administrations.setEmail(administratorRequestDTO.getEmail());
+        administrations.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
+        administrations.setUser(user);
+        administrations.setEducationalInstitution(educationalInstitution);
+        administratorService.saveAdministrator(administrations);
 
         return ResponseEntity.ok("{\"message\": \"Администратор успешно добавлен\"}");
     }
@@ -132,9 +132,9 @@ public class AdministrationControl {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, requestEntity, String.class);
 
-            Administrator administrator = administratorService.findAdministratorById(id);
-            administrator.setPathImage(uploadUrl);
-            administratorService.saveAdministrator(administrator);
+            Administrations administrations = administratorService.findAdministratorById(id);
+            administrations.setPathImage(uploadUrl);
+            administratorService.saveAdministrator(administrations);
 
             return ResponseEntity.ok("{\"message\": \"Image uploaded successfully \"}");
         } catch (Exception e) {
@@ -145,24 +145,24 @@ public class AdministrationControl {
     @PostMapping("/changeAdministrator")
     @ResponseBody
     public ResponseEntity<String> changeAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
-        Administrator administrator = administratorService.findAdministratorById(administratorRequestDTO.getId());
-        administrator.setFirstName(administratorRequestDTO.getFirstName());
-        administrator.setLastName(administratorRequestDTO.getLastName());
-        administrator.setPatronymic(administratorRequestDTO.getPatronymic());
-        administrator.setEmail(administratorRequestDTO.getEmail());
-        administrator.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
+        Administrations administrations = administratorService.findAdministratorById(administratorRequestDTO.getId());
+        administrations.setFirstName(administratorRequestDTO.getFirstName());
+        administrations.setLastName(administratorRequestDTO.getLastName());
+        administrations.setPatronymic(administratorRequestDTO.getPatronymic());
+        administrations.setEmail(administratorRequestDTO.getEmail());
+        administrations.setPhoneNumber(administratorRequestDTO.getPhoneNumber());
 
         if (administratorRequestDTO.getLogin() != null) {
-            administrator.getUser().setLogin(administratorRequestDTO.getLogin());
+            administrations.getUser().setLogin(administratorRequestDTO.getLogin());
         }
         if (administratorRequestDTO.getPassword() != null){
             byte[] salt = userService.generateSalt();
             byte[] hash = userService.hashPassword(administratorRequestDTO.getPassword(), salt);
-            administrator.getUser().setHash(hash);
-            administrator.getUser().setSalt(salt);
+            administrations.getUser().setHash(hash);
+            administrations.getUser().setSalt(salt);
         }
 
-        administratorService.saveAdministrator(administrator);
+        administratorService.saveAdministrator(administrations);
 
         return ResponseEntity.ok().build();
     }

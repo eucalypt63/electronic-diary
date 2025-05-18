@@ -15,4 +15,5 @@ public class ScheduleLessonResponseDTO {
     private QuarterInfo quarterInfo;
     private Long dayNumber;
     private Long lessonNumber;
+    private String room;
 }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GradebookDayRepository extends JpaRepository<GradebookDay, Long> {
     List<GradebookDay> findGradebookDayByScheduleLessonTeacherAssignmentIdAndScheduleLessonQuarterInfoId(Long id, Long quarterId);
+    List<GradebookDay> findGradebookDayByScheduleLessonId(Long id);
+
 }

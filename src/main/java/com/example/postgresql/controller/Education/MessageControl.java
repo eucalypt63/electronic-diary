@@ -57,8 +57,8 @@ public class MessageControl {
     //Получение конкретного сообщения
     @GetMapping("/getMessageById")
     @ResponseBody
-    public ResponseEntity<Message> getMessageById(@RequestParam Long id) {
-        return ResponseEntity.ok(messageService.findMessageById(id));
+    public ResponseEntity<MessageResponseDTO> getMessageById(@RequestParam Long id) {
+        return ResponseEntity.ok(dtoService.MessageToDto(messageService.findMessageById(id)));
     }
 
     //Получить сообщения получателя

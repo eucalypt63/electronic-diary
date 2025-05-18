@@ -9,5 +9,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthorizationUserResponseDTO {
     private Long id;
+    private Long userId;
     private String role;
 }

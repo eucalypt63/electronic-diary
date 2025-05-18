@@ -2,7 +2,7 @@ package com.example.postgresql.controller.Education;
 
 
 import com.example.postgresql.DTO.RequestDTO.EducationalInstitutionRequestDTO;
-import com.example.postgresql.model.Users.Administrator;
+import com.example.postgresql.model.Users.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
@@ -51,8 +51,8 @@ public class EducationalInstitutionControl {
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        Administrator administrator = administratorService.findAdministratorById(userId);
-        EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrator
+        Administrations administrations = administratorService.findAdministratorById(userId);
+        EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrations
                 .getEducationalInstitution()
                 .getId());
         List<EducationalInstitution> institutions = new ArrayList<>();
