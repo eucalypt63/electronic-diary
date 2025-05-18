@@ -20,6 +20,9 @@ public class MessageService {
     public List<Message> findMessageByGetterUserId(Long id){
         return messageRepository.findMessageByGetterUserId(id);
     }
+    public List<Message> findMessageBySenderUserId(Long id){
+        return messageRepository.findMessageBySenderUserId(id);
+    }
     public List<Message> findMessageBySenderUserIdAndGetterUserId(Long senderId, Long getterId){
         return messageRepository.findMessageBySenderUserIdAndGetterUserId(senderId, getterId);
     }

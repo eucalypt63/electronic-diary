@@ -75,6 +75,20 @@ public class MessageControl {
         return ResponseEntity.ok(messageResponseDTOS);
     }
 
+    //Получить сообщения отправителя
+    @GetMapping("findMessageBySenderUserId")
+    @ResponseBody
+    public ResponseEntity<List<MessageResponseDTO>> findMessageBySenderUserId(@RequestParam Long id){
+        List<Message> messages = messageService.findMessageBySenderUserId(id);
+        List<MessageResponseDTO> messageResponseDTOS = new ArrayList<>();
+
+        messages.forEach(message -> {
+            messageResponseDTOS.add(dtoService.MessageToDto(message));
+        });
+
+        return ResponseEntity.ok(messageResponseDTOS);
+    }
+
     //Получить сообщения от конкретного отправителя
     @GetMapping("findMessageBySenderUserIdAndGetterUserId")
     @ResponseBody
