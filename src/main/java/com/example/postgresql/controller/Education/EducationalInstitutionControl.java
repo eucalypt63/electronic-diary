@@ -6,9 +6,11 @@ import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
+import com.example.postgresql.model.Users.LocalOperator;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
 import com.example.postgresql.service.Users.AdministrationsService;
+import com.example.postgresql.service.Users.LocalOperatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,8 @@ public class EducationalInstitutionControl {
     private AddressService addressService;
     @Autowired
     private AdministrationsService administrationsService;
+    @Autowired
+    private LocalOperatorService localOperatorService;
 
     //Получить все школы
     @GetMapping("/getSchools")
@@ -49,10 +53,10 @@ public class EducationalInstitutionControl {
     //Получить школу текущего пользователя
     @GetMapping("/getSchoolByAuthorizationAdminId")
     @ResponseBody
-    public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) { ///////////////////
+    public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        Administrations administrations = administrationsService.findAdministrationById(userId);
-        EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrations
+        LocalOperator localOperator = localOperatorService.findLocalOperatorByUserId(userId);
+        EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(localOperator
                 .getEducationalInstitution()
                 .getId());
         List<EducationalInstitution> institutions = new ArrayList<>();

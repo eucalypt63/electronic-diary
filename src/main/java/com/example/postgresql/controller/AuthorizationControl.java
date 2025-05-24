@@ -219,6 +219,7 @@ public class AuthorizationControl {
         localOperator.setUser(newUser);
         localOperator.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(85L));
         localOperator.setEmail("korol634921777@gmail.com");
+        localOperatorService.saveLocalOperator(localOperator);
 
         //
 
@@ -230,6 +231,7 @@ public class AuthorizationControl {
         localOperator2.setUser(newUser2);
         localOperator2.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(86L));
         localOperator2.setEmail("korol634921777@gmail.com");
+        localOperatorService.saveLocalOperator(localOperator2);
 
         //
 
@@ -241,6 +243,7 @@ public class AuthorizationControl {
         localOperator3.setUser(newUser3);
         localOperator3.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(101L));
         localOperator3.setEmail("korol634921777@gmail.com");
+        localOperatorService.saveLocalOperator(localOperator3);
 
         model.addAttribute("success", "Пользователь успешно зарегистрирован");
         return "login";
