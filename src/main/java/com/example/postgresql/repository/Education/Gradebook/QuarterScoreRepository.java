@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QuarterScoreRepository extends JpaRepository<QuarterScore, Long> {
+    QuarterScore findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(Long schoolStudentId,
+                                                                                     Long schoolSubjectId,
+                                                                                     Long quarterInfoId);
 }

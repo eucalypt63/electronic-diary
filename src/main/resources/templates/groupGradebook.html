@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Журнал</title>
     <style>
-        /* Стили остаются без изменений */
         body {
             font-family: Arial, sans-serif;
             margin: 0px;
@@ -77,7 +76,6 @@
             color: #333;
             text-align: left;
         }
-
         .date-tooltip div {
             margin: 3px 0;
         }
@@ -119,7 +117,7 @@
 
         .modal-buttons {
             display: flex;
-            justify-content: flex-end;
+            margin-top: 10px;
             gap: 10px;
         }
 
@@ -129,18 +127,20 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
         .modal-button.cancel {
             background-color: #f1f1f1;
         }
-
         .modal-button.save {
             background-color: #4285f4;
             color: white;
         }
-
         .modal-button:hover {
             opacity: 0.9;
+        }
+
+        .quarter-score-column {
+            background-color: #f0f7ff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -153,6 +153,12 @@
 <div class="journal-header">
     <div><strong>Учитель:</strong> <span id="teacherName"></span></div>
     <div><strong>Четверть:</strong> <span id="quarterNumber"></span></div>
+</div>
+
+<div style="text-align: left; margin: 15px 20px;">
+    <button id="quarterResultsBtn" style="padding: 8px 16px; background-color: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Четвертные оценки
+    </button>
 </div>
 
 <div class="journal-grid" id="journalGrid">
@@ -193,6 +199,8 @@
 <script>
     let gradebookDataTemp;
     let groupDataTemp;
+    let quarterScores = new Map();
+
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const teacherAssignmentId = urlParams.get('teacherAssignmentId');
@@ -203,7 +211,6 @@
             return;
         }
 
-        // Получаем данные журнала с учётом четверти
         fetch(`/findGradebookDayByScheduleLessonTeacherAssignmentId?id=${teacherAssignmentId}&quarterId=${quarterId}`)
             .then(response => {
                 if (!response.ok) {
@@ -216,16 +223,21 @@
                     throw new Error('Нет данных о днях журнала для выбранной четверти');
                 }
 
-                // 2. Получаем данные о группе
                 const groupId = gradebookData.gradebookDayResponseDTOS[0].scheduleLesson.group.id;
                 return Promise.all([
                     Promise.resolve(gradebookData),
-                    fetch(`/findGroupMemberByGroupId?id=${groupId}`).then(res => res.json())
+                    fetch(`/findGroupMemberByGroupId?id=${groupId}`).then(res => res.json()),
+                    fetch(`/findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId?teacherAssignmentId=${teacherAssignmentId}&quarterId=${quarterId}`).then(res => res.ok ? res.json() : [])
                 ]);
             })
-            .then(([gradebookData, groupData]) => {
+            .then(([gradebookData, groupData, quarterScoresData])  => {
                 gradebookDataTemp = gradebookData;
                 groupDataTemp = groupData;
+
+                quarterScoresData.forEach(score => {
+                    quarterScores.set(score.schoolStudentId, score);
+                });
+
                 renderGradebook(gradebookData, groupData);
             })
             .catch(error => {
@@ -234,14 +246,17 @@
 
         function renderGradebook(gradebookData, groupData) {
             const firstDay = gradebookData.gradebookDayResponseDTOS[0];
+            const teacherAssignment = firstDay.scheduleLesson.teacherAssignment;
+            const schoolSubjectId = teacherAssignment.schoolSubject.id;
+
             document.getElementById('journalTitle').textContent =
-                `Журнал - ${firstDay.scheduleLesson.teacherAssignment.schoolSubject.name}
+                `Журнал - ${teacherAssignment.schoolSubject.name}
                 (${firstDay.scheduleLesson.group.groupName})`;
 
             document.getElementById('teacherName').textContent =
-                `${firstDay.scheduleLesson.teacherAssignment.teacher.lastName}
-                 ${firstDay.scheduleLesson.teacherAssignment.teacher.firstName}
-                 ${firstDay.scheduleLesson.teacherAssignment.teacher.patronymic || ''}`;
+                `${teacherAssignment.teacher.lastName}
+                 ${teacherAssignment.teacher.firstName}
+                 ${teacherAssignment.teacher.patronymic || ''}`;
 
             document.getElementById('quarterNumber').textContent =
                 firstDay.scheduleLesson.quarterInfo.quarterNumber;
@@ -254,9 +269,9 @@
 
             const grid = document.getElementById('journalGrid');
             grid.innerHTML = '';
-            grid.style.gridTemplateColumns = `200px repeat(${sortedDays.length}, minmax(100px, 1fr))`;
+            // Добавляем +1 столбец для четвертных оценок
+            grid.style.gridTemplateColumns = `200px repeat(${sortedDays.length}, minmax(100px, 1fr)) 100px`;
 
-            // Добавляем заголовки
             const studentNameHeader = document.createElement('div');
             studentNameHeader.className = 'grid-header student-name';
             studentNameHeader.textContent = 'Ученик';
@@ -268,7 +283,6 @@
                 dayHeader.textContent = formatDate(day.dateTime);
                 dayHeader.style.cursor = 'pointer';
 
-                // Обработчик клика для открытия модального окна
                 dayHeader.addEventListener('click', () => {
                     openEditDayModal(day);
                 });
@@ -276,7 +290,12 @@
                 grid.appendChild(dayHeader);
             });
 
-            // Добавляем строки для каждого студента
+            // Добавляем заголовок для столбца четвертных оценок
+            const quarterScoreHeader = document.createElement('div');
+            quarterScoreHeader.className = 'grid-header';
+            quarterScoreHeader.textContent = 'Итог';
+            grid.appendChild(quarterScoreHeader);
+
             groupData.groupMembers.forEach(member => {
                 const student = member.schoolStudent;
 
@@ -285,38 +304,50 @@
                 studentNameCell.textContent = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
                 grid.appendChild(studentNameCell);
 
-                // Ячейки с оценками/посещаемостью для каждого дня
+                // Ячейки с оценками за дни
                 sortedDays.forEach(day => {
                     const cell = document.createElement('div');
                     cell.className = 'grade-cell';
 
-                    // Сохраняем данные для удобного доступа
                     cell.dataset.dayId = day.id;
                     cell.dataset.studentId = student.id;
 
-                    // Проверяем оценки
                     const score = scoreMap.get(`${day.id}_${student.id}`);
                     if (score) {
                         cell.textContent = score.score;
                     }
-                    // Проверяем посещаемость
                     else if (attendanceMap.has(`${day.id}_${student.id}`)) {
                         cell.textContent = 'N';
                         cell.classList.add('absent');
                     }
 
-                    // Добавляем обработчик клика
                     cell.addEventListener('click', () => {
                         openEditScoreModal(cell, day, student);
                     });
 
                     grid.appendChild(cell);
                 });
-            });
 
+                // Ячейка с четвертной оценкой
+                const quarterScoreCell = document.createElement('div');
+                quarterScoreCell.className = 'grade-cell quarter-score-column';
+                quarterScoreCell.dataset.studentId = student.id;
+                quarterScoreCell.dataset.schoolSubjectId = schoolSubjectId;
+
+                const quarterScoreData = quarterScores.get(student.id);
+                if (quarterScoreData) {
+                    quarterScoreCell.textContent = quarterScoreData.score;
+                    quarterScoreCell.dataset.quarterScoreId = quarterScoreData.id;
+                }
+
+                quarterScoreCell.addEventListener('click', () => {
+                    openEditQuarterScoreModal(quarterScoreCell, student.id, schoolSubjectId);
+                });
+
+                grid.appendChild(quarterScoreCell);
+            });
         }
 
-        // Создает карту для быстрого поиска записей по ключу "dayId_studentId"
         function createRecordMap(records) {
             const map = new Map();
             if (!records) return map;
@@ -329,13 +360,20 @@
             return map;
         }
 
-        // Форматирует дату в формате "dd.MM"
         function formatDate(dateString) {
             const date = new Date(dateString);
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             return `${day}.${month}`;
         }
+
+         document.getElementById('quarterResultsBtn').addEventListener('click', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const teacherAssignmentId = urlParams.get('teacherAssignmentId');
+            if (teacherAssignmentId) {
+                window.location.href = `/groupQuarterResult?teacherAssignmentId=${teacherAssignmentId}`;
+            }
+        });
     });
 
     function openEditDayModal(day) {
@@ -343,16 +381,13 @@
         const topicInput = document.getElementById('edit-topic');
         const homeworkInput = document.getElementById('edit-homework');
 
-        // Заполняем поля текущими значениями
         topicInput.value = day.topic || '';
         homeworkInput.value = day.homework || '';
 
-        // Обработчик кнопки "Отменить"
         document.querySelector('#editDayModal .modal-button.cancel').onclick = () => {
             modal.style.display = 'none';
         };
 
-        // Обработчик кнопки "Обновить"
         document.querySelector('#editDayModal .modal-button.save').onclick = () => {
             const newTopic = topicInput.value.trim();
             const newHomework = homeworkInput.value.trim();
@@ -385,22 +420,30 @@
 
     function openEditScoreModal(cell, day, student) {
         const modal = document.getElementById('editScoreModal');
+        const modalBody = document.querySelector('#editScoreModal .modal-body');
+
+        const originalModalHTML = `
+            <label for="edit-score">Оценка (1-10) или "N" для отсутствия:</label>
+            <input type="text" id="edit-score" maxlength="2">
+        `;
+
+        modalBody.innerHTML = originalModalHTML;
+
         const scoreInput = document.getElementById('edit-score');
         const currentValue = cell.textContent;
 
-        // Заполняем поле текущим значением
         scoreInput.value = currentValue === 'N' ? '' : currentValue;
 
-        // Обработчик кнопки "Отменить"
         document.querySelector('#editScoreModal .modal-button.cancel').onclick = () => {
             modal.style.display = 'none';
         };
 
-        // Обработчик кнопки "Обновить"
         document.querySelector('#editScoreModal .modal-button.save').onclick = () => {
+            const saveButton = document.querySelector('#editScoreModal .modal-button.save');
+            saveButton.disabled = true;
+
             const newValue = scoreInput.value.trim().toUpperCase();
 
-            // Проверяем, что введено допустимое значение (1-10 или N)
             if (newValue === 'N' || (!isNaN(newValue) && parseInt(newValue) >= 1 && parseInt(newValue) <= 10)) {
                 const isAttendance = newValue === 'N';
                 const endpoint = isAttendance ? '/updateGradebookAttendance' : '/updateGradebookScore';
@@ -420,22 +463,96 @@
                 })
                 .then(data => {
                     modal.style.display = 'none';
-
-                    // Обновляем ячейку в DOM
                     cell.textContent = newValue;
-                    if (isAttendance) {
-                        cell.classList.add('absent');
-                    } else {
-                        cell.classList.remove('absent');
-                    }
+                    cell.classList.toggle('absent', isAttendance);
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);
                     alert('Произошла ошибка при обновлении: ' + error.message);
+                })
+                .finally(() => {
+                    saveButton.disabled = false;
                 });
             } else {
                 alert('Пожалуйста, введите оценку от 1 до 10 или "N" для отсутствия');
+                saveButton.disabled = false;
             }
+        };
+
+        modal.style.display = 'flex';
+    }
+
+    function openEditQuarterScoreModal(cell, studentId, schoolSubjectId) {
+        const modal = document.getElementById('editScoreModal');
+        const modalBody = document.querySelector('#editScoreModal .modal-body');
+
+        modalBody.innerHTML = `
+            <label for="edit-score">Оценка (1-10):</label>
+            <input type="text" id="edit-score" maxlength="2">
+        `;
+
+        const scoreInput = document.getElementById('edit-score');
+        scoreInput.value = cell.textContent || '';
+
+        const quarterScoreId = cell.dataset.quarterScoreId;
+        const isNewScore = !quarterScoreId;
+
+        document.querySelector('#editScoreModal .modal-button.cancel').onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        document.querySelector('#editScoreModal .modal-button.save').onclick = () => {
+            const saveButton = document.querySelector('#editScoreModal .modal-button.save');
+            saveButton.disabled = true;
+
+            const newValue = scoreInput.value.trim();
+
+            if (!newValue || isNaN(newValue) || parseInt(newValue) < 1 || parseInt(newValue) > 10) {
+                alert('Пожалуйста, введите оценку от 1 до 10');
+                saveButton.disabled = false;
+                return;
+            }
+
+            const score = parseInt(newValue);
+            const urlParams = new URLSearchParams(window.location.search);
+            const quarterId = urlParams.get('quarterId');
+
+            const endpoint = isNewScore ?
+                `/addQuarterScore?schoolStudentId=${studentId}&schoolSubjectId=${schoolSubjectId}&quarterId=${quarterId}&score=${score}` :
+                `/updateQuarterScore?quarterScoreId=${quarterScoreId}&score=${score}`;
+
+            fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка обновления четвертной оценки');
+                return response.text();
+            })
+            .then(data => {
+                modal.style.display = 'none';
+                cell.textContent = score;
+
+                if (isNewScore && data) {
+                    try {
+                        const responseData = JSON.parse(data);
+                        if (responseData.id) {
+                            cell.dataset.quarterScoreId = responseData.id;
+                        }
+                    } catch (e) {
+                        console.error('Ошибка парсинга ответа:', e);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при обновлении: ' + error.message);
+            })
+            .finally(() => {
+                saveButton.disabled = false;
+            });
         };
 
         modal.style.display = 'flex';
@@ -449,6 +566,7 @@
             }
         });
     });
+
 </script>
 </body>
 </html>

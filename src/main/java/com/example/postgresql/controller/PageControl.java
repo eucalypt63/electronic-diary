@@ -68,9 +68,17 @@ public class PageControl {
     public String getGroupGradebook(@RequestParam String teacherAssignmentId, @RequestParam String quarterId) {
         return "groupGradebook";
     }
+    @GetMapping("/groupQuarterResult")
+    public String getGroupQuarterResult(@RequestParam String teacherAssignmentId) {
+        return "groupQuarterResult";
+    }
     @GetMapping("/schoolStudentDiary")
     public String getSchoolStudentDiary(@RequestParam String id) {
         return "schoolStudentDiary";
+    }
+    @GetMapping("/schoolStudentQuarterResult")
+    public String getSchoolStudentQuarterResult(@RequestParam String id) {
+        return "schoolStudentQuarterResult";
     }
     @GetMapping("/test")
     public String getTest() {

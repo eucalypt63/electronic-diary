@@ -6,7 +6,6 @@ import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookScoreResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupMemberResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
-import com.example.postgresql.DTO.ResponseDTO.News.NewsCommentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.News.NewsResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.*;
@@ -16,19 +15,16 @@ import com.example.postgresql.model.Education.Gradebook.GradebookDay;
 import com.example.postgresql.model.Education.Gradebook.GradebookScore;
 import com.example.postgresql.model.Education.Gradebook.ScheduleLesson;
 import com.example.postgresql.model.Education.Group.GroupMember;
-import com.example.postgresql.model.Education.Message;
 import com.example.postgresql.model.Education.News.News;
-import com.example.postgresql.model.Education.News.NewsComment;
 import com.example.postgresql.model.Education.Notification;
-import com.example.postgresql.model.Education.UserComment;
 import com.example.postgresql.model.TeacherAssignment;
-import com.example.postgresql.model.Users.Administrations;
+import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.model.Users.Teacher;
-import com.example.postgresql.repository.Users.AdministratorRepository;
+import com.example.postgresql.repository.Users.Administrations.AdministrationsRepository;
 import com.example.postgresql.repository.Users.Student.ParentRepository;
 import com.example.postgresql.repository.Users.Student.SchoolStudentRepository;
 import com.example.postgresql.repository.Users.TeacherRepository;
@@ -38,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DTOService {
     @Autowired
-    private AdministratorRepository administratorRepository;
+    private AdministrationsRepository administrationsRepository;
     @Autowired
     private ParentRepository parentRepository;
     @Autowired
@@ -186,7 +182,7 @@ public class DTOService {
         newsResponseDTO.setContent(news.getContent());
         newsResponseDTO.setDateTime(news.getDateTime());
 
-        Administrations administrations = administratorRepository.findAdministratorByUserId(news.getOwnerUser().getId());
+        Administrations administrations = administrationsRepository.findAdministrationsByUserId(news.getOwnerUser().getId());
         SchoolStudent schoolStudent = schoolStudentRepository.findSchoolStudentByUserId(news.getOwnerUser().getId());
         Parent parent = parentRepository.findParentByUserId(news.getOwnerUser().getId());
         Teacher teacher = teacherRepository.findTeacherByUserId(news.getOwnerUser().getId());
@@ -216,184 +212,6 @@ public class DTOService {
         }
 
         return newsResponseDTO;
-    }
-
-    public NewsCommentResponseDTO NewsCommentToDto(NewsComment newsComment){
-        NewsCommentResponseDTO newsCommentResponseDTO = new NewsCommentResponseDTO();
-        newsCommentResponseDTO.setId(newsComment.getId());
-        newsCommentResponseDTO.setUserId(newsComment.getUser().getId());
-        newsCommentResponseDTO.setContent(newsComment.getContent());
-        newsCommentResponseDTO.setDateTime(newsComment.getDateTime());
-        newsCommentResponseDTO.setNewsResponseDTO(NewsToDto(newsComment.getNews()));
-
-        Administrations administrations = administratorRepository.findAdministratorByUserId(newsComment.getUser().getId());
-        SchoolStudent schoolStudent = schoolStudentRepository.findSchoolStudentByUserId(newsComment.getUser().getId());
-        Parent parent = parentRepository.findParentByUserId(newsComment.getUser().getId());
-        Teacher teacher = teacherRepository.findTeacherByUserId(newsComment.getUser().getId());
-
-        if (administrations != null) {
-            newsCommentResponseDTO.setFirstName(administrations.getFirstName());
-            newsCommentResponseDTO.setLastName(administrations.getLastName());
-            newsCommentResponseDTO.setPatronymic(administrations.getPatronymic());
-        }
-        else if (schoolStudent != null) {
-            newsCommentResponseDTO.setFirstName(schoolStudent.getFirstName());
-            newsCommentResponseDTO.setLastName(schoolStudent.getLastName());
-            newsCommentResponseDTO.setPatronymic(schoolStudent.getPatronymic());
-        }
-        else if (parent != null) {
-            newsCommentResponseDTO.setFirstName(parent.getFirstName());
-            newsCommentResponseDTO.setLastName(parent.getLastName());
-            newsCommentResponseDTO.setPatronymic(parent.getPatronymic());
-        }
-        else if (teacher != null) {
-            newsCommentResponseDTO.setFirstName(teacher.getFirstName());
-            newsCommentResponseDTO.setLastName(teacher.getLastName());
-            newsCommentResponseDTO.setPatronymic(teacher.getPatronymic());
-        } else {
-            newsCommentResponseDTO.setFirstName("Оповещение");
-            newsCommentResponseDTO.setLastName("Системное");
-        }
-
-        return newsCommentResponseDTO;
-    }
-
-    public UserCommentResponseDTO UserCommentToDto(UserComment userComment){
-        UserCommentResponseDTO userCommentResponseDTO = new UserCommentResponseDTO();
-        userCommentResponseDTO.setId(userComment.getId());
-        userCommentResponseDTO.setGetterUserId(userComment.getGetterUser().getId());
-        userCommentResponseDTO.setSenderUserId(userComment.getSenderUser().getId());
-        userCommentResponseDTO.setContent(userComment.getContent());
-        userCommentResponseDTO.setDateTime(userComment.getDateTime());
-
-        Administrations senderAdministrations = administratorRepository.findAdministratorByUserId(userComment.getSenderUser().getId());
-        SchoolStudent senderSchoolStudent = schoolStudentRepository.findSchoolStudentByUserId(userComment.getSenderUser().getId());
-        Parent senderParent = parentRepository.findParentByUserId(userComment.getSenderUser().getId());
-        Teacher senderTeacher = teacherRepository.findTeacherByUserId(userComment.getSenderUser().getId());
-
-        Administrations getterAdministrations = administratorRepository.findAdministratorByUserId(userComment.getGetterUser().getId());
-        SchoolStudent getterSchoolStudent = schoolStudentRepository.findSchoolStudentByUserId(userComment.getGetterUser().getId());
-        Parent getterParent = parentRepository.findParentByUserId(userComment.getGetterUser().getId());
-        Teacher getterTeacher = teacherRepository.findTeacherByUserId(userComment.getGetterUser().getId());
-
-        if (senderAdministrations != null) {
-            userCommentResponseDTO.setSenderFirstName(senderAdministrations.getFirstName());
-            userCommentResponseDTO.setSenderLastName(senderAdministrations.getLastName());
-            userCommentResponseDTO.setSenderPatronymic(senderAdministrations.getPatronymic());
-        }
-        else if (senderSchoolStudent != null) {
-            userCommentResponseDTO.setSenderFirstName(senderSchoolStudent.getFirstName());
-            userCommentResponseDTO.setSenderLastName(senderSchoolStudent.getLastName());
-            userCommentResponseDTO.setSenderPatronymic(senderSchoolStudent.getPatronymic());
-        }
-        else if (senderParent != null) {
-            userCommentResponseDTO.setSenderFirstName(senderParent.getFirstName());
-            userCommentResponseDTO.setSenderLastName(senderParent.getLastName());
-            userCommentResponseDTO.setSenderPatronymic(senderParent.getPatronymic());
-        }
-        else if (senderTeacher != null) {
-            userCommentResponseDTO.setSenderFirstName(senderTeacher.getFirstName());
-            userCommentResponseDTO.setSenderLastName(senderTeacher.getLastName());
-            userCommentResponseDTO.setSenderPatronymic(senderTeacher.getPatronymic());
-        } else {
-            userCommentResponseDTO.setSenderFirstName("Оповещение");
-            userCommentResponseDTO.setSenderLastName("Системное");
-        }
-
-        if (getterAdministrations != null) {
-            userCommentResponseDTO.setGetterFirstName(getterAdministrations.getFirstName());
-            userCommentResponseDTO.setGetterLastName(getterAdministrations.getLastName());
-            userCommentResponseDTO.setGetterPatronymic(getterAdministrations.getPatronymic());
-        }
-        else if (getterSchoolStudent != null) {
-            userCommentResponseDTO.setGetterFirstName(getterSchoolStudent.getFirstName());
-            userCommentResponseDTO.setGetterLastName(getterSchoolStudent.getLastName());
-            userCommentResponseDTO.setGetterPatronymic(getterSchoolStudent.getPatronymic());
-        }
-        else if (getterParent != null) {
-            userCommentResponseDTO.setGetterFirstName(getterParent.getFirstName());
-            userCommentResponseDTO.setGetterLastName(getterParent.getLastName());
-            userCommentResponseDTO.setGetterPatronymic(getterParent.getPatronymic());
-        }
-        else if (getterTeacher != null) {
-            userCommentResponseDTO.setGetterFirstName(getterTeacher.getFirstName());
-            userCommentResponseDTO.setGetterLastName(getterTeacher.getLastName());
-            userCommentResponseDTO.setGetterPatronymic(getterTeacher.getPatronymic());
-        }  else {
-            userCommentResponseDTO.setGetterFirstName("Оповещение");
-            userCommentResponseDTO.setGetterLastName("Системное");
-        }
-
-        return userCommentResponseDTO;
-    }
-
-    public MessageResponseDTO MessageToDto(Message message){
-        MessageResponseDTO messageResponseDTO = new MessageResponseDTO();
-        messageResponseDTO.setId(message.getId());
-        messageResponseDTO.setGetterUserId(message.getGetterUser().getId());
-        messageResponseDTO.setSenderUserId(message.getSenderUser().getId());
-        messageResponseDTO.setMessage(message.getMessage());
-        messageResponseDTO.setDateTime(message.getDateTime());
-
-        Administrations senderAdministrations = administratorRepository.findAdministratorByUserId(message.getSenderUser().getId());
-        SchoolStudent senderSchoolStudent = schoolStudentRepository.findSchoolStudentByUserId(message.getSenderUser().getId());
-        Parent senderParent = parentRepository.findParentByUserId(message.getSenderUser().getId());
-        Teacher senderTeacher = teacherRepository.findTeacherByUserId(message.getSenderUser().getId());
-
-        Administrations getterAdministrations = administratorRepository.findAdministratorByUserId(message.getGetterUser().getId());
-        SchoolStudent getterSchoolStudent = schoolStudentRepository.findSchoolStudentByUserId(message.getGetterUser().getId());
-        Parent getterParent = parentRepository.findParentByUserId(message.getGetterUser().getId());
-        Teacher getterTeacher = teacherRepository.findTeacherByUserId(message.getGetterUser().getId());
-
-        if (senderAdministrations != null) {
-            messageResponseDTO.setSenderFirstName(senderAdministrations.getFirstName());
-            messageResponseDTO.setSenderLastName(senderAdministrations.getLastName());
-            messageResponseDTO.setSenderPatronymic(senderAdministrations.getPatronymic());
-        }
-        else if (senderSchoolStudent != null) {
-            messageResponseDTO.setSenderFirstName(senderSchoolStudent.getFirstName());
-            messageResponseDTO.setSenderLastName(senderSchoolStudent.getLastName());
-            messageResponseDTO.setSenderPatronymic(senderSchoolStudent.getPatronymic());
-        }
-        else if (senderParent != null) {
-            messageResponseDTO.setSenderFirstName(senderParent.getFirstName());
-            messageResponseDTO.setSenderLastName(senderParent.getLastName());
-            messageResponseDTO.setSenderPatronymic(senderParent.getPatronymic());
-        }
-        else if (senderTeacher != null) {
-            messageResponseDTO.setSenderFirstName(senderTeacher.getFirstName());
-            messageResponseDTO.setSenderLastName(senderTeacher.getLastName());
-            messageResponseDTO.setSenderPatronymic(senderTeacher.getPatronymic());
-        } else {
-            messageResponseDTO.setSenderFirstName("Оповещение");
-            messageResponseDTO.setSenderLastName("Системное");
-        }
-
-        if (getterAdministrations != null) {
-            messageResponseDTO.setGetterFirstName(getterAdministrations.getFirstName());
-            messageResponseDTO.setGetterLastName(getterAdministrations.getLastName());
-            messageResponseDTO.setGetterPatronymic(getterAdministrations.getPatronymic());
-        }
-        else if (getterSchoolStudent != null) {
-            messageResponseDTO.setGetterFirstName(getterSchoolStudent.getFirstName());
-            messageResponseDTO.setGetterLastName(getterSchoolStudent.getLastName());
-            messageResponseDTO.setGetterPatronymic(getterSchoolStudent.getPatronymic());
-        }
-        else if (getterParent != null) {
-            messageResponseDTO.setGetterFirstName(getterParent.getFirstName());
-            messageResponseDTO.setGetterLastName(getterParent.getLastName());
-            messageResponseDTO.setGetterPatronymic(getterParent.getPatronymic());
-        }
-        else if (getterTeacher != null) {
-            messageResponseDTO.setGetterFirstName(getterTeacher.getFirstName());
-            messageResponseDTO.setGetterLastName(getterTeacher.getLastName());
-            messageResponseDTO.setGetterPatronymic(getterTeacher.getPatronymic());
-        } else {
-            messageResponseDTO.setGetterFirstName("Оповещение");
-            messageResponseDTO.setGetterLastName("Системное");
-        }
-
-        return messageResponseDTO;
     }
 
     public GradebookDayResponseDTO GradebookDayToDto(GradebookDay gradebookDay){

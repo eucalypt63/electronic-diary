@@ -2,13 +2,13 @@ package com.example.postgresql.controller.Education;
 
 
 import com.example.postgresql.DTO.RequestDTO.EducationalInstitutionRequestDTO;
-import com.example.postgresql.model.Users.Administrations;
+import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
-import com.example.postgresql.service.Users.AdministratorService;
+import com.example.postgresql.service.Users.AdministrationsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -31,7 +31,7 @@ public class EducationalInstitutionControl {
     @Autowired
     private AddressService addressService;
     @Autowired
-    private AdministratorService administratorService;
+    private AdministrationsService administrationsService;
 
     //Получить все школы
     @GetMapping("/getSchools")
@@ -49,9 +49,9 @@ public class EducationalInstitutionControl {
     //Получить школу текущего пользователя
     @GetMapping("/getSchoolByAuthorizationAdminId")
     @ResponseBody
-    public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {
+    public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) { ///////////////////
         Long userId = (Long) session.getAttribute("userId");
-        Administrations administrations = administratorService.findAdministratorById(userId);
+        Administrations administrations = administrationsService.findAdministrationById(userId);
         EducationalInstitution institution = educationalInstitutionService.findEducationalInstitutionById(administrations
                 .getEducationalInstitution()
                 .getId());

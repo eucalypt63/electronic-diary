@@ -1,4 +1,4 @@
-package com.example.postgresql.repository;
+package com.example.postgresql.repository.Education;
 
 import com.example.postgresql.model.Education.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;

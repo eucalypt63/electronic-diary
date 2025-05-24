@@ -15,4 +15,5 @@ public class AdministratorRequestDTO {
     private String email;
     private String phoneNumber;
     private Long universityId;
+    private Long administrationsTypeId;
 }

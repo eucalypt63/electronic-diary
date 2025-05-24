@@ -35,6 +35,9 @@ public class TeacherService {
         return teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
     }
 
+    public TeacherAssignment findTeacherAssignmentById(Long id) {
+        return teacherAssignmentRepository.findById(id).orElse(null);
+    }
     public List<Teacher> findTeachersBySchoolId(Long schoolId, List<Long> assignedTeacherIds) {
         List<Teacher> teachers = teacherRepository.findTeacherByEducationalInstitutionId(schoolId);
         return teachers.stream()

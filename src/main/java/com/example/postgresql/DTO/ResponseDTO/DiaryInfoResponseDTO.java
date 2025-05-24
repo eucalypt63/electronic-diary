@@ -13,4 +13,7 @@ public class DiaryInfoResponseDTO {
     private LocalDateTime dateTime;
     private boolean Attendance;
     private Long score;
+
+    private String topic;
+    private String homework;
 }

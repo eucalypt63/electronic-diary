@@ -1,5 +1,6 @@
-package com.example.postgresql.model.Education.News;
+package com.example.postgresql.model.Users;
 
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.User.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,33 +10,26 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ELD_NEW_COMMENTS")
+@Table(name = "ELD_LOCAL_OPERATOR")
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class NewsComment {
+public class LocalOperator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "nc_u_getter_id", foreignKey = @ForeignKey(name = "nc_u_getter_id"))
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "lo_u_id", foreignKey = @ForeignKey(name = "t_u_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "nc_n_getter_id", foreignKey = @ForeignKey(name = "nc_n_getter_id"))
+    @JoinColumn(name = "lo_ei_id", foreignKey = @ForeignKey(name = "t_ei_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private News news;
+    private EducationalInstitution educationalInstitution;
 
-    @Column(nullable = false, length = 1000)
-    @NonNull
-    private String content;
-
-    @Column(nullable = false)
-    @NonNull
-    private LocalDateTime dateTime;
+    private String email;
 }

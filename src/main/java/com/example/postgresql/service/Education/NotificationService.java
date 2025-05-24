@@ -1,7 +1,7 @@
 package com.example.postgresql.service.Education;
 
 import com.example.postgresql.model.Education.Notification;
-import com.example.postgresql.repository.NotificationRepository;
+import com.example.postgresql.repository.Education.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

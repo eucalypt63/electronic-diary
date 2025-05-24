@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,6 +88,7 @@ public class GradebookControl {
             List<ScheduleLesson> scheduleLessons = scheduleService.findScheduleLessonByGroupIdAndQuarterNumber(group.getId(), quarterNumber);
             scheduleLessons.parallelStream().forEach(scheduleLesson -> {
                 List<GradebookDay> gradebookDays = gradebookService.findGradebookDayByScheduleLessonId(scheduleLesson.getId());
+
                 gradebookDays.parallelStream().forEach(gradebookDay -> {
                     GradebookAttendance gradebookAttendance = gradebookService.findAttendancesByGradebookDayIdAndSchoolStudentId(gradebookDay.getId(), id);
                     GradebookScore gradebookScore = gradebookService.findScoresByGradebookDayIdAndSchoolStudentId(gradebookDay.getId(), id);
@@ -97,13 +99,20 @@ public class GradebookControl {
                     diaryInfoResponseDTO.setAttendance(gradebookAttendance != null);
                     diaryInfoResponseDTO.setDateTime(gradebookDay.getDateTime());
                     diaryInfoResponseDTO.setSchoolSubject(scheduleLesson.getTeacherAssignment().getSchoolSubject());
+                    diaryInfoResponseDTO.setTopic(gradebookDay.getTopic());
+                    diaryInfoResponseDTO.setHomework(gradebookDay.getHomework());
 
                     diaryInfoResponseDTOS.add(diaryInfoResponseDTO);
                 });
             });
         });
 
-        return ResponseEntity.ok(diaryInfoResponseDTOS);
+        List<DiaryInfoResponseDTO> sortedList = diaryInfoResponseDTOS.stream()
+                .sorted(Comparator.comparing((DiaryInfoResponseDTO dto) -> dto.getSchoolSubject().getName())
+                        .thenComparing(DiaryInfoResponseDTO::getDateTime))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(sortedList);
     }
 
     @PostMapping("updateGradebookDay")

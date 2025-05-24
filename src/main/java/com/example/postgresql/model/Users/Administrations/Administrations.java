@@ -1,4 +1,4 @@
-package com.example.postgresql.model.Users;
+package com.example.postgresql.model.Users.Administrations;
 
 import javax.persistence.*;
 
@@ -23,6 +23,11 @@ public class Administrations {
     @JoinColumn(name = "a_u_id", foreignKey = @ForeignKey(name = "a_u_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "a_at_id", foreignKey = @ForeignKey(name = "a_at_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private AdministrationsTypes administrationsTypes;
 
     @ManyToOne
     @JoinColumn(name = "a_ei_id", foreignKey = @ForeignKey(name = "u_ei_id"))

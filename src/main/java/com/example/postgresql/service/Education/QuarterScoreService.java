@@ -1,8 +1,7 @@
 package com.example.postgresql.service.Education;
 
-import com.example.postgresql.model.Education.Message;
+import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.repository.Education.Gradebook.QuarterScoreRepository;
-import com.example.postgresql.repository.Education.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,5 +13,12 @@ public class QuarterScoreService {
     @Autowired
     private QuarterScoreRepository quarterScoreRepository;
 
+    public QuarterScore findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(Long schoolStudentId,
+                                                                                            Long schoolSubjectId,
+                                                                                            Long quarterInfoId){
+        return quarterScoreRepository.findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(schoolStudentId, schoolSubjectId, quarterInfoId);
+    }
 
+    public QuarterScore  findQuarterScoreById(Long id){return quarterScoreRepository.findById(id).orElse(null);}
+    public void saveQuarterScore(QuarterScore quarterScore){quarterScoreRepository.save(quarterScore);}
 }
