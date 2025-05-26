@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценки за год</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .subject-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .group-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #555;
+        }
+        .grades-table {
+            display: grid;
+            grid-template-columns: 400px repeat(5, 100px);
+            gap: 1px;
+            background-color: #ddd;
+            border: 1px solid #ddd;
+            margin: 0 auto;
+            max-width: 905px;
+        }
+        .header-cell {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        .student-cell {
+            background-color: #f5f5f5;
+            padding: 10px;
+            position: sticky;
+            left: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .grade-cell {
+            background-color: white;
+            padding: 10px;
+            text-align: center;
+            min-height: 40px;
+        }
+        .year-grade {
+            background-color: #e8f5e9;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+            max-width: 90%;
+        }
+        .modal-body {
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal-button.cancel {
+            background-color: #f1f1f1;
+        }
+        .modal-button.save {
+            background-color: #4285f4;
+            color: white;
+        }
+        .modal-button:hover {
+            opacity: 0.9;
+        }
+        #edit-score {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{header}"></div>
+<h1>Оценки за год</h1>
+<div id="subjectInfo" class="subject-info"></div>
+<div id="groupInfo" class="group-info"></div>
+<div id="gradesContainer">
+    <div class="loading">Загрузка данных...</div>
+</div>
+
+<!-- Модальное окно для редактирования годовой оценки -->
+<div id="editScoreModal" class="modal">
+    <div class="modal-content">
+        <h3>Редактирование годовой оценки</h3>
+        <div class="modal-body">
+            <label for="edit-score">Оценка (1-10):</label>
+            <input type="text" id="edit-score" maxlength="2">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button cancel">Отменить</button>
+            <button class="modal-button save">Обновить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTeacherAssignment = null;
+    let currentStudentId = null;
+    let currentYearScoreId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const teacherAssignmentId = urlParams.get('teacherAssignmentId');
+
+        if (!teacherAssignmentId) {
+            showError('Не указан teacherAssignmentId в URL');
+            return;
+        }
+
+        loadGradesData(teacherAssignmentId);
+
+        // Обработчики для модального окна
+        document.querySelector('#editScoreModal .cancel').addEventListener('click', closeModal);
+        document.querySelector('#editScoreModal .save').addEventListener('click', saveYearScore);
+        document.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('editScoreModal')) {
+                closeModal();
+            }
+        });
+    });
+
+    async function loadGradesData(teacherAssignmentId) {
+        try {
+            const teacherAssignmentResponse = await fetch(`/getTeacherAssignment?id=${teacherAssignmentId}`);
+            currentTeacherAssignment = await teacherAssignmentResponse.json();
+
+            const [groupData, quarterScores, yearScores] = await Promise.all([
+                fetch(`/findGroupMemberByTeacherAssignmentId?id=${teacherAssignmentId}`).then(res => res.json()),
+                fetch(`/findQuarterScoreByTeacherAssignmentId?teacherAssignmentId=${teacherAssignmentId}`).then(res => res.json()),
+                fetch(`/findYearScoreByTeacherAssignmentId?teacherAssignmentId=${teacherAssignmentId}`).then(res => res.json())
+            ]);
+
+            if (!groupData || !groupData.groupMembers || !quarterScores || !yearScores) {
+                throw new Error('Не удалось загрузить данные');
+            }
+
+            document.getElementById('subjectInfo').textContent =
+                `Предмет: ${currentTeacherAssignment.schoolSubject?.name || 'Не указан'}`;
+            document.getElementById('groupInfo').textContent =
+                `Группа: ${currentTeacherAssignment.group?.groupName || 'Не указана'}`;
+
+            renderGradesTable(groupData, quarterScores, yearScores);
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showError(error.message);
+        }
+    }
+
+    function renderGradesTable(groupData, quarterScores, yearScores) {
+        const container = document.getElementById('gradesContainer');
+        container.innerHTML = '';
+
+        const table = document.createElement('div');
+        table.className = 'grades-table';
+        container.appendChild(table);
+
+        const headers = ['Ученик', '1 четверть', '2 четверть', '3 четверть', '4 четверть', 'Годовая'];
+        headers.forEach(header => {
+            const cell = document.createElement('div');
+            cell.className = 'header-cell';
+            cell.textContent = header;
+            table.appendChild(cell);
+        });
+
+        const quarterScoresMap = new Map();
+        quarterScores.forEach(score => {
+            if (!quarterScoresMap.has(score.schoolStudentId)) {
+                quarterScoresMap.set(score.schoolStudentId, {});
+            }
+            quarterScoresMap.get(score.schoolStudentId)[score.quarterNumber] = score.score;
+        });
+
+        const yearScoresMap = new Map();
+        yearScores.forEach(score => {
+            yearScoresMap.set(score.schoolStudentId, {
+                score: score.score,
+                id: score.id
+            });
+        });
+
+        groupData.groupMembers.forEach(member => {
+            const student = member.schoolStudent;
+            const studentName = `${student.lastName} ${student.firstName} ${student.patronymic || ''}`.trim();
+
+            const nameCell = document.createElement('div');
+            nameCell.className = 'student-cell';
+            nameCell.textContent = studentName;
+            nameCell.title = studentName;
+            table.appendChild(nameCell);
+
+            for (let quarter = 1; quarter <= 4; quarter++) {
+                const gradeCell = document.createElement('div');
+                gradeCell.className = 'grade-cell';
+
+                const quarterScore = quarterScoresMap.get(student.id)?.[quarter];
+                gradeCell.textContent = quarterScore || '';
+                table.appendChild(gradeCell);
+            }
+
+            const yearGradeCell = document.createElement('div');
+            yearGradeCell.className = 'grade-cell year-grade';
+            yearGradeCell.dataset.studentId = student.id; // Сохраняем ID студента
+
+            const yearScoreData = yearScoresMap.get(student.id);
+            if (yearScoreData) {
+                yearGradeCell.textContent = yearScoreData.score;
+                yearGradeCell.dataset.yearScoreId = yearScoreData.id;
+            }
+
+            yearGradeCell.addEventListener('click', () => {
+                openYearScoreModal(yearGradeCell, student.id);
+            });
+
+            table.appendChild(yearGradeCell);
+        });
+    }
+
+    function openYearScoreModal(cell, studentId) {
+        currentStudentId = studentId;
+        currentYearScoreId = cell.dataset.yearScoreId || null;
+
+        const modal = document.getElementById('editScoreModal');
+        const scoreInput = document.getElementById('edit-score');
+
+        scoreInput.value = cell.textContent || '';
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('editScoreModal').style.display = 'none';
+    }
+
+    async function saveYearScore() {
+        const scoreInput = document.getElementById('edit-score');
+        const newScore = scoreInput.value.trim();
+        const saveButton = document.querySelector('#editScoreModal .save');
+
+        if (!newScore || isNaN(newScore)) {
+            alert('Пожалуйста, введите числовую оценку');
+            return;
+        }
+
+        const scoreValue = parseInt(newScore);
+        if (scoreValue < 1 || scoreValue > 10) {
+            alert('Оценка должна быть в диапазоне от 1 до 10');
+            return;
+        }
+
+        saveButton.disabled = true;
+
+        try {
+            let response;
+            if (currentYearScoreId) {
+                response = await fetch(`/updateYearScore?yearScoreId=${currentYearScoreId}&score=${scoreValue}`);
+            } else {
+                response = await fetch(`/addYearScore?schoolStudentId=${currentStudentId}&schoolSubjectId=${currentTeacherAssignment.schoolSubject.id}&score=${scoreValue}`);
+            }
+
+            if (!response.ok) throw new Error('Ошибка при сохранении оценки');
+
+            // Находим и обновляем нужную ячейку
+            const yearGradeCells = document.querySelectorAll('.year-grade');
+            yearGradeCells.forEach(cell => {
+                if (cell.dataset.studentId === currentStudentId.toString()) {
+                    cell.textContent = scoreValue;
+                    if (!currentYearScoreId) {
+                        response.json().then(data => {
+                            if (data && data.id) {
+                                cell.dataset.yearScoreId = data.id;
+                            }
+                        });
+                    }
+                }
+            });
+
+            closeModal();
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при сохранении: ' + error.message);
+        } finally {
+            saveButton.disabled = false;
+        }
+    }
+
+    function showError(message) {
+        const container = document.getElementById('gradesContainer');
+        container.innerHTML = `<div class="error">${message}</div>`;
+    }
+</script>
+</body>
+</html>

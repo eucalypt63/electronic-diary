@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class QuarterScoreResponseDTO {
     private Long id;
+    private Long quarterNumber;
     private Long schoolStudentId;
     private SchoolSubject schoolSubject;
     private Long score;

@@ -5,11 +5,11 @@ import com.example.postgresql.DTO.ResponseDTO.YearScoreResponseDTO;
 import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.model.Education.Gradebook.YearScore;
 import com.example.postgresql.model.Education.Group.GroupMember;
+import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
-import com.example.postgresql.service.Education.GroupService;
-import com.example.postgresql.service.Education.QuarterScoreService;
-import com.example.postgresql.service.Education.ScheduleService;
-import com.example.postgresql.service.Education.YearScoreService;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.service.Education.*;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,10 @@ public class YearControl {
     private ScheduleService scheduleService;
     @Autowired
     private SchoolStudentService schoolStudentService;
+    @Autowired
+    private NotificationService notificationService;
 
+    // Получение годовых оценок для ученика
     @GetMapping("findYearScoreBySchoolStudentId")
     @ResponseBody
     public ResponseEntity<List<YearScoreResponseDTO>> findYearScoreBySchoolStudentId(@RequestParam Long schoolStudentId){
@@ -47,6 +51,7 @@ public class YearControl {
         return ResponseEntity.ok(yearScoreResponseDTOS);
     }
 
+    // Получение годовых оценок группы по предмету
     @GetMapping("findYearScoreByTeacherAssignmentId")
     @ResponseBody
     public ResponseEntity<List<YearScoreResponseDTO>> findYearScoreByGroupId(@RequestParam Long teacherAssignmentId){
@@ -67,12 +72,34 @@ public class YearControl {
     @GetMapping("addYearScore")
     @ResponseBody
     public ResponseEntity<String> addYearScore(@RequestParam Long schoolStudentId, @RequestParam Long schoolSubjectId, @RequestParam Long score){
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
+        SchoolSubject schoolSubject = scheduleService.findSchoolSubjectById(schoolSubjectId);
         YearScore yearScore = new YearScore();
         yearScore.setScore(score);
-        yearScore.setSchoolSubject(scheduleService.findSchoolSubjectById(schoolSubjectId));
-        yearScore.setSchoolStudent(schoolStudentService.findSchoolStudentById(schoolStudentId));
+        yearScore.setSchoolSubject(schoolSubject);
+        yearScore.setSchoolStudent(schoolStudent);
 
         yearScoreService.saveYearScore(yearScore);
+
+        Notification notification = new Notification();
+        notification.setUser(schoolStudent.getUser());
+        notification.setLink(
+                String.format(
+                        "/schoolStudentQuarterResult?id=%d",
+                        schoolStudent.getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Успеваемость");
+        notification.setContent(
+                String.format(
+                        "Вам была поставлена оценка за год %d по предмету \"%s\"",
+                        score,
+                        schoolSubject.getName()
+                )
+        );
+        notificationService.saveNotification(notification);
+
         return ResponseEntity.ok("{\"message\": \"Оценка за год добавлена\"}");
     }
 
@@ -82,6 +109,25 @@ public class YearControl {
         YearScore yearScore = yearScoreService.findYearScoreById(yearScoreId);
         yearScore.setScore(score);
         yearScoreService.saveYearScore(yearScore);
+
+        Notification notification = new Notification();
+        notification.setUser(yearScore.getSchoolStudent().getUser());
+        notification.setLink(
+                String.format(
+                        "/schoolStudentQuarterResult?id=%d",
+                        yearScore.getSchoolStudent().getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Успеваемость");
+        notification.setContent(
+                String.format(
+                        "Ваша оценка за год по предмету \"%s\" была заменена на %d",
+                        yearScore.getSchoolSubject().getName(),
+                        score
+                )
+        );
+        notificationService.saveNotification(notification);
 
         return ResponseEntity.ok("{\"message\": \"Годовая оценка обновлена\"}");
     }

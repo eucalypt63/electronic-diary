@@ -7,12 +7,14 @@ import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.ClassService;
 import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Users.SchoolStudentService;
+import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ public class GroupControl {
     private ClassService classService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private TeacherService teacherService;
     @Autowired
     private DTOService dtoService;
 
@@ -112,6 +116,26 @@ public class GroupControl {
     @ResponseBody
     public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByGroupId (@RequestParam Long id) {
         Group group = groupService.findGroupById(id);
+        GroupResponseDTO groupResponseDTO = dtoService.GroupToDto(group);
+
+        List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(groupResponseDTO.getId());
+        List<GroupMemberResponseDTO> groupMemberResponseDTOS = new ArrayList<>();
+        groupMembers.forEach(groupMember -> {
+            groupMemberResponseDTOS.add(dtoService.GroupMemberToDto(groupMember));
+        });
+
+        GroupInfoResponseDTO groupInfoResponseDTO = new GroupInfoResponseDTO();
+        groupInfoResponseDTO.setGroup(groupResponseDTO);
+        groupInfoResponseDTO.setGroupMembers(groupMemberResponseDTOS);
+
+        return ResponseEntity.ok(groupInfoResponseDTO);
+    }
+
+    @GetMapping("/findGroupMemberByTeacherAssignmentId")
+    @ResponseBody
+    public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByTeacherAssignmentId (@RequestParam Long id) {
+        TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(id);
+        Group group = groupService.findGroupById(teacherAssignment.getGroup().getId());
         GroupResponseDTO groupResponseDTO = dtoService.GroupToDto(group);
 
         List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(groupResponseDTO.getId());

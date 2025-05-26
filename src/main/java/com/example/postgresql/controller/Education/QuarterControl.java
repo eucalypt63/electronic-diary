@@ -3,8 +3,12 @@ package com.example.postgresql.controller.Education;
 import com.example.postgresql.DTO.ResponseDTO.QuarterScoreResponseDTO;
 import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.model.Education.Group.GroupMember;
+import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.service.Education.GroupService;
+import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Education.QuarterScoreService;
 import com.example.postgresql.service.Education.ScheduleService;
 import com.example.postgresql.service.Users.SchoolStudentService;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +36,8 @@ public class QuarterControl {
     private ScheduleService scheduleService;
     @Autowired
     private SchoolStudentService schoolStudentService;
+    @Autowired
+    private NotificationService notificationService;
 
     // Получение четвертных оценок для журнала
     @GetMapping("findQuarterScoreByTeacherAssignmentIdAndQuarterInfoId")
@@ -44,14 +51,14 @@ public class QuarterControl {
             QuarterScore quarterScore = quarterScoreService.findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(groupMember.getSchoolStudent().getId(), teacherAssignment.getSchoolSubject().getId(), quarterId);
 
             if (quarterScore != null) {
-                quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
+                quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
             }
         });
 
         return ResponseEntity.ok(quarterScoreResponseDTOS);
     }
 
-    // Получение четвертных оценок для годовых оценок
+    // Получение четвертных оценок для годовых оценок группы по предмету
     @GetMapping("findQuarterScoreByTeacherAssignmentId")
     @ResponseBody
     public ResponseEntity<List<QuarterScoreResponseDTO>> findQuarterScoreByTeacherAssignmentId(@RequestParam Long teacherAssignmentId){
@@ -64,7 +71,7 @@ public class QuarterControl {
 
             if (!quarterScores.isEmpty()) {
                 quarterScores.forEach(quarterScore -> {
-                    quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
+                    quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
                 });
             }
         });
@@ -79,7 +86,7 @@ public class QuarterControl {
         List<QuarterScore> quarterScores = quarterScoreService.findQuarterScoreBySchoolStudentId(schoolStudentId);
         List<QuarterScoreResponseDTO> quarterScoreResponseDTOS = new ArrayList<>();
         quarterScores.forEach(quarterScore -> {
-            quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
+            quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
         });
 
         return ResponseEntity.ok(quarterScoreResponseDTOS);
@@ -88,13 +95,36 @@ public class QuarterControl {
     @GetMapping("addQuarterScore")
     @ResponseBody
     public ResponseEntity<String> addQuarterScore(@RequestParam Long schoolStudentId, @RequestParam Long schoolSubjectId, @RequestParam Long quarterId, @RequestParam Long score){
+        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
+        SchoolSubject schoolSubject = scheduleService.findSchoolSubjectById(schoolSubjectId);
+
         QuarterScore quarterScore = new QuarterScore();
         quarterScore.setScore(score);
         quarterScore.setQuarterInfo(scheduleService.findQuarterInfoByQuarterNumber(quarterId));
-        quarterScore.setSchoolSubject(scheduleService.findSchoolSubjectById(schoolSubjectId));
-        quarterScore.setSchoolStudent(schoolStudentService.findSchoolStudentById(schoolStudentId));
-
+        quarterScore.setSchoolSubject(schoolSubject);
+        quarterScore.setSchoolStudent(schoolStudent);
         quarterScoreService.saveQuarterScore(quarterScore);
+
+        Notification notification = new Notification();
+        notification.setUser(schoolStudent.getUser());
+        notification.setLink(
+                String.format(
+                        "/schoolStudentQuarterResult?id=%d",
+                        schoolStudent.getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Успеваемость");
+        notification.setContent(
+                String.format(
+                        "Вам была поставлена оценка %d за %d четверть по предмету \"%s\"",
+                        score,
+                        quarterScore.getQuarterInfo().getQuarterNumber(),
+                        schoolSubject.getName()
+                )
+        );
+        notificationService.saveNotification(notification);
+
         return ResponseEntity.ok("{\"message\": \"Оценка за четверть добавлена\"}");
     }
 
@@ -104,6 +134,26 @@ public class QuarterControl {
         QuarterScore quarterScore = quarterScoreService.findQuarterScoreById(quarterScoreId);
         quarterScore.setScore(score);
         quarterScoreService.saveQuarterScore(quarterScore);
+
+        Notification notification = new Notification();
+        notification.setUser(quarterScore.getSchoolStudent().getUser());
+        notification.setLink(
+                String.format(
+                        "/schoolStudentQuarterResult?id=%d",
+                        quarterScore.getSchoolStudent().getId()
+                )
+        );
+        notification.setDateTime(LocalDateTime.now());
+        notification.setTitle("Успеваемость");
+        notification.setContent(
+                String.format(
+                        "Ваша оценка за %d четверть по предмету \"%s\" была заменена на %d",
+                        quarterScore.getQuarterInfo().getQuarterNumber(),
+                        quarterScore.getSchoolSubject().getName(),
+                        score
+                )
+        );
+        notificationService.saveNotification(notification);
 
         return ResponseEntity.ok("{\"message\": \"Оценка за четверть обновлена\"}");
     }

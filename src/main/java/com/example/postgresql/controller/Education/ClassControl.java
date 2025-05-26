@@ -2,10 +2,12 @@ package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.ClassRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.ClassResponseDTO;
+import com.example.postgresql.DTO.ResponseDTO.TeacherAssignmentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.ClassService;
@@ -75,6 +77,14 @@ public class ClassControl {
         TeacherResponseDTO teacherResponseDTO = dtoService.TeacherToDto(teacher);
 
         return ResponseEntity.ok(teacherResponseDTO);
+    }
+
+    @GetMapping("/getTeacherAssignment")
+    @ResponseBody
+    public ResponseEntity<TeacherAssignmentResponseDTO> getTeacherAssignment(@RequestParam Long id) {
+        TeacherAssignmentResponseDTO teacherAssignmentResponseDTO = dtoService.TeacherAssignmentToDto(teacherService.findTeacherAssignmentById(id));
+
+        return ResponseEntity.ok(teacherAssignmentResponseDTO);
     }
 
     // Создать новый класс

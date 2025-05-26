@@ -471,11 +471,11 @@
                     alert('Произошла ошибка при обновлении: ' + error.message);
                 })
                 .finally(() => {
-                    saveButton.disabled = false;
+                    saveButton.disabled = false; // Разблокируем кнопку в любом случае
                 });
             } else {
                 alert('Пожалуйста, введите оценку от 1 до 10 или "N" для отсутствия');
-                saveButton.disabled = false;
+                saveButton.disabled = false; // Разблокируем кнопку, если ввод некорректный
             }
         };
 
