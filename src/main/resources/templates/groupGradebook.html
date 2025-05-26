@@ -227,7 +227,7 @@
                 return Promise.all([
                     Promise.resolve(gradebookData),
                     fetch(`/findGroupMemberByGroupId?id=${groupId}`).then(res => res.json()),
-                    fetch(`/findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId?teacherAssignmentId=${teacherAssignmentId}&quarterId=${quarterId}`).then(res => res.ok ? res.json() : [])
+                    fetch(`/findQuarterScoreByTeacherAssignmentIdAndQuarterInfoId?teacherAssignmentId=${teacherAssignmentId}&quarterId=${quarterId}`).then(res => res.ok ? res.json() : [])
                 ]);
             })
             .then(([gradebookData, groupData, quarterScoresData])  => {

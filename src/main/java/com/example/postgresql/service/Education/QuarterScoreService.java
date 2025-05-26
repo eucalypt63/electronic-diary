@@ -18,6 +18,14 @@ public class QuarterScoreService {
                                                                                             Long quarterInfoId){
         return quarterScoreRepository.findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(schoolStudentId, schoolSubjectId, quarterInfoId);
     }
+    public List<QuarterScore> findQuarterScoreBySchoolStudentIdAndSchoolSubjectId(Long schoolStudentId,
+                                                                                  Long schoolSubjectId){
+        return quarterScoreRepository.findQuarterScoreBySchoolStudentIdAndSchoolSubjectId(schoolStudentId, schoolSubjectId);
+    }
+
+    public List<QuarterScore> findQuarterScoreBySchoolStudentId(Long schoolStudentId){
+        return quarterScoreRepository.findQuarterScoreBySchoolStudentId(schoolStudentId);
+    }
 
     public QuarterScore  findQuarterScoreById(Long id){return quarterScoreRepository.findById(id).orElse(null);}
     public void saveQuarterScore(QuarterScore quarterScore){quarterScoreRepository.save(quarterScore);}

@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class QuarterScoreResponseDTO {
+public class YearScoreResponseDTO {
     private Long id;
     private Long schoolStudentId;
     private SchoolSubject schoolSubject;

@@ -32,7 +32,8 @@ public class QuarterControl {
     @Autowired
     private SchoolStudentService schoolStudentService;
 
-    @GetMapping("findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId")
+    // Получение четвертных оценок для журнала
+    @GetMapping("findQuarterScoreByTeacherAssignmentIdAndQuarterInfoId")
     @ResponseBody
     public ResponseEntity<List<QuarterScoreResponseDTO>> findGradebookDayByScheduleLessonTeacherAssignmentId(@RequestParam Long teacherAssignmentId, @RequestParam Long quarterId){
         TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(teacherAssignmentId);
@@ -43,8 +44,42 @@ public class QuarterControl {
             QuarterScore quarterScore = quarterScoreService.findQuarterScoreBySchoolStudentIdAndSchoolSubjectIdAndQuarterInfoId(groupMember.getSchoolStudent().getId(), teacherAssignment.getSchoolSubject().getId(), quarterId);
 
             if (quarterScore != null) {
-                quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getScore()));
+                quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
             }
+        });
+
+        return ResponseEntity.ok(quarterScoreResponseDTOS);
+    }
+
+    // Получение четвертных оценок для годовых оценок
+    @GetMapping("findQuarterScoreByTeacherAssignmentId")
+    @ResponseBody
+    public ResponseEntity<List<QuarterScoreResponseDTO>> findQuarterScoreByTeacherAssignmentId(@RequestParam Long teacherAssignmentId){
+        TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(teacherAssignmentId);
+        List<GroupMember> groupMembers = groupService.findGroupMemberByGroupId(teacherAssignment.getGroup().getId());
+
+        List<QuarterScoreResponseDTO> quarterScoreResponseDTOS = new ArrayList<>();
+        groupMembers.forEach(groupMember -> {
+            List<QuarterScore> quarterScores = quarterScoreService.findQuarterScoreBySchoolStudentIdAndSchoolSubjectId(groupMember.getSchoolStudent().getId(), teacherAssignment.getSchoolSubject().getId());
+
+            if (!quarterScores.isEmpty()) {
+                quarterScores.forEach(quarterScore -> {
+                    quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
+                });
+            }
+        });
+
+        return ResponseEntity.ok(quarterScoreResponseDTOS);
+    }
+
+    // Получение четвертных оценок для дневника
+    @GetMapping("findQuarterScoreBySchoolStudentId")
+    @ResponseBody
+    public ResponseEntity<List<QuarterScoreResponseDTO>> findQuarterScoreBySchoolStudentId(@RequestParam Long schoolStudentId){
+        List<QuarterScore> quarterScores = quarterScoreService.findQuarterScoreBySchoolStudentId(schoolStudentId);
+        List<QuarterScoreResponseDTO> quarterScoreResponseDTOS = new ArrayList<>();
+        quarterScores.forEach(quarterScore -> {
+            quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
         });
 
         return ResponseEntity.ok(quarterScoreResponseDTOS);
