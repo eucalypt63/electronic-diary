@@ -47,8 +47,16 @@ public class YearControl {
         yearScores.forEach(yearScore -> {
             yearScoreResponseDTOS.add(new YearScoreResponseDTO(yearScore.getId(), schoolStudentId, yearScore.getSchoolSubject(), yearScore.getScore()));
         });
+        System.out.println(yearScoreResponseDTOS);
 
         return ResponseEntity.ok(yearScoreResponseDTOS);
+    }
+
+    @GetMapping("dd")
+    @ResponseBody
+    public void dd(){
+        YearScore yearScores = yearScoreService.findYearScoreById(1L);
+        yearScoreService.deleteYearScore(yearScores);
     }
 
     // Получение годовых оценок группы по предмету

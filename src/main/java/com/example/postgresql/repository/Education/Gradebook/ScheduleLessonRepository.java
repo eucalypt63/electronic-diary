@@ -16,6 +16,8 @@ public interface ScheduleLessonRepository extends JpaRepository<ScheduleLesson, 
             Long teacherId
     );
 
+    List<ScheduleLesson> findScheduleLessonByGroupId(Long id);
+
     List<ScheduleLesson> findByGroup_ClassRoom_IdAndDayNumberAndLessonNumberAndQuarterInfo_QuarterNumber(
             Long classId,
             Long dayNumber,

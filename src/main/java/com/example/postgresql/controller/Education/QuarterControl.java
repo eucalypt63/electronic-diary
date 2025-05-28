@@ -86,8 +86,9 @@ public class QuarterControl {
         List<QuarterScore> quarterScores = quarterScoreService.findQuarterScoreBySchoolStudentId(schoolStudentId);
         List<QuarterScoreResponseDTO> quarterScoreResponseDTOS = new ArrayList<>();
         quarterScores.forEach(quarterScore -> {
-            quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getSchoolStudent().getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
+            quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
         });
+        System.out.println(quarterScoreResponseDTOS);
 
         return ResponseEntity.ok(quarterScoreResponseDTOS);
     }

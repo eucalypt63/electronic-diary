@@ -9,6 +9,8 @@ import com.example.postgresql.model.Education.Gradebook.*;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
+import com.example.postgresql.model.SchoolSubject;
+import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.GradebookService;
@@ -113,6 +115,26 @@ public class GradebookControl {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(sortedList);
+    }
+
+    @GetMapping("findSchoolSubjectsBySchoolStudentId")
+    @ResponseBody
+    public ResponseEntity<List<SchoolSubject>>findSchoolSubjectsBySchoolStudentId(@RequestParam Long id){
+        List<GroupMember> groupMembers = groupService.findGroupMemberBySchoolStudentId(id);
+        List<Group> groups = groupMembers.stream()
+                .map(GroupMember::getGroup)
+                .distinct()
+                .toList();
+
+        List<SchoolSubject> schoolSubjects = groups.stream()
+                .flatMap(group -> scheduleService.findScheduleLessonByGroupId(group.getId()).stream())
+                .map(ScheduleLesson::getTeacherAssignment)
+                .map(TeacherAssignment::getSchoolSubject)
+                .distinct()
+                .toList();
+
+
+        return ResponseEntity.ok(schoolSubjects);
     }
 
     @PostMapping("updateGradebookDay")

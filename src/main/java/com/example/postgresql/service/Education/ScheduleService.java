@@ -25,6 +25,10 @@ public class ScheduleService {
         return scheduleLessonRepository.findByGroupIdAndQuarterInfo_QuarterNumber(groupId, quarterNumber);
     }
 
+    public List<ScheduleLesson> findScheduleLessonByGroupId(Long groupId){
+        return scheduleLessonRepository.findScheduleLessonByGroupId(groupId);
+    }
+
     public List<ScheduleLesson> findScheduleLessonByTeacherAssignmentIdAndQuarterNumber(Long teacherId, Long quarterNumber){
         return scheduleLessonRepository.findScheduleLessonByTeacherAssignmentIdAndQuarterInfo_QuarterNumber(teacherId, quarterNumber);
     }

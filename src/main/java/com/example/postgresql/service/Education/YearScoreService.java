@@ -26,4 +26,6 @@ public class YearScoreService {
 
     public YearScore  findYearScoreById(Long id){return yearScoreRepository.findById(id).orElse(null);}
     public void saveYearScore(YearScore yearScore){yearScoreRepository.save(yearScore);}
+
+    public void deleteYearScore(YearScore yearScore){yearScoreRepository.delete(yearScore);}
 }
