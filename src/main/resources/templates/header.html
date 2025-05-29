@@ -7,7 +7,10 @@
 </head>
 <body>
 <header>
-    <div class="school-name">Школа</div>
+    <div class="header-navigation" id="headerNavigation">
+
+    </div>
+
     <div class="header-right">
         <div class="notifications-container">
             <button class="notification-bell">
@@ -23,6 +26,90 @@
 </header>
 
 <script>
+    // Функция для создания кнопок навигации в зависимости от роли
+    async function setupNavigation() {
+        try {
+            // Получаем информацию о пользователе
+            const userResponse = await fetch('/getAuthorizationUserInfo', {
+                credentials: 'include'
+            });
+
+            if (!userResponse.ok) throw new Error('Ошибка получения данных пользователя');
+
+            const userData = await userResponse.json();
+            const role = userData.role;
+            const userId = userData.userId;
+            const id = userData.id;
+
+            // Получаем информацию о школе
+            const schoolResponse = await fetch('/getSchoolByAuthorizationUser', {
+                credentials: 'include'
+            });
+
+            let schoolId = null;
+            let schoolName = "Школа";
+            if (schoolResponse.ok) {
+                const schoolData = await schoolResponse.json();
+                schoolId = schoolData.id;
+                schoolName = schoolData.name || "Школа";
+            }
+
+            const navContainer = document.getElementById('headerNavigation');
+            navContainer.innerHTML = '';
+
+            // Создаем кнопки в зависимости от роли
+            switch(role) {
+                case "Main admin":
+                    addButton(navContainer, 'Настройки', `/adminSettings`);
+                    break;
+
+                case "Local admin":
+                    addButton(navContainer, schoolName, `/schoolPage?id=${schoolId}`);
+                    addButton(navContainer, 'Настройки', `/adminSettings`);
+                    break;
+
+                case "School student":
+                    addButton(navContainer, schoolName, `/schoolPage?id=${schoolId}`);
+                    addButton(navContainer, 'Профиль', `/profileSchoolStudent?id=${id}`);
+                    addButton(navContainer, 'Расписание', `/schoolStudentSchedule?id=${id}`);
+                    addButton(navContainer, 'Дневник', `/schoolStudentDiary?id=${id}`);
+                    break;
+
+                case "Teacher":
+                    addButton(navContainer, schoolName, `/schoolPage?id=${schoolId}`);
+                    addButton(navContainer, 'Профиль', `/profileTeacher?id=${id}`);
+                    addButton(navContainer, 'Расписание', `/teacherSchedule?id=${id}`);
+                    break;
+
+                case "Administration":
+                    addButton(navContainer, schoolName, `/schoolPage?id=${schoolId}`);
+                    addButton(navContainer, 'Профиль', `/profileAdministrator?id=${id}`);
+                    break;
+
+                case "Parent":
+                    addButton(navContainer, schoolName, `/schoolPage?id=${schoolId}`);
+                    break;
+
+                default:
+                    console.error('Unknown role:', role);
+            }
+
+        } catch (error) {
+            console.error('Ошибка при настройке навигации:', error);
+        }
+    }
+
+    // Вспомогательная функция для добавления кнопки
+    function addButton(container, text, url) {
+        const button = document.createElement('button');
+        button.className = 'nav-button';
+        button.textContent = text;
+        button.addEventListener('click', () => {
+            window.location.href = url;
+        });
+        container.appendChild(button);
+    }
+
     // Функция для удаления уведомления
     async function deleteNotification(notificationId, element) {
         try {
@@ -58,7 +145,6 @@
         const dropdown = document.getElementById('notification-dropdown');
         const countBadge = document.getElementById('notification-count');
 
-        // Проверяем, что notifications существует и является массивом
         if (!Array.isArray(notifications)) {
             console.error('Получены некорректные данные уведомлений');
             dropdown.innerHTML = '<div class="notification-empty">Ошибка загрузки уведомлений</div>';
@@ -66,17 +152,13 @@
             return;
         }
 
-        // Если уведомлений нет
         if (notifications.length === 0) {
             dropdown.innerHTML = '<div class="notification-empty">Нет новых уведомлений</div>';
             countBadge.textContent = '0';
             return;
         }
-
-        // Очищаем dropdown
         dropdown.innerHTML = '';
 
-        // Добавляем каждое уведомление
         notifications.forEach(notification => {
             const notificationDate = new Date(notification.dateTime);
             const formattedDate = notificationDate.toLocaleString('ru-RU', {
@@ -99,7 +181,6 @@
                 </button>
             `;
 
-            // Обработчик клика по уведомлению (кроме кнопки удаления)
             item.addEventListener('click', (e) => {
                 if (!e.target.closest('.delete-notification')) {
                     window.location.href = notification.link;
@@ -108,8 +189,6 @@
 
             dropdown.appendChild(item);
         });
-
-        // Обновляем счетчик
         countBadge.textContent = notifications.length;
     }
 
@@ -154,22 +233,23 @@
         }).catch(console.error);
     });
 
-    // Обработчик уведомлений
     document.querySelector('.notification-bell')?.addEventListener('click', function(e) {
         e.stopPropagation();
         const dropdown = document.getElementById('notification-dropdown');
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Закрытие dropdown при клике вне его
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.notifications-container')) {
             document.getElementById('notification-dropdown').style.display = 'none';
         }
     });
 
-    // Загружаем уведомления при загрузке страницы
-    document.addEventListener('DOMContentLoaded', loadNotifications);
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        loadNotifications();
+        setupNavigation();
+    });
 </script>
 </body>
 </html>

@@ -7,10 +7,14 @@ import com.example.postgresql.model.Education.EducationInfo.EducationalInstituti
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
 import com.example.postgresql.model.Education.EducationInfo.Settlement;
 import com.example.postgresql.model.Users.LocalOperator;
+import com.example.postgresql.model.Users.Student.Parent;
+import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Teacher;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Education.AddressService;
 import com.example.postgresql.service.Users.AdministrationsService;
 import com.example.postgresql.service.Users.LocalOperatorService;
+import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -50,7 +54,7 @@ public class EducationalInstitutionControl {
         return ResponseEntity.ok(institutions);
     }
 
-    //Получить школу текущего пользователя
+    //Получить школу текущего оператора
     @GetMapping("/getSchoolByAuthorizationAdminId")
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {

@@ -1,6 +1,7 @@
 package com.example.postgresql.controller;
 
 import com.example.postgresql.DTO.ResponseDTO.AuthorizationUserResponseDTO;
+import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Users.LocalOperator;
 import com.example.postgresql.model.Users.Student.Parent;
@@ -190,6 +191,38 @@ public class AuthorizationControl {
         authorizationUserResponseDTO.setRole(role);
 
         return ResponseEntity.ok(authorizationUserResponseDTO);
+    }
+
+    //Получить школу текущего пользователя
+    @GetMapping("/getSchoolByAuthorizationUser")
+    @ResponseBody
+    public ResponseEntity<EducationalInstitution> getSchoolByAuthorizationUser(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        Long userId = (Long) session.getAttribute("userId");
+        EducationalInstitution educationalInstitution = new EducationalInstitution();
+        switch (role) {
+            case "Local admin" -> {
+                LocalOperator localOperator = localOperatorService.findLocalOperatorByUserId(userId);
+                educationalInstitution = localOperator.getEducationalInstitution();
+            }
+            case "Administration" -> {
+                Administrations administrations = administrationsService.findAdministrationByUserId(userId);
+                educationalInstitution = administrations.getEducationalInstitution();
+            }
+            case "Teacher" -> {
+                Teacher teacher = teacherService.findTeacherByUserId(userId);
+                educationalInstitution = teacher.getEducationalInstitution();
+            }
+            case "School student" -> {
+                SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentByUserId(userId);
+                educationalInstitution = schoolStudent.getEducationalInstitution();
+            }
+            case "Parent" -> {
+                Parent parent = parentService.findParentByUserId(userId);
+                educationalInstitution = parent.getEducationalInstitution();
+            }
+        }
+        return ResponseEntity.ok(educationalInstitution);
     }
 
     //временно

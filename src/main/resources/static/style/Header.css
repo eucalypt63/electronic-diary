@@ -11,12 +11,22 @@ header {
     align-items: center;
 }
 
-.school-name {
+.header-navigation {
+    display: flex;
+    gap: 15px;
+    margin-left: 20px;
+}
+.nav-button {
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    border: none;
+    background: none;
+    font-size: inherit;
+    font-family: inherit;
+    color: white;
 }
-.school-name:hover {
+.nav-button:hover {
     background-color: #e0e0e0;
     color: orange;
 }

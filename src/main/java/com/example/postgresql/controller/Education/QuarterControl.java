@@ -88,7 +88,6 @@ public class QuarterControl {
         quarterScores.forEach(quarterScore -> {
             quarterScoreResponseDTOS.add(new QuarterScoreResponseDTO(quarterScore.getId(), quarterScore.getQuarterInfo().getQuarterNumber(), quarterScore.getSchoolStudent().getId(), quarterScore.getSchoolSubject(), quarterScore.getScore()));
         });
-        System.out.println(quarterScoreResponseDTOS);
 
         return ResponseEntity.ok(quarterScoreResponseDTOS);
     }
