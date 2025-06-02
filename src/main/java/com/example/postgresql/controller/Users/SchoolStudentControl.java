@@ -3,6 +3,7 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.Users.SchoolStudentRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.SchoolStudentResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.Group.GroupMember;
@@ -42,6 +43,7 @@ public class SchoolStudentControl {
 
     //Получить учеников по id школы
     @GetMapping("/getSchoolStudents")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<SchoolStudentResponseDTO>> getSchoolStudents(@RequestParam Long schoolId) {
         List<SchoolStudent> schoolStudents = schoolStudentService.findSchoolStudentByEducationalInstitutionId(schoolId);
@@ -61,6 +63,7 @@ public class SchoolStudentControl {
 
     //Получить ученика по id
     @GetMapping("/findSchoolStudentById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<SchoolStudentResponseDTO> findSchoolStudentById(@RequestParam Long id) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
@@ -75,6 +78,7 @@ public class SchoolStudentControl {
 
     //Получить школу по id ученика
     @GetMapping("/findSchoolBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolBySchoolStudentId(@RequestParam Long id) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
@@ -85,6 +89,7 @@ public class SchoolStudentControl {
 
     //Добавить ученика
     @PostMapping("/addSchoolStudent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addSchoolStudents(@RequestBody SchoolStudentRequestDTO schoolStudentRequestDTO) {
         byte[] salt = userService.generateSalt();
@@ -114,6 +119,7 @@ public class SchoolStudentControl {
 
     //Получить учеников по id класса
     @GetMapping("/getStudentsOfClass")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<SchoolStudentResponseDTO>> getStudentsOfClass(@RequestParam Long ObjectId) {
         List<SchoolStudent> schoolStudents = schoolStudentService.findAllSchoolStudentByClassId(ObjectId);
@@ -133,6 +139,8 @@ public class SchoolStudentControl {
 
     //Удалить ученика
     @DeleteMapping("/deleteSchoolStudent")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteSchoolStudent(@RequestParam Long id){
         schoolStudentService.deleteSchoolStudentById(id);
         return ResponseEntity.ok().build();
@@ -140,6 +148,7 @@ public class SchoolStudentControl {
 
     //Добавление фотографии ученика
     @PostMapping("/addImageSchoolStudent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addImageSchoolStudent(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
         try {
@@ -168,6 +177,7 @@ public class SchoolStudentControl {
     }
 
     @PostMapping("/changeSchoolStudent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeSchoolStudent(@RequestBody SchoolStudentRequestDTO schoolStudentRequestDTO) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentRequestDTO.getId());

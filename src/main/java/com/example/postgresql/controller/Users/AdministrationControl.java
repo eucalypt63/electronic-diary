@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.Users.AdministratorRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.AdministratorResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Administrations.AdministrationsTypes;
@@ -40,6 +41,7 @@ public class AdministrationControl {
 
     //Получить администрацию по id школы
     @GetMapping("/getAdministrators")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<AdministratorResponseDTO>> getAdministrators(@RequestParam Long schoolId) {
         List<Administrations> administrations = administrationsService.findAdministrationsByEducationalInstitutionId(schoolId);
@@ -60,6 +62,7 @@ public class AdministrationControl {
 
     //Получить администратора по его id
     @GetMapping("/findAdministratorById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<AdministratorResponseDTO> findAdministratorById(@RequestParam Long id) {
         Administrations administrations = administrationsService.findAdministrationById(id);
@@ -70,6 +73,7 @@ public class AdministrationControl {
 
     //Получить школу по id админа
     @GetMapping("/findSchoolByAdministratorId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByAdministratorId(@RequestParam Long id) {
         Administrations administrations = administrationsService.findAdministrationById(id);
@@ -84,6 +88,7 @@ public class AdministrationControl {
 
     //Получить типы администрации
     @GetMapping("/getAdministrationsType")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<AdministrationsTypes>> getAdministrationsType() {
         return ResponseEntity.ok(administrationsService.getAllAdministrationsTypes());
@@ -91,6 +96,7 @@ public class AdministrationControl {
 
     //Добавить админа
     @PostMapping("/addAdministrator")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
         Long administrationsTypesId = administratorRequestDTO.getAdministrationsTypeId();
@@ -137,6 +143,8 @@ public class AdministrationControl {
 
     //Удалить админа
     @DeleteMapping("/deleteAdministrator")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteAdministrator(@RequestParam("id") Long id) {
         administrationsService.deleteAdministrationById(id);
         return ResponseEntity.ok().build();
@@ -144,6 +152,7 @@ public class AdministrationControl {
 
     //Добавление фотографии Администратора
     @PostMapping("/addImageAdministrator")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addImageAdministrator(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
         try {
@@ -172,6 +181,7 @@ public class AdministrationControl {
     }
 
     @PostMapping("/changeAdministrator")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeAdministrator(@RequestBody AdministratorRequestDTO administratorRequestDTO) {
         Administrations administrations = administrationsService.findAdministrationById(administratorRequestDTO.getId());

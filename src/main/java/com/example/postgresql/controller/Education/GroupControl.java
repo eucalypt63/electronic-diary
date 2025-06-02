@@ -4,6 +4,7 @@ import com.example.postgresql.DTO.RequestDTO.GroupRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupInfoResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupMemberResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Group.GroupResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
@@ -41,6 +42,7 @@ public class GroupControl {
     private DTOService dtoService;
 
     @GetMapping("/findGroupsByClassId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<GroupResponseDTO>> findGroupsByClassId (@RequestParam Long id){
         List<Group> groups = groupService.findGroupByClassId(id);
@@ -58,6 +60,7 @@ public class GroupControl {
     }
 
     @PostMapping("/addGroup")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
         Group group = new Group();
@@ -70,6 +73,7 @@ public class GroupControl {
 
     //Пока не используется
     @DeleteMapping("/deleteGroupById")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<Void> deleteGroupById(@RequestParam Long id) {
         groupService.deleteGroupById(id);
@@ -78,6 +82,7 @@ public class GroupControl {
 
     //Пока не используется
     @PostMapping("/changeGroup")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeGroup(@RequestBody GroupRequestDTO groupRequestDTO) {
         Group group = groupService.findGroupById(groupRequestDTO.getId());
@@ -86,9 +91,9 @@ public class GroupControl {
         return ResponseEntity.ok().build();
     }
 
-
     //Ученики группы
     @GetMapping("/findGroupMembersByClassId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<GroupInfoResponseDTO>> findGroupMembersByClassId (@RequestParam Long id) {
         List<Group> groups = groupService.findGroupByClassId(id);
@@ -113,6 +118,7 @@ public class GroupControl {
     }
 
     @GetMapping("/findGroupMemberByGroupId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByGroupId (@RequestParam Long id) {
         Group group = groupService.findGroupById(id);
@@ -132,6 +138,7 @@ public class GroupControl {
     }
 
     @GetMapping("/findGroupMemberByTeacherAssignmentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<GroupInfoResponseDTO> findGroupMemberByTeacherAssignmentId (@RequestParam Long id) {
         TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(id);
@@ -152,6 +159,7 @@ public class GroupControl {
     }
 
     @PostMapping("/addGroupMember")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
         Group group = groupService.findGroupById(groupId);
@@ -184,6 +192,7 @@ public class GroupControl {
     }
 
     @PostMapping("/deleteGroupMember")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> deleteGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
         GroupMember groupMember = groupService.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);

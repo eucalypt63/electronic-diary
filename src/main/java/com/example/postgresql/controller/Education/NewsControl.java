@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.RequestDTO.News.NewsRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.News.NewsResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.News.News;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
@@ -29,6 +30,7 @@ public class NewsControl {
 
     //Найти новость по id
     @GetMapping("/findNewsById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<NewsResponseDTO> findNewsById(@RequestParam Long id) {
         NewsResponseDTO news = dtoService.NewsToDto(newsService.findNewsById(id));
@@ -38,6 +40,7 @@ public class NewsControl {
 
     //Найти все новости по id школы
     @GetMapping("/findNewsByEducationId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<NewsResponseDTO>> findNewsByEducationId(@RequestParam Long id) {
         List<News> newsList = newsService.findNewsByEducationalInstitutionId(id);
@@ -51,6 +54,7 @@ public class NewsControl {
 
     //Добавить новость
     @PostMapping("/addNews")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addNews(@RequestBody NewsRequestDTO newsRequestDTO) {
         News news = new News();
@@ -66,6 +70,7 @@ public class NewsControl {
 
     //Обновить новость
     @PostMapping("/changeNews")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeNews(@RequestBody NewsRequestDTO newsRequestDTO) {
         News news = newsService.findNewsById(newsRequestDTO.getId());
@@ -78,6 +83,7 @@ public class NewsControl {
 
     //Удалить новость по id
     @DeleteMapping("/deleteNewsById")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<Void> deleteNewsById(@RequestParam Long id) {
         newsService.deleteNewsById(id);

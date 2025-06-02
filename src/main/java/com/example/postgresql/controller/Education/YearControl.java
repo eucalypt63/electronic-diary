@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.ResponseDTO.QuarterScoreResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.YearScoreResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.model.Education.Gradebook.YearScore;
 import com.example.postgresql.model.Education.Group.GroupMember;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -40,6 +42,7 @@ public class YearControl {
 
     // Получение годовых оценок для ученика
     @GetMapping("findYearScoreBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<YearScoreResponseDTO>> findYearScoreBySchoolStudentId(@RequestParam Long schoolStudentId){
         List<YearScore> yearScores = yearScoreService.findYearScoreBySchoolStudentId(schoolStudentId);
@@ -53,6 +56,7 @@ public class YearControl {
 
     // Получение годовых оценок группы по предмету
     @GetMapping("findYearScoreByTeacherAssignmentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<YearScoreResponseDTO>> findYearScoreByGroupId(@RequestParam Long teacherAssignmentId){
         TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(teacherAssignmentId);
@@ -69,7 +73,8 @@ public class YearControl {
         return ResponseEntity.ok(yearScoreResponseDTOS);
     }
 
-    @GetMapping("addYearScore")
+    @PostMapping("addYearScore")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addYearScore(@RequestParam Long schoolStudentId, @RequestParam Long schoolSubjectId, @RequestParam Long score){
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
@@ -103,7 +108,8 @@ public class YearControl {
         return ResponseEntity.ok("{\"message\": \"Оценка за год добавлена\"}");
     }
 
-    @GetMapping("updateYearScore")
+    @PostMapping("updateYearScore")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> updateYearScore(@RequestParam Long yearScoreId, @RequestParam Long score){
         YearScore yearScore = yearScoreService.findYearScoreById(yearScoreId);

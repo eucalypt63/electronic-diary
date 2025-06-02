@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Users;
 
 import com.example.postgresql.DTO.RequestDTO.Users.TeacherRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Teacher;
@@ -43,6 +44,7 @@ public class TeacherControl {
 
     //Получить учителей по id школы
     @GetMapping("/getTeachers")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<TeacherResponseDTO>> getTeachers(@RequestParam Long schoolId) {
         List<Teacher> teachers = teacherService.findTeacherByEducationalInstitutionId(schoolId);
@@ -62,6 +64,7 @@ public class TeacherControl {
 
     //Получить учителя по id
     @GetMapping("/findTeacherById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<TeacherResponseDTO> findTeacherById(@RequestParam Long id) {
         Teacher teacher = teacherService.findTeacherById(id);
@@ -76,6 +79,7 @@ public class TeacherControl {
 
     //Получить школу по id учителя
     @GetMapping("/findSchoolByTeacherId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolByTeacherId(@RequestParam Long id) {
         Teacher teacher = teacherService.findTeacherById(id);
@@ -86,6 +90,7 @@ public class TeacherControl {
 
     //Получить учителей исключив тех, у кого уже есть свой класс
     @GetMapping("/getTeachersToClass")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<TeacherResponseDTO>> getTeachersToClass(@RequestParam Long schoolId) {
         List<Class> classes = classService.findAllByTeacherEducationalInstitutionId(schoolId);
@@ -110,6 +115,7 @@ public class TeacherControl {
 
     //Добавить учителя
     @PostMapping("/addTeacher")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addTeacher(@RequestBody TeacherRequestDTO teacherRequestDTO) {
         byte[] salt = userService.generateSalt();
@@ -134,6 +140,8 @@ public class TeacherControl {
 
     //Удалить учителя
     @DeleteMapping("/deleteTeacher")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteTeacher(@RequestParam("id") Long id) {
         teacherService.deleteTeacherById(id);
         return ResponseEntity.ok().build();
@@ -141,6 +149,7 @@ public class TeacherControl {
 
     //Добавление фотографии Учителя
     @PostMapping("/addImageTeacher")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addImageTeacher(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
         try {
@@ -169,6 +178,7 @@ public class TeacherControl {
     }
 
     @PostMapping("/changeTeacher")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeTeacher(@RequestBody TeacherRequestDTO teacherRequestDTO) {
         Teacher teacher = teacherService.findTeacherById(teacherRequestDTO.getId());

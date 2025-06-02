@@ -1,6 +1,7 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.ResponseDTO.QuarterScoreResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -41,6 +43,7 @@ public class QuarterControl {
 
     // Получение четвертных оценок для журнала
     @GetMapping("findQuarterScoreByTeacherAssignmentIdAndQuarterInfoId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<QuarterScoreResponseDTO>> findGradebookDayByScheduleLessonTeacherAssignmentId(@RequestParam Long teacherAssignmentId, @RequestParam Long quarterId){
         TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(teacherAssignmentId);
@@ -60,6 +63,7 @@ public class QuarterControl {
 
     // Получение четвертных оценок для годовых оценок группы по предмету
     @GetMapping("findQuarterScoreByTeacherAssignmentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<QuarterScoreResponseDTO>> findQuarterScoreByTeacherAssignmentId(@RequestParam Long teacherAssignmentId){
         TeacherAssignment teacherAssignment = teacherService.findTeacherAssignmentById(teacherAssignmentId);
@@ -81,6 +85,7 @@ public class QuarterControl {
 
     // Получение четвертных оценок для дневника
     @GetMapping("findQuarterScoreBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<QuarterScoreResponseDTO>> findQuarterScoreBySchoolStudentId(@RequestParam Long schoolStudentId){
         List<QuarterScore> quarterScores = quarterScoreService.findQuarterScoreBySchoolStudentId(schoolStudentId);
@@ -92,7 +97,8 @@ public class QuarterControl {
         return ResponseEntity.ok(quarterScoreResponseDTOS);
     }
 
-    @GetMapping("addQuarterScore")
+    @PostMapping("addQuarterScore")
+    @RequiredRoles({"Main admin", "Local admin", "Teacher"})
     @ResponseBody
     public ResponseEntity<String> addQuarterScore(@RequestParam Long schoolStudentId, @RequestParam Long schoolSubjectId, @RequestParam Long quarterId, @RequestParam Long score){
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(schoolStudentId);
@@ -128,7 +134,8 @@ public class QuarterControl {
         return ResponseEntity.ok("{\"message\": \"Оценка за четверть добавлена\"}");
     }
 
-    @GetMapping("updateQuarterScore")
+    @PostMapping("updateQuarterScore")
+    @RequiredRoles({"Main admin", "Local admin", "Teacher"})
     @ResponseBody
     public ResponseEntity<String> updateQuarterScore(@RequestParam Long quarterScoreId, @RequestParam Long score){
         QuarterScore quarterScore = quarterScoreService.findQuarterScoreById(quarterScoreId);

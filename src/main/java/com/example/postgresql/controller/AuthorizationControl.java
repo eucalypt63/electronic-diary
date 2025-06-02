@@ -172,12 +172,14 @@ public class AuthorizationControl {
 
     //Получить роль в сессии
     @GetMapping("/getRole")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<String> getRole(HttpSession session) {
         return ResponseEntity.ok((String) session.getAttribute("role"));
     }
 
     @GetMapping("/getAuthorizationUserInfo")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<AuthorizationUserResponseDTO> getAuthorizationUserInfo(HttpSession session) {
         AuthorizationUserResponseDTO authorizationUserResponseDTO = new AuthorizationUserResponseDTO();
@@ -195,6 +197,7 @@ public class AuthorizationControl {
 
     //Получить школу текущего пользователя
     @GetMapping("/getSchoolByAuthorizationUser")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<EducationalInstitution> getSchoolByAuthorizationUser(HttpSession session) {
         String role = (String) session.getAttribute("role");

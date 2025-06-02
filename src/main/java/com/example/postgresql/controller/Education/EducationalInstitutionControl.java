@@ -2,6 +2,7 @@ package com.example.postgresql.controller.Education;
 
 
 import com.example.postgresql.DTO.RequestDTO.EducationalInstitutionRequestDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Users.Administrations.Administrations;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitutionType;
@@ -43,6 +44,7 @@ public class EducationalInstitutionControl {
 
     //Получить все школы
     @GetMapping("/getSchools")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchools() {
         List<EducationalInstitution> institutions = educationalInstitutionService.findAllEducationalInstitution();
@@ -56,6 +58,7 @@ public class EducationalInstitutionControl {
 
     //Получить школу текущего оператора
     @GetMapping("/getSchoolByAuthorizationAdminId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<EducationalInstitution>> getSchoolByAuthorizationAdminId(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -70,6 +73,7 @@ public class EducationalInstitutionControl {
 
     //Найти школу по id
     @GetMapping("/findSchoolById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<EducationalInstitution> findSchoolById(Long id){
         EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(id);
@@ -78,6 +82,7 @@ public class EducationalInstitutionControl {
 
     //Добавить школу
     @PostMapping("/addEducationalInstitution")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitutionRequestDTO institutionDTO) {
         EducationalInstitutionType type = educationalInstitutionService.findEducationalInstitutionTypeById(1L);
@@ -95,6 +100,8 @@ public class EducationalInstitutionControl {
 
     //Удалить школу
     @DeleteMapping("/deleteEducationalInstitution")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteEducationalInstitution(@RequestParam Long id) {
         educationalInstitutionService.deleteEducationalInstitutionById(id);
         return ResponseEntity.ok().build();
@@ -102,6 +109,7 @@ public class EducationalInstitutionControl {
 
     //Добавление фотографии Школы
     @PostMapping("/addImageEducational")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addImageEducational(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
         try {
@@ -130,6 +138,7 @@ public class EducationalInstitutionControl {
     }
 
     @PostMapping("/changeEducationalInstitution")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeEducationalInstitution(@RequestBody EducationalInstitutionRequestDTO institutionDTO) {
         EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(institutionDTO.getId());

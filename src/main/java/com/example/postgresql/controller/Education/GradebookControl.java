@@ -5,6 +5,7 @@ import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookAttendanceRespo
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Gradebook.GradebookScoreResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.Gradebook.*;
 import com.example.postgresql.model.Education.Group.Group;
 import com.example.postgresql.model.Education.Group.GroupMember;
@@ -46,6 +47,7 @@ public class GradebookControl {
     private DTOService dtoService;
 
     @GetMapping("findGradebookDayByScheduleLessonTeacherAssignmentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<GradebookResponseDTO>findGradebookDayByScheduleLessonTeacherAssignmentId(@RequestParam Long id, @RequestParam Long quarterId){
         List<GradebookDay> gradebookDays = gradebookService.findGradebookDayByScheduleLessonTeacherAssignmentId(id, quarterId);
@@ -76,6 +78,7 @@ public class GradebookControl {
     }
 
     @GetMapping("findDiaryInfoBySchoolStudentIdAndQuarter")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<DiaryInfoResponseDTO>>findDiaryInfoBySchoolStudentIdAndQuarter(@RequestParam Long id, @RequestParam(defaultValue = "1") Long quarterNumber){
         List<GroupMember> groupMembers = groupService.findGroupMemberBySchoolStudentId(id);
@@ -118,6 +121,7 @@ public class GradebookControl {
     }
 
     @GetMapping("findSchoolSubjectsBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<SchoolSubject>>findSchoolSubjectsBySchoolStudentId(@RequestParam Long id){
         List<GroupMember> groupMembers = groupService.findGroupMemberBySchoolStudentId(id);
@@ -138,6 +142,7 @@ public class GradebookControl {
     }
 
     @PostMapping("updateGradebookDay")
+    @RequiredRoles({"Main admin", "Local admin", "Teacher"})
     @ResponseBody
     public ResponseEntity<String> updateGradebookDay(@RequestParam Long id, @RequestParam String topic, @RequestParam String homework) {
         GradebookDay gradebookDay = gradebookService.findGradebookDayById(id);
@@ -173,6 +178,7 @@ public class GradebookControl {
     }
 
     @PostMapping("updateGradebookScore")
+    @RequiredRoles({"Main admin", "Local admin", "Teacher"})
     @ResponseBody
     public ResponseEntity<String> updateGradebookScore(@RequestParam Long gradebookDayId, @RequestParam Long schoolStudentId, @RequestParam Long score) {
         GradebookScore gradebookScore = gradebookService.findScoresByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);
@@ -222,6 +228,7 @@ public class GradebookControl {
     }
 
     @PostMapping("updateGradebookAttendance")
+    @RequiredRoles({"Main admin", "Local admin", "Teacher"})
     @ResponseBody
     public ResponseEntity<String> updateGradebookAttendance(@RequestParam Long gradebookDayId, @RequestParam Long schoolStudentId) {
         GradebookAttendance gradebookAttendance = gradebookService.findAttendancesByGradebookDayIdAndSchoolStudentId(gradebookDayId, schoolStudentId);

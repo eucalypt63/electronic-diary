@@ -1,6 +1,7 @@
 package com.example.postgresql.controller.Education;
 
 import com.example.postgresql.DTO.ResponseDTO.NotificationResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.Users.User.User;
 import com.example.postgresql.service.DTOService;
@@ -21,6 +22,7 @@ public class NotificationControl {
     private DTOService dtoService;
 
     @GetMapping("/findNotificationByUserId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<NotificationResponseDTO>> findNotificationByUserId(@RequestParam Long id){
         List<Notification> notifications = notificationService.findNotificationByUserId(id);
@@ -33,6 +35,7 @@ public class NotificationControl {
     }
 
     @DeleteMapping("deleteNotificationById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<String> deleteNotificationById(@RequestParam Long id){
         notificationService.deleteNotificationById(id);

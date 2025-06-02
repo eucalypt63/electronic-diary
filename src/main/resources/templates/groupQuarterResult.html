@@ -308,9 +308,24 @@
         try {
             let response;
             if (currentYearScoreId) {
-                response = await fetch(`/updateYearScore?yearScoreId=${currentYearScoreId}&score=${scoreValue}`);
+                response = await fetch(`/updateYearScore?yearScoreId=${currentYearScoreId}&score=${scoreValue}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
             } else {
-                response = await fetch(`/addYearScore?schoolStudentId=${currentStudentId}&schoolSubjectId=${currentTeacherAssignment.schoolSubject.id}&score=${scoreValue}`);
+                response = await fetch('/addYearScore', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        schoolStudentId: currentStudentId,
+                        schoolSubjectId: currentTeacherAssignment.schoolSubject.id,
+                        score: scoreValue
+                    })
+                });
             }
 
             if (!response.ok) throw new Error('Ошибка при сохранении оценки');
@@ -320,9 +335,11 @@
             yearGradeCells.forEach(cell => {
                 if (cell.dataset.studentId === currentStudentId.toString()) {
                     cell.textContent = scoreValue;
+
+                    // Если это новая оценка (не было currentYearScoreId), обновляем data-yearScoreId
                     if (!currentYearScoreId) {
                         response.json().then(data => {
-                            if (data && data.id) {
+                            if (data?.id) {
                                 cell.dataset.yearScoreId = data.id;
                             }
                         });

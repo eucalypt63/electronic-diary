@@ -6,6 +6,7 @@ import com.example.postgresql.DTO.ResponseDTO.Schedule.LessonParamsResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Schedule.ScheduleLessonsDayResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.TeacherResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Class;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Education.Gradebook.GradebookDay;
@@ -51,6 +52,7 @@ public class ScheduleControl {
     private DTOService dtoService;
 
     @GetMapping("/findLessonsByClassId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, List<ScheduleLessonResponseDTO>>> findLessonsByClassId (@RequestParam Long id, @RequestParam Long quarter){
         List<Group> groups = groupService.findGroupByClassId(id);
@@ -72,6 +74,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("/findLessonsBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, List<ScheduleLessonResponseDTO>>> findLessonsBySchoolStudentId (@RequestParam Long id, @RequestParam Long quarter){
         List<GroupMember> groupMembers = groupService.findGroupMemberBySchoolStudentId(id);
@@ -99,6 +102,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("/findLessonsByTeacherId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, List<ScheduleLessonResponseDTO>>> findLessonsByLessonNumberAndTeacherId(@RequestParam Long id, @RequestParam Long quarter) {
 
@@ -123,6 +127,7 @@ public class ScheduleControl {
 
     //Добавить даты для журнала
     @GetMapping("getLessonAddParams")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<LessonParamsResponseDTO> getLessonAddParams(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
@@ -150,6 +155,7 @@ public class ScheduleControl {
 
     //Исправить
     @GetMapping("getLessonAddParamsBySchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsBySchoolStudentId(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
@@ -178,6 +184,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("getLessonAddParamsByTeacherId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<LessonParamsResponseDTO> getLessonAddParamsByTeacherId(@RequestParam Long id){
         LessonParamsResponseDTO lessonParamsResponseDTO = new LessonParamsResponseDTO();
@@ -205,6 +212,7 @@ public class ScheduleControl {
     }
 
     @PostMapping("/addLesson")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addLesson (@RequestBody ScheduleLessonRequestDTO schLesReqDTO) {
 
@@ -278,6 +286,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("/findLessonsByLessonNumber")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, ScheduleLessonsDayResponseDTO>> findLessonsByLessonNumber(
             @RequestParam Long id,
@@ -304,6 +313,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("/findLessonsByLessonNumberAndSchoolStudentId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, ScheduleLessonsDayResponseDTO>> findLessonsByLessonNumberAndSchoolStudentId(
             @RequestParam Long id,
@@ -342,6 +352,7 @@ public class ScheduleControl {
     }
 
     @GetMapping("/findLessonsByLessonNumberAndTeacherId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<Map<Long, ScheduleLessonsDayResponseDTO>> findLessonsByLessonNumberAndTeacherId(
             @RequestParam Long id,
@@ -373,12 +384,15 @@ public class ScheduleControl {
     }
 
     @DeleteMapping("/deleteLesson")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<String> deleteLesson(@RequestParam Long id) {
         scheduleService.deleteScheduleLesson(id);
         return ResponseEntity.ok("{\"message\": \"Урок успешно удалён\"}");
     }
 
     @PutMapping("/updateLesson")
+    @RequiredRoles({"Main admin", "Local admin"})
     public ResponseEntity<String> updateLesson(@RequestBody ScheduleLessonRequestDTO requestDTO) {
         ScheduleLesson scheduleLesson = scheduleService.findScheduleLessonById(requestDTO.getLessonNumber());
         scheduleLesson.setGroup(groupService.findGroupById(requestDTO.getGroupId()));

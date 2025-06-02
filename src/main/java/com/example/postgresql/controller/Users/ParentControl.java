@@ -5,6 +5,7 @@ import com.example.postgresql.DTO.RequestDTO.StudentParentRequestDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.ParentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.Users.SchoolStudentResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.StudentParentResponseDTO;
+import com.example.postgresql.controller.RequiredRoles;
 import com.example.postgresql.model.Education.EducationInfo.EducationalInstitution;
 import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.ParentType;
@@ -49,6 +50,7 @@ public class ParentControl {
 
     //Получить StudentParent по id ученика
     @GetMapping("/getStudentParents")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<StudentParentResponseDTO>> getStudentParents(@RequestParam Long id) {
         List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(id);
@@ -68,6 +70,7 @@ public class ParentControl {
 
     //Получить StudentParent по id родителя
     @GetMapping("/getStudentParentsByParentTd")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<StudentParentResponseDTO>> getStudentParentsByParentTd(@RequestParam Long id) {
         List<StudentParent> studentParents = parentService.findStudentParentByParentId(id);
@@ -87,6 +90,7 @@ public class ParentControl {
 
     //Получить родителя по id
     @GetMapping("/findParentById")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<ParentResponseDTO> findParentById(@RequestParam Long id) {
         Parent parent = parentService.findParentById(id);
@@ -97,6 +101,7 @@ public class ParentControl {
 
     //Получить родителей по id школы
     @GetMapping("/getParentsByEducationId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<ParentResponseDTO>> getParentsByEducationId(@RequestParam Long id) {
         List<Parent> parents = parentService.findParentsByEducationId(id);
@@ -115,6 +120,7 @@ public class ParentControl {
 
     //Получить родителей исключив родителей по id ребёнка
     @GetMapping("/getNewParents")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<ParentResponseDTO>> getNewParents(@RequestParam Long id) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(id);
@@ -145,6 +151,7 @@ public class ParentControl {
 
     //Добавить нового родителя
     @PostMapping("/addNewParent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addNewParent(@RequestBody ParentRequestDTO parentRequestDTO) {
         byte[] salt = userService.generateSalt();
@@ -177,6 +184,7 @@ public class ParentControl {
 
     //Добавить уже существующего родителя ребёнку
     @PostMapping("/addParent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addParent(@RequestBody StudentParentRequestDTO studentParentRequestDTO) {
         SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(studentParentRequestDTO.getSchoolStudentId());
@@ -194,6 +202,8 @@ public class ParentControl {
 
     //Удалить родителя
     @DeleteMapping("/deleteParent")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteParent(@RequestParam("id") Long id) {
         parentService.deleteParentById(id);
         return ResponseEntity.ok().build();
@@ -201,6 +211,8 @@ public class ParentControl {
 
     //Удалить связь StudentParent
     @DeleteMapping("/deleteStudentParent")
+    @RequiredRoles({"Main admin", "Local admin"})
+    @ResponseBody
     public ResponseEntity<Void> deleteStudentParent(@RequestParam("id") Long id) {
         parentService.deleteStudentParentById(id);
         return ResponseEntity.ok().build();
@@ -208,6 +220,7 @@ public class ParentControl {
 
     //Получить тип родитлея
     @GetMapping("/getParentType")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<ParentType>> getParentType() {
         List<ParentType> parentTypes = parentService.getAllParentTypes();
@@ -221,6 +234,7 @@ public class ParentControl {
 
     //Получить учеников по id родителя
     @GetMapping("/getStudentsOfParent")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @ResponseBody
     public ResponseEntity<List<SchoolStudentResponseDTO>> getStudentsOfParent(@RequestParam Long ObjectId) {
         List<StudentParent> studentParents = parentService.findStudentParentByParentId(ObjectId);
@@ -244,6 +258,7 @@ public class ParentControl {
 
     //Добавление фотографии Родителя
     @PostMapping("/addImageParent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addImageParent(@RequestParam("image") MultipartFile file, @RequestParam Long id) {
         try {
@@ -272,6 +287,7 @@ public class ParentControl {
     }
 
     @PostMapping("/changeStudentParent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<Void> changeStudentParent(@RequestBody StudentParentRequestDTO studentParentRequestDTO) {
         StudentParent studentParent = parentService.findStudentParentById(studentParentRequestDTO.getId());
@@ -282,6 +298,7 @@ public class ParentControl {
     }
 
     @PostMapping("/changeParent")
+    @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> changeParent(@RequestBody ParentRequestDTO parentRequestDTO){
         Parent parent = parentService.findParentById(parentRequestDTO.getId());
