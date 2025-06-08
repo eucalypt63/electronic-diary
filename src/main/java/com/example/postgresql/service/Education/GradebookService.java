@@ -35,6 +35,7 @@ public class GradebookService {
     public List<GradebookAttendance> findAttendancesByGradebookDayId(Long id){return gradebookAttendanceRepository.findAttendancesByGradebookDayId(id);}
     public List<GradebookScore> findScoresByGradebookDayId(Long id){return gradebookScoreRepository.findScoresByGradebookDayId(id);}
 
+    public List<GradebookAttendance> findAttendancesBySchoolStudentIdAndGradebookDayScheduleLessonQuarterInfoId(Long id, Long quarterId){return gradebookAttendanceRepository.findAttendancesBySchoolStudentIdAndGradebookDayScheduleLessonQuarterInfoId(id, quarterId);}
     public GradebookScore findScoresByGradebookDayIdAndSchoolStudentId(Long gradebookId, Long schoolStudentId){return gradebookScoreRepository.findScoresByGradebookDayIdAndSchoolStudentId(gradebookId, schoolStudentId);}
 
     public void deleteGradebookScore(GradebookScore gradebookScore){gradebookScoreRepository.delete(gradebookScore);}

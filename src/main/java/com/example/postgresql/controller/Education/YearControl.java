@@ -1,16 +1,16 @@
 package com.example.postgresql.controller.Education;
 
-import com.example.postgresql.DTO.ResponseDTO.QuarterScoreResponseDTO;
 import com.example.postgresql.DTO.ResponseDTO.YearScoreResponseDTO;
 import com.example.postgresql.controller.RequiredRoles;
-import com.example.postgresql.model.Education.Gradebook.QuarterScore;
 import com.example.postgresql.model.Education.Gradebook.YearScore;
 import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.service.Education.*;
+import com.example.postgresql.service.Users.ParentService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,8 @@ public class YearControl {
     private SchoolStudentService schoolStudentService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private ParentService parentService;
 
     // Получение годовых оценок для ученика
     @GetMapping("findYearScoreBySchoolStudentId")
@@ -105,6 +107,30 @@ public class YearControl {
         );
         notificationService.saveNotification(notification);
 
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudentId);
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                    String.format(
+                            "/schoolStudentQuarterResult?id=%d",
+                            schoolStudent.getId()
+                    )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                    String.format(
+                            "Ученику %s %s была поставлена оценка за год %d по предмету \"%s\"",
+                            schoolStudent.getLastName(),
+                            schoolStudent.getFirstName(),
+                            score,
+                            schoolSubject.getName()
+                    )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
+
         return ResponseEntity.ok("{\"message\": \"Оценка за год добавлена\"}");
     }
 
@@ -116,8 +142,10 @@ public class YearControl {
         yearScore.setScore(score);
         yearScoreService.saveYearScore(yearScore);
 
+        SchoolStudent schoolStudent = yearScore.getSchoolStudent();
+
         Notification notification = new Notification();
-        notification.setUser(yearScore.getSchoolStudent().getUser());
+        notification.setUser(schoolStudent.getUser());
         notification.setLink(
                 String.format(
                         "/schoolStudentQuarterResult?id=%d",
@@ -134,6 +162,30 @@ public class YearControl {
                 )
         );
         notificationService.saveNotification(notification);
+
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudent.getId());
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                    String.format(
+                            "/schoolStudentQuarterResult?id=%d",
+                            schoolStudent.getId()
+                    )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                    String.format(
+                            "Оценка за год ученика %s %s по предмету \"%s\" была заменена на %d",
+                            schoolStudent.getLastName(),
+                            schoolStudent.getFirstName(),
+                            yearScore.getSchoolSubject().getName(),
+                            score
+                    )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
 
         return ResponseEntity.ok("{\"message\": \"Годовая оценка обновлена\"}");
     }

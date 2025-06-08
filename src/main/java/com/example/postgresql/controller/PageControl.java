@@ -99,6 +99,12 @@ public class PageControl {
         return "schoolStudentDiary";
     }
 
+    @RequiredRoles({"Main admin", "Administration"})
+    @GetMapping("/reportList")
+    public String getReportList(@RequestParam String id) {
+        return "reportList";
+    }
+
     @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @GetMapping("/schoolStudentQuarterResult")
     public String getSchoolStudentQuarterResult(@RequestParam String id) {

@@ -12,12 +12,15 @@ import com.example.postgresql.model.Education.Group.GroupMember;
 import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
+import com.example.postgresql.model.Users.Student.Parent;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Education.GradebookService;
 import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Education.ScheduleService;
+import com.example.postgresql.service.Users.ParentService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,8 @@ public class GradebookControl {
     private SchoolStudentService schoolStudentService;
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private ParentService parentService;
     @Autowired
     private DTOService dtoService;
 
@@ -206,23 +211,48 @@ public class GradebookControl {
         notification.setUser(schoolStudent.getUser());
         notification.setLink(
                 String.format(
-                        "/groupGradebook?teacherAssignmentId=%d&quarterId=%d",
-                        gradebookDay.getScheduleLesson().getTeacherAssignment().getId(),
-                        gradebookDay.getScheduleLesson().getQuarterInfo().getId()
+                        "/schoolStudentDiary?id=%d",
+                        schoolStudentId
                 )
         );
         notification.setDateTime(LocalDateTime.now());
         notification.setTitle("Успеваемость");
         notification.setContent(
-                String.format(
-                        "Вам была поставлена оценка %d по предмету %s на %02d.%02d",
-                        score,
-                        gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
-                        gradebookDay.getDateTime().getDayOfMonth(),
-                        gradebookDay.getDateTime().getMonthValue()
-                )
+             String.format(
+                "Вам была поставлена оценка %d по предмету %s на %02d.%02d",
+                score,
+                gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                gradebookDay.getDateTime().getDayOfMonth(),
+                gradebookDay.getDateTime().getMonthValue()
+            )
         );
         notificationService.saveNotification(notification);
+
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudentId);
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                String.format(
+                    "/schoolStudentDiary?id=%d",
+                    schoolStudentId
+                )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                String.format(
+                    "Ученику %s %s была поставлена оценка %d по предмету %s на %02d.%02d",
+                    schoolStudent.getLastName(),
+                    schoolStudent.getFirstName(),
+                    score,
+                    gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                    gradebookDay.getDateTime().getDayOfMonth(),
+                    gradebookDay.getDateTime().getMonthValue()
+                )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
 
         return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
     }
@@ -253,22 +283,46 @@ public class GradebookControl {
         notification.setUser(schoolStudent.getUser());
         notification.setLink(
                 String.format(
-                        "/groupGradebook?teacherAssignmentId=%d&quarterId=%d",
-                        gradebookDay.getScheduleLesson().getTeacherAssignment().getId(),
-                        gradebookDay.getScheduleLesson().getQuarterInfo().getId()
+                        "/schoolStudentDiary?id=%d",
+                        schoolStudentId
                 )
         );
         notification.setDateTime(LocalDateTime.now());
         notification.setTitle("Посещаемость");
         notification.setContent(
                 String.format(
-                        "Вам был поставлен пропуск по предмету %s на %02d.%02d",
+                        "Вам был выставлен пропуск по предмету %s на %02d.%02d",
                         gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
                         gradebookDay.getDateTime().getDayOfMonth(),
                         gradebookDay.getDateTime().getMonthValue()
                 )
         );
         notificationService.saveNotification(notification);
+
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudentId);
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                    String.format(
+                        "/schoolStudentDiary?id=%d",
+                        schoolStudentId
+                    )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                    String.format(
+                        "Ученику %s %s был выставлен пропуск по предмету %s на %02d.%02d",
+                        schoolStudent.getLastName(),
+                        schoolStudent.getFirstName(),
+                        gradebookDay.getScheduleLesson().getTeacherAssignment().getSchoolSubject().getName(),
+                        gradebookDay.getDateTime().getDayOfMonth(),
+                        gradebookDay.getDateTime().getMonthValue()
+                    )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
 
         return ResponseEntity.ok("{\"message\": \"Информация успешно обновлена\"}");
     }

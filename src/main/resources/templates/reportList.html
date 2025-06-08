@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчёты школы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .reports-container {
+            width: 50%;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .reports-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .report-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .download-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+
+        .generate-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            background-color: #0b7dda;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            text-align: center;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<div th:replace="~{header}"></div>
+<body>
+<div class="container">
+    <div class="reports-container">
+        <div class="reports-header">Отчёты</div>
+        <div id="reports-list"></div>
+    </div>
+
+    <button id="generate-report-btn" class="generate-btn">Сгенерировать отчёт</button>
+
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <p>Идёт генерация отчёта, пожалуйста подождите...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Получаем ID школы из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const educationalId = urlParams.get('id');
+
+        if (!educationalId) {
+            alert('ID школы не указан в URL');
+            return;
+        }
+
+        // Загружаем отчёты при загрузке страницы
+        loadReports(educationalId);
+
+        // Обработчик кнопки генерации отчёта
+        document.getElementById('generate-report-btn').addEventListener('click', function() {
+            generateReport(educationalId);
+        });
+    });
+
+    function loadReports(educationalId) {
+        fetch(`/findReportsByEducationalId?educationalId=${educationalId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке отчётов');
+                }
+                return response.json();
+            })
+            .then(reports => {
+                // Сортируем отчёты по дате (новые сначала)
+                reports.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+
+                const reportsList = document.getElementById('reports-list');
+                reportsList.innerHTML = '';
+
+                reports.forEach(report => {
+                    const reportDate = new Date(report.dateTime);
+                    const formattedDate = `${reportDate.getDate().toString().padStart(2, '0')}.${(reportDate.getMonth() + 1).toString().padStart(2, '0')}.${reportDate.getFullYear()}`;
+
+                    const reportItem = document.createElement('div');
+                    reportItem.className = 'report-item';
+                    reportItem.innerHTML = `
+                        <span>Отчёт за ${formattedDate}</span>
+                        <a href="${report.downloadUrl}" class="download-btn">Скачать отчёт</a>
+                    `;
+
+                    reportsList.appendChild(reportItem);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert(error.message);
+            });
+    }
+
+    function generateReport(educationalId) {
+        const modal = document.getElementById('loading-modal');
+        modal.style.display = 'block';
+
+        fetch(`/createReport?educationalInstitutionId=${educationalId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при генерации отчёта');
+            }
+            return response.json();
+        })
+        .then(newReport => {
+            modal.style.display = 'none';
+            loadReports(educationalId); // Перезагружаем список отчётов
+        })
+        .catch(error => {
+            modal.style.display = 'none';
+            console.error('Ошибка:', error);
+            alert(error.message);
+        });
+    }
+</script>
+</body>
+</html>

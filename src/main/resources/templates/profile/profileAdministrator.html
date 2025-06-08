@@ -31,6 +31,10 @@
             <span id="phoneNumber"></span>
         </div>
     </div>
+    <div class="section">
+        <h2>Отчёты</h2>
+        <p><a href="#" class="link" id="reportListLink">Открыть список отчётов</a></p>
+    </div>
 </div>
 
 <script>
@@ -57,6 +61,8 @@
                 document.getElementById('email').innerText = data.email || 'Не указан';
                 document.getElementById('phoneNumber').innerText = data.phoneNumber || 'Не указан';
                 document.getElementById('school').innerText = data.educationalInstitution.name;
+
+                document.getElementById('reportListLink').href = `reportList?id=${data.educationalInstitution.id}`; //
 
                 const initials = `${data.lastName.charAt(0)}${data.firstName.charAt(0)}`;
                 document.getElementById('profile-picture').innerText = initials.toUpperCase();

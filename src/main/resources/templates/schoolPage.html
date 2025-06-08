@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьный портал</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f9ff;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Общая рамка для всего контента */
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 20px;
+            gap: 20px;
+            background-color: white; /* Белый фон для контента */
+        }
+
+        /* Боковая панель с кнопками */
+        .sidebar {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            border: 2px solid black;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: white; /* Белый фон для панели */
+        }
+
+        .sidebar-btn {
+            background: none;
+            border: none;
+            color: #2196F3;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .sidebar-btn:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-btn:hover {
+            color: #0b7dda;
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        /* Блок информации о школе */
+        .school-info {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            gap: 20px;
+            align-items: center;
+            border: 2px solid black;
+        }
+
+        .school-image-container {
+            width: 30%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .school-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .school-details {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .school-detail-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .school-detail-item:first-child {
+            border-top: 2px solid black;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #555;
+        }
+
+        .detail-value {
+            flex-grow: 1;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        /* Блок новостей */
+        .news-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid black;
+        }
+
+        .news-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        .news-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 15px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .news-meta {
+            font-size: 14px;
+            color: #777;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Блок директора */
+        .director-container {
+            width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .director-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: auto;
+            border: 2px solid black;
+        }
+
+        .director-image {
+            width: 200px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .director-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        .director-detail {
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+            padding-left: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .director-detail:first-child {
+            border-top: 2px solid black;
+        }
+
+        .director-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .director-value {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<!-- Боковая панель с кнопками -->
+<div class="sidebar">
+    <button class="sidebar-btn">Школа</button>
+    <button class="sidebar-btn">Администрация школы</button>
+    <button class="sidebar-btn">Учителя</button>
+    <button class="sidebar-btn">Классы</button>
+</div>
+
+<!-- Основной контент -->
+<div class="content-wrapper">
+    <div class="main-content">
+        <!-- Блок информации о школе -->
+        <div class="school-info">
+            <div class="school-image-container">
+                <img src="https://via.placeholder.com/800x450?text=Нет+фотографии" alt="Фото школы" class="school-image" id="school-photo">
+            </div>
+            <div class="school-details">
+                <h1 class="school-name" id="school-name">Средняя общеобразовательная школа №1</h1>
+
+                <div class="school-detail-item">
+                    <span class="detail-label">Официальное название:</span>
+                    <span class="detail-value" id="official-name">Государственное бюджетное общеобразовательное учреждение "Средняя общеобразовательная школа №1"</span>
+                </div>
+
+                <div class="school-detail-item">
+                    <span class="detail-label">Адрес:</span>
+                    <span class="detail-value" id="school-address">г. Москва, ул. Ленина, д. 1</span>
+                </div>
+
+                <div class="school-detail-item">
+                    <span class="detail-label">Почта:</span>
+                    <span class="detail-value" id="school-email">school1@example.com</span>
+                </div>
+
+                <div class="school-detail-item">
+                    <span class="detail-label">Телефон:</span>
+                    <span class="detail-value" id="school-phone">+7 (495) 123-45-67</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок новостей -->
+        <div class="news-container">
+            <h2 class="news-header">Новости школы</h2>
+            <div class="news-list" id="news-list">
+                <!-- Пример новости 1 -->
+                <div class="news-item">
+                    <div class="news-title">День знаний 2023</div>
+                    <div class="news-meta">
+                        <span class="news-author">Иванова М.А.</span>
+                        <span class="news-date">01.09.2023</span>
+                    </div>
+                </div>
+
+                <!-- Пример новости 2 -->
+                <div class="news-item">
+                    <div class="news-title">Школьный турнир по шахматам</div>
+                    <div class="news-meta">
+                        <span class="news-author">Петров С.И.</span>
+                        <span class="news-date">15.10.2023</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Блок директора -->
+    <div class="director-container">
+        <div class="director-info">
+            <img src="https://via.placeholder.com/200x250?text=Директор" alt="Фото директора" class="director-image" id="director-photo">
+            <h3 class="director-name" id="director-name">Иванов Иван Иванович</h3>
+
+            <div class="director-detail">
+                <div class="director-label">Почта:</div>
+                <div class="director-value" id="director-email">director@school1.ru</div>
+            </div>
+
+            <div class="director-detail">
+                <div class="director-label">Телефон:</div>
+                <div class="director-value" id="director-phone">+7 (495) 765-43-21</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Здесь будут запросы к API для получения данных
+    // Пример данных для демонстрации
+    const schoolData = {
+        name: "Средняя общеобразовательная школа №1",
+        officialName: "Государственное бюджетное общеобразовательное учреждение \"Средняя общеобразовательная школа №1\"",
+        address: "г. Москва, ул. Ленина, д. 1",
+        pathImage: null,
+        email: "school1@example.com",
+        phoneNumber: "+7 (495) 123-45-67"
+    };
+
+    const directorData = {
+        firstName: "Иван",
+        lastName: "Иванов",
+        patronymic: "Иванович",
+        pathImage: null,
+        email: "director@school1.ru",
+        phoneNumber: "+7 (495) 765-43-21"
+    };
+
+    const newsData = [
+        {
+            id: 1,
+            title: "День знаний 2023",
+            firstName: "Мария",
+            lastName: "Иванова",
+            patronymic: "Александровна",
+            dateTime: "2023-09-01T10:00:00"
+        },
+        {
+            id: 2,
+            title: "Школьный турнир по шахматам",
+            firstName: "Сергей",
+            lastName: "Петров",
+            patronymic: "Игоревич",
+            dateTime: "2023-10-15T14:00:00"
+        }
+    ];
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+    }
+
+    function displayData() {
+        // Школа
+        document.getElementById('school-name').textContent = schoolData.name;
+        document.getElementById('official-name').textContent = schoolData.officialName;
+        document.getElementById('school-address').textContent = schoolData.address;
+        document.getElementById('school-email').textContent = schoolData.email;
+        document.getElementById('school-phone').textContent = schoolData.phoneNumber;
+
+        if (schoolData.pathImage) {
+            document.getElementById('school-photo').src = schoolData.pathImage;
+        }
+
+        // Директор
+        document.getElementById('director-name').textContent = `${directorData.lastName} ${directorData.firstName} ${directorData.patronymic}`;
+        document.getElementById('director-email').textContent = directorData.email;
+        document.getElementById('director-phone').textContent = directorData.phoneNumber;
+
+        if (directorData.pathImage) {
+            document.getElementById('director-photo').src = directorData.pathImage;
+        }
+
+        // Новости
+        const newsList = document.getElementById('news-list');
+        newsList.innerHTML = '';
+
+        newsData.forEach(news => {
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item';
+
+            const authorName = `${news.lastName} ${news.firstName.charAt(0)}.${news.patronymic.charAt(0)}.`;
+
+            newsItem.innerHTML = `
+                <div class="news-title">${news.title}</div>
+                <div class="news-meta">
+                    <span class="news-author">${authorName}</span>
+                    <span class="news-date">${formatDate(news.dateTime)}</span>
+                </div>
+            `;
+
+            newsList.appendChild(newsItem);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', displayData);
+</script>
+</body>
+</html>

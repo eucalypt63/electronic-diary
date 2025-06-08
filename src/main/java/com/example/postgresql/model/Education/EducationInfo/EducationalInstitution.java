@@ -33,11 +33,6 @@ public class EducationalInstitution {
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ei_eit_id", nullable = false, foreignKey = @ForeignKey(name = "ei_eit_id"))
-    private EducationalInstitutionType educationalInstitutionType;
-
-    @NonNull
-    @ManyToOne
     @JoinColumn(name = "ei_s_id", nullable = false, foreignKey = @ForeignKey(name = "ei_s_id"))
     private Settlement settlement;
 

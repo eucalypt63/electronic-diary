@@ -56,6 +56,12 @@ public class TeacherService {
         return teacherAssignmentRepository.findTeacherAssignmentByTeacherId(teacherId);
     }
 
+
+    public List<TeacherAssignment> findTeacherAssignmentByGroupIdAndSchoolSubjectId(
+            Long groupId,
+            Long schoolSubjectId){
+        return teacherAssignmentRepository.findTeacherAssignmentByGroupIdAndSchoolSubjectId(groupId, schoolSubjectId);
+    }
     public void saveTeacherAssignment(TeacherAssignment teacherAssignment) {
         teacherAssignmentRepository.save(teacherAssignment);
     }

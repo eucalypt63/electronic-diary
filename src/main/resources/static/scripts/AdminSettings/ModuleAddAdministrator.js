@@ -13,10 +13,11 @@ document.getElementById('submitAdminButton').addEventListener('click', function(
     const adminPassword = document.getElementById('adminPassword').value;
     const adminEmail = document.getElementById('adminEmail').value;
     const adminPhoneNumber = document.getElementById('adminPhoneNumber').value;
+    const administrationTypeId = document.getElementById('administrationSelect').value;
 
     const universityId = selectedElementId;
 
-    if (adminFirstName && adminLastName && adminLogin && adminPassword) {
+    if (adminFirstName && adminLastName && adminLogin && adminPassword && administrationTypeId) {
         const data = {
             firstName: adminFirstName,
             lastName: adminLastName,
@@ -25,7 +26,8 @@ document.getElementById('submitAdminButton').addEventListener('click', function(
             password: adminPassword,
             email: adminEmail,
             phoneNumber: adminPhoneNumber,
-            universityId: universityId
+            universityId: universityId,
+            administrationsTypeId: administrationTypeId
         };
 
         fetch('/addAdministrator', {
@@ -44,6 +46,7 @@ document.getElementById('submitAdminButton').addEventListener('click', function(
         .then(data => {
             const modal = document.getElementById('moduleAddAdministrator');
             modal.style.display = 'none';
+
             document.getElementById('adminFirstName').value = '';
             document.getElementById('adminLastName').value = '';
             document.getElementById('adminPatronymic').value = '';
@@ -59,6 +62,6 @@ document.getElementById('submitAdminButton').addEventListener('click', function(
             alert('Не удалось добавить администратора');
         });
     } else {
-        alert('Пожалуйста, заполните обязательные поля.');
+        alert('Пожалуйста, заполните все обязательные поля.');
     }
 });

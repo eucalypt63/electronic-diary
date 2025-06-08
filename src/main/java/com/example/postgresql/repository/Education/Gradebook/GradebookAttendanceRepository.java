@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface GradebookAttendanceRepository extends JpaRepository<GradebookAttendance, Long> {
     List<GradebookAttendance> findAttendancesByGradebookDayId(Long id);
+    List<GradebookAttendance> findAttendancesBySchoolStudentIdAndGradebookDayScheduleLessonQuarterInfoId(Long id, Long quarterId);
     GradebookAttendance findAttendancesByGradebookDayIdAndSchoolStudentId(Long gradebookId, Long schoolStudentId);
 }

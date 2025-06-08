@@ -8,10 +8,12 @@ import com.example.postgresql.model.Education.Notification;
 import com.example.postgresql.model.SchoolSubject;
 import com.example.postgresql.model.TeacherAssignment;
 import com.example.postgresql.model.Users.Student.SchoolStudent;
+import com.example.postgresql.model.Users.Student.StudentParent;
 import com.example.postgresql.service.Education.GroupService;
 import com.example.postgresql.service.Education.NotificationService;
 import com.example.postgresql.service.Education.QuarterScoreService;
 import com.example.postgresql.service.Education.ScheduleService;
+import com.example.postgresql.service.Users.ParentService;
 import com.example.postgresql.service.Users.SchoolStudentService;
 import com.example.postgresql.service.Users.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,8 @@ public class QuarterControl {
     private SchoolStudentService schoolStudentService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private ParentService parentService;
 
     // Получение четвертных оценок для журнала
     @GetMapping("findQuarterScoreByTeacherAssignmentIdAndQuarterInfoId")
@@ -131,6 +135,31 @@ public class QuarterControl {
         );
         notificationService.saveNotification(notification);
 
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudentId);
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                    String.format(
+                            "/schoolStudentQuarterResult?id=%d",
+                            schoolStudent.getId()
+                    )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                    String.format(
+                            "Ученику %s %s была поставлена оценка %d за %d четверть по предмету \"%s\"",
+                            schoolStudent.getLastName(),
+                            schoolStudent.getFirstName(),
+                            score,
+                            quarterScore.getQuarterInfo().getQuarterNumber(),
+                            schoolSubject.getName()
+                    )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
+
         return ResponseEntity.ok("{\"message\": \"Оценка за четверть добавлена\"}");
     }
 
@@ -141,6 +170,8 @@ public class QuarterControl {
         QuarterScore quarterScore = quarterScoreService.findQuarterScoreById(quarterScoreId);
         quarterScore.setScore(score);
         quarterScoreService.saveQuarterScore(quarterScore);
+
+        SchoolStudent schoolStudent = quarterScore.getSchoolStudent();
 
         Notification notification = new Notification();
         notification.setUser(quarterScore.getSchoolStudent().getUser());
@@ -161,6 +192,31 @@ public class QuarterControl {
                 )
         );
         notificationService.saveNotification(notification);
+
+        List<StudentParent> studentParents = parentService.findStudentParentBySchoolStudentId(schoolStudent.getId());
+        studentParents.forEach(studentParent -> {
+            Notification notificationParent = new Notification();
+            notificationParent.setUser(studentParent.getParent().getUser());
+            notificationParent.setLink(
+                    String.format(
+                            "/schoolStudentQuarterResult?id=%d",
+                            quarterScore.getSchoolStudent().getId()
+                    )
+            );
+            notificationParent.setDateTime(LocalDateTime.now());
+            notificationParent.setTitle("Успеваемость");
+            notificationParent.setContent(
+                    String.format(
+                            "Ученику %s %s была замеена оценка за %d четверть по предмету \"%s\" на %d",
+                            schoolStudent.getLastName(),
+                            schoolStudent.getFirstName(),
+                            quarterScore.getQuarterInfo().getQuarterNumber(),
+                            quarterScore.getSchoolSubject().getName(),
+                            score
+                    )
+            );
+            notificationService.saveNotification(notificationParent);
+        });
 
         return ResponseEntity.ok("{\"message\": \"Оценка за четверть обновлена\"}");
     }

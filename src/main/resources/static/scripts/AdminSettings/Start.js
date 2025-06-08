@@ -154,7 +154,34 @@ document.getElementById('addObjectButton').addEventListener('click', function() 
     closeAllModules();
     if (selectedModule === 'administrationSelector') {
         if (userRole == "Main admin"){
-            document.getElementById('moduleAddAdministrator').style.display = 'block';
+            const modal = document.getElementById('moduleAddAdministrator');
+            modal.style.display = 'block';
+
+            fetch('/getAdministrationsType')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('administrationSelect');
+                    select.innerHTML = '';
+
+                    // Добавляем placeholder
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    defaultOption.textContent = 'Выберите должность';
+                    select.appendChild(defaultOption);
+
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке типов администрации:', error);
+                    alert('Не удалось загрузить список должностей');
+                });
         } else {
             alert('Доступ ограничен');
         }

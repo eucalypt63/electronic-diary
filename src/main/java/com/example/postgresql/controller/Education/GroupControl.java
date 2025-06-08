@@ -170,24 +170,6 @@ public class GroupControl {
         groupMember.setSchoolStudent(schoolStudent);
         groupService.saveGroupMember(groupMember);
 
-        Notification notification = new Notification();
-        notification.setUser(schoolStudent.getUser());
-        notification.setLink(
-                String.format(
-                        "/classGroups?id=%d",
-                        group.getClassRoom().getId()
-                )
-        );
-        notification.setDateTime(LocalDateTime.now());
-        notification.setTitle("Группа");
-        notification.setContent(
-                String.format(
-                        "Вы были добавлены в группу %s",
-                        group.getGroupName()
-                )
-        );
-        notificationService.saveNotification(notification);
-
         return ResponseEntity.ok("{\"message\": \"Ученик успешно добавлен в группу\"}");
     }
 
@@ -197,26 +179,6 @@ public class GroupControl {
     public ResponseEntity<String> deleteGroupMember(@RequestParam Long studentId, @RequestParam Long groupId){
         GroupMember groupMember = groupService.findGroupMemberByGroupIdAndSchoolStudentId(groupId, studentId);
         groupService.deleteGroupMember(groupMember);
-
-        Group group = groupService.findGroupById(groupId);
-        SchoolStudent schoolStudent = schoolStudentService.findSchoolStudentById(studentId);
-        Notification notification = new Notification();
-        notification.setUser(schoolStudent.getUser());
-        notification.setLink(
-                String.format(
-                        "/classGroups?id=%d",
-                        group.getClassRoom().getId()
-                )
-        );
-        notification.setDateTime(LocalDateTime.now());
-        notification.setTitle("Группа");
-        notification.setContent(
-                String.format(
-                        "Вы были удалены из группы %s",
-                        group.getGroupName()
-                )
-        );
-        notificationService.saveNotification(notification);
 
         return ResponseEntity.ok("{\"message\": \"Ученик успешно удалён из группы\"}");
     }
