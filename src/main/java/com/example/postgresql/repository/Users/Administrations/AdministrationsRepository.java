@@ -12,4 +12,5 @@ public interface AdministrationsRepository extends JpaRepository<Administrations
     Administrations findAdministrationsByUserId(Long userId);
     List<Administrations> findAdministrationsByAdministrationsTypesId(Long id);
 
+    Administrations findAdministrationByAdministrationsTypesIdAndEducationalInstitutionId(Long typeId, Long EducationId);
 }

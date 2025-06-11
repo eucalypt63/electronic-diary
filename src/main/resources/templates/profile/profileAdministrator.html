@@ -31,13 +31,32 @@
             <span id="phoneNumber"></span>
         </div>
     </div>
-    <div class="section">
+    <div class="section" id="reportsSection">
         <h2>Отчёты</h2>
         <p><a href="#" class="link" id="reportListLink">Открыть список отчётов</a></p>
     </div>
 </div>
 
 <script>
+    function checkUserRoleAndModifyUI() {
+        fetch('/getAuthorizationUserInfo')
+            .then(response => response.json())
+            .then(userInfo => {
+                const allowedRoles = ["Main admin", "Administration"];
+                if (!allowedRoles.includes(userInfo.role)) {
+                    const reportsSection = document.getElementById('reportsSection');
+                    if (reportsSection) {
+                        reportsSection.remove();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при получении информации о пользователе:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', checkUserRoleAndModifyUI);
+
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
 
@@ -62,13 +81,16 @@
                 document.getElementById('phoneNumber').innerText = data.phoneNumber || 'Не указан';
                 document.getElementById('school').innerText = data.educationalInstitution.name;
 
-                document.getElementById('reportListLink').href = `reportList?id=${data.educationalInstitution.id}`; //
+                const reportListLink = document.getElementById('reportListLink');
+                if (reportListLink) {
+                    reportListLink.href = `reportList?id=${data.educationalInstitution.id}`;
+                }
 
                 const initials = `${data.lastName.charAt(0)}${data.firstName.charAt(0)}`;
                 document.getElementById('profile-picture').innerText = initials.toUpperCase();
             })
             .catch(error => {
-                cconsole.error('There was a problem with the fetch operation:', error);
+                console.error('There was a problem with the fetch operation:', error);
             });
     }
 
@@ -96,7 +118,6 @@
                 })
                 .then(data => {
                     console.log('Фото успешно загружено', data.message);
-                    //обновить фото
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);

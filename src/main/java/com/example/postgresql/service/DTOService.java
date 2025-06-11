@@ -54,6 +54,7 @@ public class DTOService {
         administratorResponseDTO.setPathImage(administrations.getPathImage());
         administratorResponseDTO.setEmail(administrations.getEmail());
         administratorResponseDTO.setPhoneNumber(administrations.getPhoneNumber());
+        administratorResponseDTO.setAdministrationsTypes(administrations.getAdministrationsTypes());
 
         return administratorResponseDTO;
     }

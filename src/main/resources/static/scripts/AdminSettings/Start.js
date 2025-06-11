@@ -48,7 +48,7 @@ function updateSchoolList() {
                 schoolDiv.id = institution.id;
 
                 schoolDiv.addEventListener('dblclick', () => {
-                    window.location.href = `EducationPage?id=${institution.id}`;//
+                    window.location.href = `schoolPage?id=${institution.id}`;
                 });
 
                 educationColumn.appendChild(schoolDiv);

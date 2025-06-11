@@ -12,8 +12,12 @@ import com.example.postgresql.service.DTOService;
 import com.example.postgresql.service.Users.AdministrationsService;
 import com.example.postgresql.service.Education.EducationalInstitutionService;
 import com.example.postgresql.service.Users.UserService;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -94,6 +98,17 @@ public class AdministrationControl {
         return ResponseEntity.ok(administrationsService.getAllAdministrationsTypes());
     }
 
+    //Получить директора школы
+    @GetMapping("/findDirectorByEducationId")
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
+    @ResponseBody
+    public ResponseEntity<AdministratorResponseDTO> findDirectorByEducationId(@RequestParam Long educationId) {
+        Administrations administrations = administrationsService.findAdministrationByAdministrationsTypesIdAndEducationalInstitutionId(1L, educationId);
+        AdministratorResponseDTO administratorResponse = dtoService.AdministratorToDto(administrations);
+
+        return ResponseEntity.ok(administratorResponse);
+    }
+
     //Добавить админа
     @PostMapping("/addAdministrator")
     @RequiredRoles({"Main admin", "Local admin"})
@@ -102,8 +117,8 @@ public class AdministrationControl {
         Long administrationsTypesId = administratorRequestDTO.getAdministrationsTypeId();
 
         if (administrationsTypesId == 1L) {
-            List<Administrations> administrations = administrationsService.findAdministrationsByAdministrationsTypesId(administrationsTypesId);
-            if (!administrations.isEmpty()) {
+            Administrations administration = administrationsService.findAdministrationByAdministrationsTypesIdAndEducationalInstitutionId(administrationsTypesId, administratorRequestDTO.getUniversityId());
+            if (administration == null) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body("{\"error\": \"Роль директора уже занята\"}");
@@ -161,13 +176,23 @@ public class AdministrationControl {
             ImageIO.write(originalImage, "png", pngOutputStream);
             byte[] pngBytes = pngOutputStream.toByteArray();
 
-            String uploadUrl = "http://77.222.37.9/files/" + "Administrator" + id + ".png";
+            String uploadUrl = "https://77.222.37.9/files/" + "Administrator" + id + ".png";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.IMAGE_JPEG);
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(pngBytes, headers);
 
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate(
+                new HttpComponentsClientHttpRequestFactory(
+                    HttpClients.custom()
+                        .setSSLContext(
+                            SSLContextBuilder.create()
+                                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                                .build()
+                        )
+                        .build()
+                )
+            );
             ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, requestEntity, String.class);
 
             Administrations administrations = administrationsService.findAdministrationById(id);
@@ -176,7 +201,8 @@ public class AdministrationControl {
 
             return ResponseEntity.ok("{\"message\": \"Image uploaded successfully \"}");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("{\"message\": \"Error uploading image \"}");
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("{\"message\": \"Error uploading image: " + e.getMessage() + "\"}");
         }
     }
 

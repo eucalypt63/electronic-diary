@@ -6,84 +6,85 @@
   <title>Список родителей</title>
   <link rel="stylesheet" type="text/css" th:href="@{/style/AdminSettings/ModuleAdd.css}">
   <style>
-      body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f4;
-          margin: 0;
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-      }
-      .container {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 20px;
-      }
-      .user-list {
-          background: #fff;
-          border-radius: 5px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-          overflow-y: auto;
-          flex: 1;
-          margin-bottom: 20px;
-          max-height: 75vh; /* Установлена высота 75% от высоты экрана */
-      }
-      .user {
-          border-bottom: 1px solid #ddd;
-          padding: 10px 0;
-          cursor: pointer;
-          transition: background-color 0.1s; /* Время перехода 0.1s */
-          padding-left: 5px; /* Сдвиг текста на 5 пикселей */
-      }
-      .user:last-child {
-          border-bottom: none;
-      }
-      .user h3 {
-          margin: 0;
-          font-size: 1.2em;
-      }
-      .user p {
-          margin: 5px 0;
-          color: #555;
-      }
-      .user p strong {
-          font-weight: bold; /* Жирный текст */
-      }
-      .button-container {
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-      }
-      button {
-          padding: 10px 15px;
-          font-size: 1em;
-          border: none;
-          border-radius: 5px;
-          color: white;
-          cursor: pointer;
-      }
-      .add-button {
-          background-color: #28a745; /* Зелёный цвет */
-      }
-      .add-button:hover {
-          background-color: #218838;
-      }
-      .add-existing-button {
-          background-color: #007BFF; /* Синий цвет */
-      }
-      .add-existing-button:hover {
-          background-color: #0056b3;
-      }
-      .deleteParentButton {
-          background-color: #dc3545; /* Красный цвет */
-      }
-      .deleteParentButton:hover {
-          background-color: #c82333;
-      }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    .container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+    }
+    .user-list {
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+        margin-bottom: 20px;
+        max-height: 75vh; /* Установлена высота 75% от высоты экрана */
+    }
+    .user {
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+        cursor: pointer;
+        transition: background-color 0.1s; /* Время перехода 0.1s */
+        padding-left: 5px; /* Сдвиг текста на 5 пикселей */
+    }
+    .user:last-child {
+        border-bottom: none;
+    }
+    .user h3 {
+        margin: 0;
+        font-size: 1.2em;
+    }
+    .user p {
+        margin: 5px 0;
+        color: #555;
+    }
+    .user p strong {
+        font-weight: bold; /* Жирный текст */
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        display: none;
+    }
+    button {
+        padding: 10px 15px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+    .add-button {
+        background-color: #28a745;
+    }
+    .add-button:hover {
+        background-color: #218838;
+    }
+    .add-existing-button {
+        background-color: #007BFF;
+    }
+    .add-existing-button:hover {
+        background-color: #0056b3;
+    }
+    .deleteParentButton {
+        background-color: #dc3545;
+    }
+    .deleteParentButton:hover {
+        background-color: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -97,7 +98,7 @@
 
   </div>
 
-  <div class="button-container">
+  <div class="button-container" id="buttonContainer">
     <button class="add-button" id="add-button">Добавить родителя</button>
     <button class="add-existing-button" id="add-existing-button">Добавить уже существующего</button>
     <button class="deleteParentButton" id="deleteParentButton">Удалить родителя</button>
@@ -153,6 +154,29 @@
 </div>
 
 <script>
+  function checkUserRoleAndModifyUI() {
+      fetch('/getAuthorizationUserInfo')
+          .then(response => response.json())
+          .then(userInfo => {
+              const allowedRoles = ["Main admin", "Local admin"];
+              const buttonContainer = document.getElementById('buttonContainer');
+              if (!allowedRoles.includes(userInfo.role)) {
+                  const moduleAddNewParent = document.getElementById('moduleAddNewParent');
+                  const moduleAddParent = document.getElementById('moduleAddParent');
+                  if (moduleAddNewParent) moduleAddNewParent.remove();
+                  if (moduleAddParent) moduleAddParent.remove();
+                  if (buttonContainer) buttonContainer.remove();
+              } else {
+                buttonContainer.style.display = 'flex';
+              }
+          })
+          .catch(error => {
+              console.error('Ошибка при получении информации о пользователе:', error);
+          });
+  }
+
+  document.addEventListener('DOMContentLoaded', checkUserRoleAndModifyUI);
+
   function updateObjectList() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
@@ -203,99 +227,103 @@
       users.forEach(user => {
           user.addEventListener('mouseenter', () => {
               if (!user.classList.contains('clicked')) {
-                  user.style.backgroundColor = 'lightgray'; // Цвет при наведении
+                  user.style.backgroundColor = 'lightgray';
               }
           });
 
           user.addEventListener('mouseleave', () => {
               if (!user.classList.contains('clicked')) {
-                  user.style.backgroundColor = ''; // Возврат к стандартному
+                  user.style.backgroundColor = '';
               }
           });
 
           user.addEventListener('mousedown', () => {
-              user.style.backgroundColor = 'gray'; // Цвет при нажатии
+              user.style.backgroundColor = 'gray';
           });
 
           user.addEventListener('mouseup', () => {
-              user.style.backgroundColor = 'darkgray'; // Цвет при отпускании
+              user.style.backgroundColor = 'darkgray';
           });
 
           user.addEventListener('click', () => {
               if (selectedUser) {
                   selectedUser.classList.remove('clicked');
-                  selectedUser.style.backgroundColor = ''; // Возврат к стандартному
+                  selectedUser.style.backgroundColor = '';
               }
               user.classList.add('clicked');
               selectedUserId = user.id;
               selectedUser = user;
-              user.style.backgroundColor = 'darkgray'; // Цвет при выборе
+              user.style.backgroundColor = 'darkgray';
           });
       });
   }
 
   const deleteParentButton = document.getElementById('deleteParentButton');
-  deleteParentButton.addEventListener('click', function() {
-
-      if (selectedUser) {
-
-        fetch(`/deleteStudentParent?id=${selectedUserId}`, {
-            method: 'DELETE',
-        })
-        .then(response => {
-            if (response.ok) {
-                updateObjectList();
-            } else {
-                throw new Error('Ошибка при удалении');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Не удалось удалить элемент.');
-        });
-      } else {
-          alert('Пожалуйста, выберите элемент для удаления.');
-      }
-  });
-
-  //
-
-  function closeModule() {
-      document.getElementById('moduleAddNewParent').style.display = 'none';
-      document.getElementById('moduleAddParent').style.display = 'none';
+  if (deleteParentButton) {
+      deleteParentButton.addEventListener('click', function() {
+          if (selectedUser) {
+            fetch(`/deleteStudentParent?id=${selectedUserId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    updateObjectList();
+                } else {
+                    throw new Error('Ошибка при удалении');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Не удалось удалить элемент.');
+            });
+          } else {
+              alert('Пожалуйста, выберите элемент для удаления.');
+          }
+      });
   }
 
-  document.getElementById('add-button').addEventListener('click', function() {
-      const modal = document.getElementById('moduleAddNewParent');
+  function closeModule() {
+      const moduleAddNewParent = document.getElementById('moduleAddNewParent');
+      const moduleAddParent = document.getElementById('moduleAddParent');
 
-      fetch('/getParentType')
-          .then(response => response.json())
-          .then(parentTypes => {
-              const parentTypeSelect = document.getElementById('parentTypeSelect');
-              parentTypeSelect.innerHTML = '';
+      if (moduleAddNewParent) moduleAddNewParent.style.display = 'none';
+      if (moduleAddParent) moduleAddParent.style.display = 'none';
+  }
 
-              const defaultOption = document.createElement('option');
-              defaultOption.value = '';
-              defaultOption.disabled = true;
-              defaultOption.selected = true;
-              defaultOption.textContent = 'Выберите роль опекуна';
-              parentTypeSelect.appendChild(defaultOption);
+  const addParentButton = document.getElementById('add-button');
+if (addParentButton) {
+    addParentButton.addEventListener('click', function() {
+        const modal = document.getElementById('moduleAddNewParent');
 
-              parentTypes.forEach(parent => {
-                  const option = document.createElement('option');
-                  option.value = parent.id;
-                  option.textContent = parent.name;
-                  parentTypeSelect.appendChild(option);
-              });
-          })
-          .catch(error => {
-              console.error('Ошибка при получении ролей опекунства:', error);
-              const parentTypeSelect = document.getElementById('parentTypeSelect');
-              parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
-          });
+        fetch('/getParentType')
+            .then(response => response.json())
+            .then(parentTypes => {
+                const parentTypeSelect = document.getElementById('parentTypeSelect');
+                parentTypeSelect.innerHTML = '';
 
-      modal.style.display = 'block';
-  });
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Выберите роль опекуна';
+                parentTypeSelect.appendChild(defaultOption);
+
+                parentTypes.forEach(parent => {
+                    const option = document.createElement('option');
+                    option.value = parent.id;
+                    option.textContent = parent.name;
+                    parentTypeSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка при получении ролей опекунства:', error);
+                const parentTypeSelect = document.getElementById('parentTypeSelect');
+                parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+            });
+
+        modal.style.display = 'block';
+    });
+}
 
   window.addEventListener('click', function(event) {
     const modal = document.getElementById('moduleAddNewParent');
@@ -304,131 +332,135 @@
     }
   });
 
-  document.getElementById('submitParentButton').addEventListener('click', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+  const submitParentButton = document.getElementById('submitParentButton');
+  if (submitParentButton) {
+      submitParentButton.addEventListener('click', function() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
 
-      const parentFirstName = document.getElementById('parentFirstName').value;
-      const parentLastName = document.getElementById('parentLastName').value;
-      const parentPatronymic = document.getElementById('parentPatronymic').value;
-      const parentLogin = document.getElementById('parentLogin').value;
-      const parentPassword = document.getElementById('parentPassword').value;
-      const parentEmail = document.getElementById('parentEmail').value;
-      const parentPhoneNumber = document.getElementById('parentPhoneNumber').value;
+          const parentFirstName = document.getElementById('parentFirstName').value;
+          const parentLastName = document.getElementById('parentLastName').value;
+          const parentPatronymic = document.getElementById('parentPatronymic').value;
+          const parentLogin = document.getElementById('parentLogin').value;
+          const parentPassword = document.getElementById('parentPassword').value;
+          const parentEmail = document.getElementById('parentEmail').value;
+          const parentPhoneNumber = document.getElementById('parentPhoneNumber').value;
 
-      const selectedParentId = parentTypeSelect.options[parentTypeSelect.selectedIndex].value;
+          const selectedParentId = parentTypeSelect.options[parentTypeSelect.selectedIndex].value;
 
-      if (parentFirstName && parentLastName && parentLogin && parentPassword && selectedParentId) {
-          const data = {
-              firstName: parentFirstName,
-              lastName: parentLastName,
-              patronymic: parentPatronymic,
-              login: parentLogin,
-              password: parentPassword,
-              email: parentEmail,
-              phoneNumber: parentPhoneNumber,
-              parentType: selectedParentId,
-              schoolStudentId: id
-          };
+          if (parentFirstName && parentLastName && parentLogin && parentPassword && selectedParentId) {
+              const data = {
+                  firstName: parentFirstName,
+                  lastName: parentLastName,
+                  patronymic: parentPatronymic,
+                  login: parentLogin,
+                  password: parentPassword,
+                  email: parentEmail,
+                  phoneNumber: parentPhoneNumber,
+                  parentType: selectedParentId,
+                  schoolStudentId: id
+              };
 
-          fetch('/addNewParent', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-          })
-          .then(response => {
-              if (response.ok) {
-                  return response.json();
-              }
-              throw new Error('Ошибка при добавлении администратора');
-          })
-          .then(data => {
-              const modal = document.getElementById('moduleAddNewParent');
-              modal.style.display = 'none';
-              document.getElementById('parentFirstName').value = '';
-              document.getElementById('parentLastName').value = '';
-              document.getElementById('parentPatronymic').value = '';
-              document.getElementById('parentLogin').value = '';
-              document.getElementById('parentPassword').value = '';
-              document.getElementById('parentEmail').value = '';
-              document.getElementById('parentPhoneNumber').value = '';
+              fetch('/addNewParent', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              })
+              .then(response => {
+                  if (response.ok) {
+                      return response.json();
+                  }
+                  throw new Error('Ошибка при добавлении администратора');
+              })
+              .then(data => {
+                  const modal = document.getElementById('moduleAddNewParent');
+                  modal.style.display = 'none';
+                  document.getElementById('parentFirstName').value = '';
+                  document.getElementById('parentLastName').value = '';
+                  document.getElementById('parentPatronymic').value = '';
+                  document.getElementById('parentLogin').value = '';
+                  document.getElementById('parentPassword').value = '';
+                  document.getElementById('parentEmail').value = '';
+                  document.getElementById('parentPhoneNumber').value = '';
 
-              updateObjectList();
-          })
-          .catch(error => {
-              console.error('Ошибка:', error);
-              alert('Не удалось добавить администратора');
-          });
-      } else {
-          alert('Пожалуйста, заполните обязательные поля.');
-      }
-  });
-
-  //
-
-  document.getElementById('add-existing-button').addEventListener('click', function() {
-      const modal = document.getElementById('moduleAddParent');
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-
-      fetch(`/getNewParents?id=${id}`)
-          .then(response => response.json())
-          .then(parents => {
-              const parentSelect = document.getElementById('parentSelect');
-              parentSelect.innerHTML = '';
-
-              const defaultOption = document.createElement('option');
-              defaultOption.value = '';
-              defaultOption.disabled = true;
-              defaultOption.selected = true;
-              defaultOption.textContent = 'Выберите опекуна';
-              parentSelect.appendChild(defaultOption);
-
-              parents.forEach(parent => {
-                  const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
-                  const option = document.createElement('option');
-                  option.value = parent.id;
-                  option.textContent = fullName;
-                  parentSelect.appendChild(option);
+                  updateObjectList();
+              })
+              .catch(error => {
+                  console.error('Ошибка:', error);
+                  alert('Не удалось добавить администратора');
               });
-          })
-          .catch(error => {
-              console.error('Ошибка при получении ролей опекунства:', error);
-              const parentTypeSelect = document.getElementById('parentTypeSelect2');
-              parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
-          });
+          } else {
+              alert('Пожалуйста, заполните обязательные поля.');
+          }
+      });
+  }
 
-      fetch('/getParentType')
-          .then(response => response.json())
-          .then(parentTypes => {
-              const parentTypeSelect = document.getElementById('parentTypeSelect2');
-              parentTypeSelect.innerHTML = '';
+  const addExistingButton = document.getElementById('add-existing-button');
+  if (addExistingButton) {
+      addExistingButton.addEventListener('click', function() {
+          const modal = document.getElementById('moduleAddParent');
 
-              const defaultOption = document.createElement('option');
-              defaultOption.value = '';
-              defaultOption.disabled = true;
-              defaultOption.selected = true;
-              defaultOption.textContent = 'Выберите роль опекуна';
-              parentTypeSelect.appendChild(defaultOption);
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
 
-              parentTypes.forEach(parent => {
-                  const option = document.createElement('option');
-                  option.value = parent.id;
-                  option.textContent = parent.name;
-                  parentTypeSelect.appendChild(option);
+          fetch(`/getNewParents?id=${id}`)
+              .then(response => response.json())
+              .then(parents => {
+                  const parentSelect = document.getElementById('parentSelect');
+                  parentSelect.innerHTML = '';
+
+                  const defaultOption = document.createElement('option');
+                  defaultOption.value = '';
+                  defaultOption.disabled = true;
+                  defaultOption.selected = true;
+                  defaultOption.textContent = 'Выберите опекуна';
+                  parentSelect.appendChild(defaultOption);
+
+                  parents.forEach(parent => {
+                      const fullName = `${parent.lastName} ${parent.firstName} ${parent.patronymic || ''}`.trim();
+                      const option = document.createElement('option');
+                      option.value = parent.id;
+                      option.textContent = fullName;
+                      parentSelect.appendChild(option);
+                  });
+              })
+              .catch(error => {
+                  console.error('Ошибка при получении ролей опекунства:', error);
+                  const parentTypeSelect = document.getElementById('parentTypeSelect2');
+                  parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
               });
-          })
-          .catch(error => {
-              console.error('Ошибка при получении ролей опекунства:', error);
-              const parentTypeSelect = document.getElementById('parentTypeSelect2');
-              parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
-          });
 
-      modal.style.display = 'block';
-  });
+          fetch('/getParentType')
+              .then(response => response.json())
+              .then(parentTypes => {
+                  const parentTypeSelect = document.getElementById('parentTypeSelect2');
+                  parentTypeSelect.innerHTML = '';
+
+                  const defaultOption = document.createElement('option');
+                  defaultOption.value = '';
+                  defaultOption.disabled = true;
+                  defaultOption.selected = true;
+                  defaultOption.textContent = 'Выберите роль опекуна';
+                  parentTypeSelect.appendChild(defaultOption);
+
+                  parentTypes.forEach(parent => {
+                      const option = document.createElement('option');
+                      option.value = parent.id;
+                      option.textContent = parent.name;
+                      parentTypeSelect.appendChild(option);
+                  });
+              })
+              .catch(error => {
+                  console.error('Ошибка при получении ролей опекунства:', error);
+                  const parentTypeSelect = document.getElementById('parentTypeSelect2');
+                  parentTypeSelect.innerHTML = '<option value="">Ошибка загрузки ролей опекунства</option>';
+              });
+
+          modal.style.display = 'block';
+      });
+  }
 
   window.addEventListener('click', function(event) {
       const modal = document.getElementById('moduleAddParent');
@@ -437,47 +469,49 @@
       }
   });
 
-  document.getElementById('submitParentAddButton').addEventListener('click', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
+  const submitParentAddButton = document.getElementById('submitParentAddButton');
+  if (submitParentAddButton) {
+      submitParentAddButton.addEventListener('click', function() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const id = urlParams.get('id');
 
-      const selectedParentId = parentSelect.options[parentSelect.selectedIndex].value;
-      const selectedParentTypeId = parentTypeSelect2.options[parentTypeSelect2.selectedIndex].value;
+          const selectedParentId = parentSelect.options[parentSelect.selectedIndex].value;
+          const selectedParentTypeId = parentTypeSelect2.options[parentTypeSelect2.selectedIndex].value;
 
-      if (selectedParentId && selectedParentTypeId) {
-          const data = {
-              parentId: selectedParentId,
-              parentTypeId: selectedParentTypeId,
-              schoolStudentId: id
-          };
+          if (selectedParentId && selectedParentTypeId) {
+              const data = {
+                  parentId: selectedParentId,
+                  parentTypeId: selectedParentTypeId,
+                  schoolStudentId: id
+              };
 
-          fetch('/addParent', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-          })
-          .then(response => {
-              if (response.ok) {
-                  return response.json();
-              }
-              throw new Error('Ошибка при добавлении администратора');
-          })
-          .then(data => {
-              const modal = document.getElementById('moduleAddParent');
-              modal.style.display = 'none';
-              updateObjectList();
-          })
-          .catch(error => {
-              console.error('Ошибка:', error);
-              alert('Не удалось добавить администратора');
-          });
-      } else {
-          alert('Пожалуйста, заполните обязательные поля.');
-      }
-  });
-
+              fetch('/addParent', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+              })
+              .then(response => {
+                  if (response.ok) {
+                      return response.json();
+                  }
+                  throw new Error('Ошибка при добавлении администратора');
+              })
+              .then(data => {
+                  const modal = document.getElementById('moduleAddParent');
+                  modal.style.display = 'none';
+                  updateObjectList();
+              })
+              .catch(error => {
+                  console.error('Ошибка:', error);
+                  alert('Не удалось добавить администратора');
+              });
+          } else {
+              alert('Пожалуйста, заполните обязательные поля.');
+          }
+      });
+  }
 </script>
 
 </body>

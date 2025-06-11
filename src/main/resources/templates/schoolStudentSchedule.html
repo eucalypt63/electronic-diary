@@ -264,7 +264,7 @@
     <div class="modal-content">
         <h2>Просмотр уроков</h2>
 
-        <div class="modal-buttons-top">
+        <div class="modal-buttons-top" id="modal-buttons-top">
             <button class="modal-button open-journal">Открыть журнал</button>
         </div>
 
@@ -287,6 +287,26 @@
 </div>
 
 <script>
+    function checkUserRoleAndModifyUI() {
+        fetch('/getAuthorizationUserInfo')
+            .then(response => response.json())
+            .then(userInfo => {
+                const allowedRoles = ["Main admin", "Administration", "Teacher"];
+                if (!allowedRoles.includes(userInfo.role)) {
+                    const reportsSection = document.getElementById('modal-buttons-top');
+                    if (reportsSection) {
+                        reportsSection.remove();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при получении информации о пользователе:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', checkUserRoleAndModifyUI);
+
+
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
 
@@ -457,13 +477,16 @@
                     });
 
                 // Журнал
-                document.querySelector('#editLessonModal .modal-button.open-journal').onclick = () => {
-                    if (activeTeacherAssignment) {
-                        window.location.href = `/groupGradebook?teacherAssignmentId=${activeTeacherAssignment}&quarterId=${activeQuarter}`;
-                    } else {
-                        alert('Не выбран активный урок для открытия журнала');
-                    }
-                };
+                const reportsSection = document.getElementById('modal-buttons-top');
+                if(reportsSection) {
+                    document.querySelector('#editLessonModal .modal-button.open-journal').onclick = () => {
+                        if (activeTeacherAssignment) {
+                            window.location.href = `/groupGradebook?teacherAssignmentId=${activeTeacherAssignment}&quarterId=${activeQuarter}`;
+                        } else {
+                            alert('Не выбран активный урок для открытия журнала');
+                        }
+                    };
+                }
 
                 document.querySelector('#editLessonModal .modal-button.cancel').onclick = () => {
                     modal.style.display = 'none';

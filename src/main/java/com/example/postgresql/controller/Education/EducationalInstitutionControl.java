@@ -16,8 +16,12 @@ import com.example.postgresql.service.Education.AddressService;
 import com.example.postgresql.service.Users.AdministrationsService;
 import com.example.postgresql.service.Users.LocalOperatorService;
 import com.example.postgresql.service.Users.TeacherService;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -85,11 +89,9 @@ public class EducationalInstitutionControl {
     @RequiredRoles({"Main admin", "Local admin"})
     @ResponseBody
     public ResponseEntity<String> addEducationalInstitution(@RequestBody EducationalInstitutionRequestDTO institutionDTO) {
-        EducationalInstitutionType type = educationalInstitutionService.findEducationalInstitutionTypeById(1L);
         Settlement settlement = addressService.findSettlementById(institutionDTO.getSettlementId());
         EducationalInstitution educationalInstitution = new EducationalInstitution(institutionDTO.getName(),
                 institutionDTO.getAddress(),
-                type,
                 settlement);
         educationalInstitution.setEmail(institutionDTO.getEmail());
         educationalInstitution.setPhoneNumber(institutionDTO.getPhoneNumber());
@@ -118,13 +120,23 @@ public class EducationalInstitutionControl {
             ImageIO.write(originalImage, "png", pngOutputStream);
             byte[] pngBytes = pngOutputStream.toByteArray();
 
-            String uploadUrl = "http://77.222.37.9/files/" + "Educational" + id + ".png";
+            String uploadUrl = "https://77.222.37.9/files/" + "Educational" + id + ".png";
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.IMAGE_JPEG);
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(pngBytes, headers);
 
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate(
+                new HttpComponentsClientHttpRequestFactory(
+                    HttpClients.custom()
+                        .setSSLContext(
+                            SSLContextBuilder.create()
+                                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                                .build()
+                        )
+                        .build()
+                )
+            );
             ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, requestEntity, String.class);
 
             EducationalInstitution educationalInstitution = educationalInstitutionService.findEducationalInstitutionById(id);

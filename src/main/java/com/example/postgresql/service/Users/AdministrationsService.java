@@ -30,6 +30,10 @@ public class AdministrationsService {
         return administrationsRepository.findById(id).orElse(null);
     }
 
+    public Administrations findAdministrationByAdministrationsTypesIdAndEducationalInstitutionId(Long typeId, Long EducationId) {
+        return administrationsRepository.findAdministrationByAdministrationsTypesIdAndEducationalInstitutionId(typeId, EducationId);
+    }
+
     public void saveAdministration(Administrations administrations) {
         administrationsRepository.save(administrations);
     }

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Классы школы</title>
+  <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        min-height: 100vh;
+        background-color: #cfe2ff;
+        gap: 20px;
+    }
+
+    .main-wrapper {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+        height: 94vh;
+    }
+
+    .sidebar {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-shrink: 0;
+        border: 2px solid black;
+        border-radius: 8px;
+        padding: 15px;
+        background-color: white;
+    }
+
+    .sidebar-btn {
+        background: none;
+        border: none;
+        color: #2196F3;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px 0;
+        border-bottom: 2px solid black;
+    }
+
+    .sidebar-btn:last-child {
+        border-bottom: none;
+    }
+
+    .sidebar-btn:hover {
+        color: #0b7dda;
+    }
+
+    .content-wrapper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid #666;
+        border-radius: 8px;
+        padding: 20px;
+        gap: 20px;
+        background-color: white;
+        margin: 0 auto;
+        max-width: calc(100% - 40px);
+        height: 100%;
+    }
+
+    .page-header {
+        font-size: 24px;
+        font-weight: bold;
+        padding-bottom: 10px;
+        border-bottom: 2px solid black;
+        flex-shrink: 0;
+    }
+
+    .classes-list {
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        overflow-y: auto;
+        max-width: 100%;
+        padding-top: 10px;
+    }
+
+    .class-container {
+        width: 290px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .class-info {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: auto;
+        border: 2px solid black;
+        transition: box-shadow 0.2s;
+        margin-left: 10px;
+    }
+
+    .class-container:hover .class-info {
+        box-shadow: 0 0 10px #2196f3;
+    }
+
+    .teacher-image {
+        width: 200px;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .class-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid black;
+    }
+
+    .teacher-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid black;
+        height: 68px;
+    }
+
+    .teacher-detail {
+        width: 100%;
+        margin-bottom: 8px;
+        text-align: left;
+        padding-left: 20px;
+        padding: 10px 0;
+        border-bottom: 2px solid black;
+    }
+
+    .teacher-detail:first-child {
+        border-top: 2px solid black;
+    }
+
+    .teacher-label {
+        font-weight: bold;
+        color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{header}"></div>
+
+<div class="main-wrapper">
+  <!-- Боковая панель с кнопками -->
+  <div class="sidebar">
+    <button class="sidebar-btn" id="school-btn">Школа</button>
+    <button class="sidebar-btn" id="admin-btn">Администрация школы</button>
+    <button class="sidebar-btn" id="teachers-btn">Учителя</button>
+    <button class="sidebar-btn" id="classes-btn">Классы</button>
+  </div>
+
+  <!-- Основной контент -->
+  <div class="content-wrapper">
+    <h1 class="page-header">Классы школы</h1>
+    <div class="classes-list" id="classes-list">
+      <!-- Карточки классов будут добавляться сюда -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Фото по умолчанию для учителей
+  const DEFAULT_TEACHER_IMAGE = 'https://77.222.37.9/files/NoImageUser.jpg';
+
+  // Получаем ID школы из URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const schoolId = urlParams.get('id');
+
+  // Навигация
+  document.addEventListener('DOMContentLoaded', () => {
+      if (!schoolId) {
+          alert('ID школы не указан в URL');
+          return;
+      }
+
+      document.getElementById('school-btn').addEventListener('click', () => {
+          window.location.href = `schoolPage?id=${schoolId}`;
+      });
+      document.getElementById('admin-btn').addEventListener('click', () => {
+          window.location.href = `schoolAdministrators?id=${schoolId}`;
+      });
+      document.getElementById('teachers-btn').addEventListener('click', () => {
+          window.location.href = `schoolTeachers?id=${schoolId}`;
+      });
+      document.getElementById('classes-btn').addEventListener('click', () => {
+          window.location.href = `schoolClasses?id=${schoolId}`;
+      });
+
+      // Загрузка классов
+      loadClasses();
+  });
+
+  // Функция для сравнения названий классов для сортировки
+  function compareClassNames(a, b) {
+      // Извлекаем числовую часть
+      const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
+      const numB = parseInt(b.name.match(/\d+/)?.[0] || 0);
+
+      // Если числа разные - сортируем по убыванию
+      if (numA !== numB) {
+          return numB - numA;
+      }
+
+      // Если числа одинаковые - сортируем по буквенной части
+      const letterA = a.name.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
+      const letterB = b.name.match(/[А-Яа-яA-Za-z]+/)?.[0] || '';
+
+      return letterA.localeCompare(letterB);
+  }
+
+  async function loadClasses() {
+      const classesListElem = document.getElementById('classes-list');
+      classesListElem.innerHTML = '<div>Загрузка...</div>';
+
+      try {
+          const response = await fetch(`/getClasses?schoolId=${schoolId}`);
+          if (response.status === 204) {
+              classesListElem.innerHTML = '<div>Нет данных о классах</div>';
+              return;
+          }
+          if (!response.ok) throw new Error('Ошибка загрузки классов');
+
+          const classes = await response.json();
+          classesListElem.innerHTML = ''; // Очищаем
+
+          // Сортируем классы
+          classes.sort(compareClassNames);
+
+          classes.forEach(cls => {
+              const className = cls.name || 'Не указано';
+              const teacher = cls.teacher;
+
+              if (!teacher) {
+                  // Если нет классного руководителя
+                  const card = document.createElement('div');
+                  card.className = 'class-container';
+                  card.innerHTML = `
+                      <div class="class-info">
+                          <h2 class="class-name">${className}</h2>
+                          <div>Классный руководитель не назначен</div>
+                      </div>
+                  `;
+                  card.onclick = () => {
+                      window.location.href = `/classPage?id=${cls.id}`;
+                  };
+                  classesListElem.appendChild(card);
+                  return;
+              }
+
+              const fullName = [teacher.lastName, teacher.firstName, teacher.patronymic].filter(Boolean).join(' ');
+              const email = teacher.email || 'Не указано';
+              const phone = teacher.phoneNumber || 'Не указано';
+              const image = teacher.pathImage ? (teacher.pathImage) : DEFAULT_TEACHER_IMAGE;
+
+              // Создаем карточку класса
+              const card = document.createElement('div');
+              card.className = 'class-container';
+              card.innerHTML = `
+                  <div class="class-info">
+                      <h2 class="class-name">${className}</h2>
+                      <h3 class="teacher-name">Классный руководитель: ${fullName}</h3>
+                      <img src="${image}" alt="Фото классного руководителя" class="teacher-image">
+                      <div class="teacher-detail">
+                          <div class="teacher-label">Почта:</div>
+                          <div class="teacher-value">${email}</div>
+                      </div>
+                      <div class="teacher-detail">
+                          <div class="teacher-label">Телефон:</div>
+                          <div class="teacher-value">${phone}</div>
+                      </div>
+                  </div>
+              `;
+              card.onclick = () => {
+                  window.location.href = `/classPage?id=${cls.id}`;
+              };
+              classesListElem.appendChild(card);
+          });
+      } catch (error) {
+          classesListElem.innerHTML = '<div>Ошибка загрузки классов</div>';
+          console.error(error);
+      }
+  }
+</script>
+</body>
+</html>

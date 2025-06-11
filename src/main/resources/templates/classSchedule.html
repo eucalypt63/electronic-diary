@@ -185,7 +185,7 @@
             background-color: #0b7dda;
         }
         .groups-button {
-            display: block;
+            display: none;
             margin: 20px auto;
             padding: 12px 24px;
             background-color: #4285f4;
@@ -300,8 +300,6 @@
     <button id="viewGroupsBtn" class="groups-button">Обзор групп</button>
 </div>
 
-
-
 <div class="modal" id="addLessonModal" style="display: none;">
     <div class="modal-content">
         <h2>Добавить урок</h2>
@@ -330,8 +328,8 @@
         <h2>Редактировать урок</h2>
 
         <div class="modal-buttons-top">
-            <button class="modal-button add-new">Добавить урок</button>
-            <button class="modal-button open-journal">Открыть журнал</button>
+            <button class="modal-button add-new" id="addNewLesson">Добавить урок</button>
+            <button class="modal-button open-journal" id="openJournal">Открыть журнал</button>
         </div>
 
         <label for="edit-lesson-select">Урок:</label>
@@ -355,6 +353,41 @@
 </div>
 
 <script>
+
+    function checkUserRoleAndModifyUI() {
+        fetch('/getAuthorizationUserInfo')
+            .then(response => response.json())
+            .then(userInfo => {
+                const allowedRolesJ = ["Main admin", "Administration", "Teacher"];
+                const allowedRolesA = ["Main admin", "Local admin"];
+
+                const reportsSectionGroupsBtn = document.getElementById('viewGroupsBtn');
+                if (!allowedRolesA.includes(userInfo.role)) {
+                    const reportsSectionLessonModal = document.getElementById('addLessonModal');
+                    const reportsSectionNewLesson = document.getElementById('addNewLesson');
+                    if (reportsSectionLessonModal) {reportsSectionLessonModal.remove();}
+                    if (reportsSectionGroupsBtn) {reportsSectionGroupsBtn.remove();}
+                    if (reportsSectionNewLesson) {reportsSectionNewLesson.remove();}
+                } else {
+                    reportsSectionGroupsBtn.style.display = 'block';
+                    document.getElementById('viewGroupsBtn').addEventListener('click', function() {
+                        window.location.href = `/classGroups?id=${id}`;
+                    });
+                }
+                if (!allowedRolesJ.includes(userInfo.role)) {
+                    const reportsSectionOpenJournal = document.getElementById('openJournal');
+                    if (reportsSectionOpenJournal) {
+                        reportsSectionOpenJournal.remove();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при получении информации о пользователе:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', checkUserRoleAndModifyUI);
+
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
 
@@ -445,6 +478,7 @@
     // Добавление урока
     function handleAddNewLesson(day, lessonNumber) {
         const modal = document.getElementById('addLessonModal');
+
         let activeTeacherAssignment = 0;
 
         fetch(`/getLessonAddParams?id=${id}`)
@@ -597,24 +631,29 @@
                         alert('Ошибка загрузки данных для выбора');
                     });
 
-                document.querySelector('#editLessonModal .modal-button.open-journal').onclick = () => {
-                    if (activeTeacherAssignment) {
-                        window.location.href = `/groupGradebook?teacherAssignmentId=${activeTeacherAssignment}&quarterId=${activeQuarter}`;
-                    } else {
-                        alert('Не выбран активный урок для открытия журнала');
-                    }
-                };
+                const reportsSectionOpenJournal = document.getElementById('openJournal');
+                if (reportsSectionOpenJournal){
+                    document.querySelector('#editLessonModal .modal-button.open-journal').onclick = () => {
+                        if (activeTeacherAssignment) {
+                            window.location.href = `/groupGradebook?teacherAssignmentId=${activeTeacherAssignment}&quarterId=${activeQuarter}`;
+                        } else {
+                            alert('Не выбран активный урок для открытия журнала');
+                        }
+                    };
+                }
 
-
-
-                document.querySelector('#editLessonModal .modal-button.add-new').onclick = () => {
-                    modal.style.display = 'none';
-                    handleAddNewLesson(day, lessonNumber);
-                };
+                const reportsSectionNewLesson = document.getElementById('addNewLesson');
+                if (reportsSectionNewLesson){
+                    document.querySelector('#editLessonModal .modal-button.add-new').onclick = () => {
+                        modal.style.display = 'none';
+                        handleAddNewLesson(day, lessonNumber);
+                    };
+                }
 
                 document.querySelector('#editLessonModal .modal-button.cancel').onclick = () => {
                     modal.style.display = 'none';
                 };
+
 
                 // Удаление
                 document.querySelector('#editLessonModal .modal-button.delete').onclick = () => {
@@ -683,15 +722,14 @@
             const [day, lessonNumber] = lessonId.split('-').map(Number);
 
             if (this.classList.contains('free')) {
-                handleAddNewLesson(day, lessonNumber);
+                const modal = document.getElementById('addLessonModal');
+                if (modal){
+                    handleAddNewLesson(day, lessonNumber);
+                }
             } else if (this.classList.contains('occupied')) {
                 handleOccupiedLesson(day, lessonNumber);
             }
         });
-    });
-
-    document.getElementById('viewGroupsBtn').addEventListener('click', function() {
-        window.location.href = `/classGroups?id=${id}`;
     });
 </script>
 

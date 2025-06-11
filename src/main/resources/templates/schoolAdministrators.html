@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Администрация школы</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #cfe2ff;
+            gap: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            height: 94vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            border: 2px solid black;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: white;
+        }
+
+        .sidebar-btn {
+            background: none;
+            border: none;
+            color: #2196F3;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .sidebar-btn:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-btn:hover {
+            color: #0b7dda;
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 20px;
+            gap: 20px;
+            background-color: white;
+            margin: 0 auto;
+            max-width: calc(100% - 40px);
+            height: 100%;
+        }
+
+        .page-header {
+            font-size: 24px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+            flex-shrink: 0;
+        }
+
+        .admin-list {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            overflow-y: auto;
+            max-width: 100%;
+            padding-top: 10px;
+        }
+
+        .admin-container {
+            width: 290px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .admin-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: auto;
+            border: 2px solid black;
+            transition: box-shadow 0.2s;
+            margin-left: 10px;
+        }
+
+        .admin-container:hover .admin-info {
+            box-shadow: 0 0 10px #2196f3;
+        }
+
+        .admin-image {
+            width: 200px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .admin-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+            height: 50px;
+        }
+
+        .admin-detail {
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+            padding-left: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid black;
+        }
+
+        .admin-detail:first-child {
+            border-top: 2px solid black;
+        }
+
+        .admin-label {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{header}"></div>
+
+<div class="main-wrapper">
+    <!-- Боковая панель с кнопками -->
+    <div class="sidebar">
+        <button class="sidebar-btn" id="school-btn">Школа</button>
+        <button class="sidebar-btn" id="admin-btn">Администрация школы</button>
+        <button class="sidebar-btn" id="teachers-btn">Учителя</button>
+        <button class="sidebar-btn" id="classes-btn">Классы</button>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content-wrapper">
+        <h1 class="page-header">Администрация школы</h1>
+        <div class="admin-list" id="admin-list">
+            <!-- Карточки администрации будут добавляться сюда -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Фото по умолчанию для администрации
+    const DEFAULT_ADMIN_IMAGE = 'https://77.222.37.9/files/NoImageUser.jpg';
+
+    // Получаем ID школы из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const schoolId = urlParams.get('id');
+
+    // Навигация
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!schoolId) {
+            alert('ID школы не указан в URL');
+            return;
+        }
+
+        document.getElementById('school-btn').addEventListener('click', () => {
+            window.location.href = `schoolPage?id=${schoolId}`;
+        });
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            window.location.href = `schoolAdministrators?id=${schoolId}`;
+        });
+        document.getElementById('teachers-btn').addEventListener('click', () => {
+            window.location.href = `schoolTeachers?id=${schoolId}`;
+        });
+        document.getElementById('classes-btn').addEventListener('click', () => {
+            window.location.href = `schoolClasses?id=${schoolId}`;
+        });
+
+        // Загрузка администрации
+        loadAdministrators();
+    });
+
+    async function loadAdministrators() {
+        const adminListElem = document.getElementById('admin-list');
+        adminListElem.innerHTML = '<div>Загрузка...</div>';
+
+        try {
+            const response = await fetch(`/getAdministrators?schoolId=${schoolId}`);
+            if (response.status === 204) {
+                adminListElem.innerHTML = '<div>Нет данных об администрации</div>';
+                return;
+            }
+            if (!response.ok) throw new Error('Ошибка загрузки администрации');
+
+            const admins = await response.json();
+            adminListElem.innerHTML = ''; // Очищаем
+
+            admins.forEach(admin => {
+                const fullName = [admin.lastName, admin.firstName, admin.patronymic].filter(Boolean).join(' ');
+                const position = admin.administrationsTypes?.name || 'Не указано';
+                const email = admin.email || 'Не указано';
+                const phone = admin.phoneNumber || 'Не указано';
+                const image = admin.pathImage ? (admin.pathImage) : DEFAULT_ADMIN_IMAGE;
+
+                // Создаем карточку администратора
+                const card = document.createElement('div');
+                card.className = 'admin-container';
+                card.innerHTML = `
+                    <div class="admin-info">
+                        <img src="${image}" alt="Фото администратора" class="admin-image">
+                        <h3 class="admin-name">${fullName}</h3>
+                        <div class="admin-detail">
+                            <div class="admin-label">Должность:</div>
+                            <div class="admin-value">${position}</div>
+                        </div>
+                        <div class="admin-detail">
+                            <div class="admin-label">Почта:</div>
+                            <div class="admin-value">${email}</div>
+                        </div>
+                        <div class="admin-detail">
+                            <div class="admin-label">Телефон:</div>
+                            <div class="admin-value">${phone}</div>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => {
+                    window.location.href = `/profileAdministrator?id=${admin.id}`;
+                };
+                adminListElem.appendChild(card);
+            });
+        } catch (error) {
+            adminListElem.innerHTML = '<div>Ошибка загрузки администрации</div>';
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html>

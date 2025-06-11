@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class NewsRequestDTO {
     private Long id;
     private Long educationalInstitutionId;
-    private Long ownerUserId;
     private String title;
     private String content;
     private LocalDateTime dateTime;

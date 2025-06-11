@@ -106,6 +106,30 @@ public class PageControl {
     }
 
     @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
+    @GetMapping("/schoolPage")
+    public String getSchoolPage(@RequestParam String id) {
+        return "schoolPage";
+    }
+
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
+    @GetMapping("/schoolAdministrators")
+    public String getSchoolAdministrators (@RequestParam String id) {
+        return "schoolAdministrators";
+    }
+
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
+    @GetMapping("/schoolClasses")
+    public String getSchoolClasses (@RequestParam String id) {
+        return "schoolClasses";
+    }
+
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
+    @GetMapping("/schoolTeachers")
+    public String getSchoolTeachers (@RequestParam String id) {
+        return "schoolTeachers";
+    }
+
+    @RequiredRoles({"Main admin", "Local admin", "Administration", "Teacher", "School student", "Parent"})
     @GetMapping("/schoolStudentQuarterResult")
     public String getSchoolStudentQuarterResult(@RequestParam String id) {
         return "schoolStudentQuarterResult";

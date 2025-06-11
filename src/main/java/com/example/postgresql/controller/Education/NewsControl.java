@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,12 +55,12 @@ public class NewsControl {
 
     //Добавить новость
     @PostMapping("/addNews")
-    @RequiredRoles({"Main admin", "Local admin"})
+    @RequiredRoles({"Main admin", "Local admin", "Administration"})
     @ResponseBody
-    public ResponseEntity<String> addNews(@RequestBody NewsRequestDTO newsRequestDTO) {
+    public ResponseEntity<String> addNews(@RequestBody NewsRequestDTO newsRequestDTO, HttpSession session) {
         News news = new News();
         news.setEducationalInstitution(educationalInstitutionService.findEducationalInstitutionById(newsRequestDTO.getEducationalInstitutionId()));
-        news.setOwnerUser(userService.findUserById(newsRequestDTO.getOwnerUserId()));
+        news.setOwnerUser(userService.findUserById((Long) session.getAttribute("userId")));
         news.setTitle(newsRequestDTO.getTitle());
         news.setContent(newsRequestDTO.getContent());
         news.setDateTime(newsRequestDTO.getDateTime());
@@ -70,7 +71,7 @@ public class NewsControl {
 
     //Обновить новость
     @PostMapping("/changeNews")
-    @RequiredRoles({"Main admin", "Local admin"})
+    @RequiredRoles({"Main admin", "Local admin", "Administration"})
     @ResponseBody
     public ResponseEntity<String> changeNews(@RequestBody NewsRequestDTO newsRequestDTO) {
         News news = newsService.findNewsById(newsRequestDTO.getId());

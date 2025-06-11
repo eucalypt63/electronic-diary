@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,11 +13,28 @@
         }
 
         body {
-            display: flex;
             min-height: 100vh;
-            background-color: #f5f9ff;
+            background-color: #cfe2ff;
+            gap: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
             padding: 20px;
             gap: 20px;
+            height: 94vh;
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 20px;
+            gap: 20px;
+            background-color: white;
+            margin: 0 auto; /* Центрируем контент */
+            max-width: calc(100% - 40px); /* Учитываем padding */
         }
 
         /* Общая рамка для всего контента */
@@ -28,7 +45,7 @@
             border-radius: 8px;
             padding: 20px;
             gap: 20px;
-            background-color: white; /* Белый фон для контента */
+            background-color: white;
         }
 
         /* Боковая панель с кнопками */
@@ -41,7 +58,7 @@
             border: 2px solid black;
             border-radius: 8px;
             padding: 15px;
-            background-color: white; /* Белый фон для панели */
+            background-color: white;
         }
 
         .sidebar-btn {
@@ -105,7 +122,6 @@
             width: 70%;
             display: flex;
             flex-direction: column;
-            gap: 12px;
         }
 
         .school-detail-item {
@@ -121,7 +137,6 @@
 
         .detail-label {
             font-weight: bold;
-            min-width: 120px;
             color: #555;
         }
 
@@ -132,7 +147,6 @@
         .school-name {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid black;
         }
@@ -149,12 +163,32 @@
             border: 2px solid black;
         }
 
-        .news-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
+        .news-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding-bottom: 10px;
             border-bottom: 2px solid black;
+        }
+
+        .news-header {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .add-news-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display:none;
+        }
+
+        .add-news-btn:hover {
+            background-color: #45a049;
         }
 
         .news-list {
@@ -165,6 +199,11 @@
         .news-item {
             padding: 15px 0;
             border-bottom: 2px solid black;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            background-color: #f5f5f5;
         }
 
         .news-title {
@@ -232,189 +271,565 @@
         .director-label {
             font-weight: bold;
             color: #555;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 600px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid black;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
             font-size: 14px;
         }
 
-        .director-value {
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .cancel-btn {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .add-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        .add-btn:hover {
+            background-color: #45a049;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 14px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
         }
     </style>
 </head>
 <body>
-<!-- Боковая панель с кнопками -->
-<div class="sidebar">
-    <button class="sidebar-btn">Школа</button>
-    <button class="sidebar-btn">Администрация школы</button>
-    <button class="sidebar-btn">Учителя</button>
-    <button class="sidebar-btn">Классы</button>
-</div>
 
-<!-- Основной контент -->
-<div class="content-wrapper">
-    <div class="main-content">
-        <!-- Блок информации о школе -->
-        <div class="school-info">
-            <div class="school-image-container">
-                <img src="https://via.placeholder.com/800x450?text=Нет+фотографии" alt="Фото школы" class="school-image" id="school-photo">
+<div th:replace="~{header}"></div>
+
+<div class="main-wrapper">
+    <!-- Боковая панель с кнопками -->
+    <div class="sidebar">
+        <button class="sidebar-btn" id="school-btn">Школа</button>
+        <button class="sidebar-btn" id="admin-btn">Администрация школы</button>
+        <button class="sidebar-btn" id="teachers-btn">Учителя</button>
+        <button class="sidebar-btn" id="classes-btn">Классы</button>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content-wrapper">
+        <div class="main-content">
+            <!-- Блок информации о школе -->
+            <div class="school-info">
+                <div class="school-image-container" onclick="uploadPhoto()">
+                    <img src="https://77.222.37.9/files/NoImageSchool.png" alt="Фото школы" class="school-image" id="school-photo">
+                </div>
+                <div class="school-details">
+                    <h1 class="school-name" id="school-name">Загрузка...</h1>
+
+                    <div class="school-detail-item">
+                        <span class="detail-label">Официальное название:</span>
+                        <span class="detail-value" id="official-name">Загрузка...</span>
+                    </div>
+
+                    <div class="school-detail-item">
+                        <span class="detail-label">Адрес:</span>
+                        <span class="detail-value" id="school-address">Загрузка...</span>
+                    </div>
+
+                    <div class="school-detail-item">
+                        <span class="detail-label">Почта:</span>
+                        <span class="detail-value" id="school-email">Загрузка...</span>
+                    </div>
+
+                    <div class="school-detail-item">
+                        <span class="detail-label">Телефон:</span>
+                        <span class="detail-value" id="school-phone">Загрузка...</span>
+                    </div>
+                </div>
             </div>
-            <div class="school-details">
-                <h1 class="school-name" id="school-name">Средняя общеобразовательная школа №1</h1>
 
-                <div class="school-detail-item">
-                    <span class="detail-label">Официальное название:</span>
-                    <span class="detail-value" id="official-name">Государственное бюджетное общеобразовательное учреждение "Средняя общеобразовательная школа №1"</span>
+            <!-- Блок новостей -->
+            <div class="news-container">
+                <div class="news-header-container">
+                    <h2 class="news-header">Новости школы</h2>
+                    <button class="add-news-btn" id="add-news-btn">Добавить новость</button>
                 </div>
-
-                <div class="school-detail-item">
-                    <span class="detail-label">Адрес:</span>
-                    <span class="detail-value" id="school-address">г. Москва, ул. Ленина, д. 1</span>
-                </div>
-
-                <div class="school-detail-item">
-                    <span class="detail-label">Почта:</span>
-                    <span class="detail-value" id="school-email">school1@example.com</span>
-                </div>
-
-                <div class="school-detail-item">
-                    <span class="detail-label">Телефон:</span>
-                    <span class="detail-value" id="school-phone">+7 (495) 123-45-67</span>
+                <div class="news-list" id="news-list">
+                    <div class="news-item">Загрузка новостей...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Блок новостей -->
-        <div class="news-container">
-            <h2 class="news-header">Новости школы</h2>
-            <div class="news-list" id="news-list">
-                <!-- Пример новости 1 -->
-                <div class="news-item">
-                    <div class="news-title">День знаний 2023</div>
-                    <div class="news-meta">
-                        <span class="news-author">Иванова М.А.</span>
-                        <span class="news-date">01.09.2023</span>
-                    </div>
+        <!-- Блок директора -->
+        <div class="director-container" id="director-container">
+            <div class="director-info">
+                <img src="https://77.222.37.9/files/NoImageUser.jpg" alt="Фото директора" class="director-image" id="director-photo">
+                <h3 class="director-name" id="director-name">Загрузка...</h3>
+
+                <div class="director-detail">
+                    <div class="director-label">Почта:</div>
+                    <div class="director-value" id="director-email">Загрузка...</div>
                 </div>
 
-                <!-- Пример новости 2 -->
-                <div class="news-item">
-                    <div class="news-title">Школьный турнир по шахматам</div>
-                    <div class="news-meta">
-                        <span class="news-author">Петров С.И.</span>
-                        <span class="news-date">15.10.2023</span>
-                    </div>
+                <div class="director-detail">
+                    <div class="director-label">Телефон:</div>
+                    <div class="director-value" id="director-phone">Загрузка...</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Блок директора -->
-    <div class="director-container">
-        <div class="director-info">
-            <img src="https://via.placeholder.com/200x250?text=Директор" alt="Фото директора" class="director-image" id="director-photo">
-            <h3 class="director-name" id="director-name">Иванов Иван Иванович</h3>
+<!-- Модальное окно просмотра новости -->
+<div class="modal" id="news-modal">
+    <div class="modal-content">
+        <div class="modal-header" id="modal-news-title"></div>
+        <div class="modal-body">
+            <div class="news-meta" id="modal-news-meta"></div>
+            <p id="modal-news-content"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn delete-btn" id="delete-news-btn">Удалить</button>
+            <button class="modal-btn cancel-btn" id="close-news-modal">Закрыть</button>
+        </div>
+    </div>
+</div>
 
-            <div class="director-detail">
-                <div class="director-label">Почта:</div>
-                <div class="director-value" id="director-email">director@school1.ru</div>
+<!-- Модальное окно добавления новости -->
+<div class="modal" id="add-news-modal">
+    <div class="modal-content">
+        <div class="modal-header">Добавить новость</div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="news-title-input" class="form-label">Заголовок:</label>
+                <input type="text" id="news-title-input" class="form-input">
             </div>
-
-            <div class="director-detail">
-                <div class="director-label">Телефон:</div>
-                <div class="director-value" id="director-phone">+7 (495) 765-43-21</div>
+            <div class="form-group">
+                <label for="news-content-input" class="form-label">Содержание:</label>
+                <textarea id="news-content-input" class="form-textarea"></textarea>
             </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn add-btn" id="submit-news-btn">Добавить</button>
+            <button class="modal-btn cancel-btn" id="cancel-add-news">Отмена</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Здесь будут запросы к API для получения данных
-    // Пример данных для демонстрации
-    const schoolData = {
-        name: "Средняя общеобразовательная школа №1",
-        officialName: "Государственное бюджетное общеобразовательное учреждение \"Средняя общеобразовательная школа №1\"",
-        address: "г. Москва, ул. Ленина, д. 1",
-        pathImage: null,
-        email: "school1@example.com",
-        phoneNumber: "+7 (495) 123-45-67"
-    };
+    // Константы с URL изображений по умолчанию
+    const DEFAULT_SCHOOL_IMAGE = 'https://77.222.37.9/files/NoImageSchool.png';
+    const DEFAULT_DIRECTOR_IMAGE = 'https://77.222.37.9/files/NoImageUser.jpg';
 
-    const directorData = {
-        firstName: "Иван",
-        lastName: "Иванов",
-        patronymic: "Иванович",
-        pathImage: null,
-        email: "director@school1.ru",
-        phoneNumber: "+7 (495) 765-43-21"
-    };
+    // Получаем ID школы из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const schoolId = urlParams.get('id');
 
-    const newsData = [
-        {
-            id: 1,
-            title: "День знаний 2023",
-            firstName: "Мария",
-            lastName: "Иванова",
-            patronymic: "Александровна",
-            dateTime: "2023-09-01T10:00:00"
-        },
-        {
-            id: 2,
-            title: "Школьный турнир по шахматам",
-            firstName: "Сергей",
-            lastName: "Петров",
-            patronymic: "Игоревич",
-            dateTime: "2023-10-15T14:00:00"
-        }
-    ];
+    // Текущая выбранная новость для модального окна
+    let currentNewsId = null;
 
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+    // DOM элементы
+    const directorContainer = document.getElementById('director-container');
+    const schoolPhoto = document.getElementById('school-photo');
+    const directorPhoto = document.getElementById('director-photo');
+
+    const addNewsBtn = document.getElementById('add-news-btn');
+    const newsModal = document.getElementById('news-modal');
+    const addNewsModal = document.getElementById('add-news-modal');
+    const closeNewsModalBtn = document.getElementById('close-news-modal');
+    const cancelAddNewsBtn = document.getElementById('cancel-add-news');
+    const deleteNewsBtn = document.getElementById('delete-news-btn');
+    const submitNewsBtn = document.getElementById('submit-news-btn');
+
+    // Кнопки бокового меню
+    const schoolBtn = document.getElementById('school-btn');
+    const adminBtn = document.getElementById('admin-btn');
+    const teachersBtn = document.getElementById('teachers-btn');
+    const classesBtn = document.getElementById('classes-btn');
+
+    // Устанавливаем изображения по умолчанию
+    schoolPhoto.src = DEFAULT_SCHOOL_IMAGE;
+    directorPhoto.src = DEFAULT_DIRECTOR_IMAGE;
+
+    function checkUserRoleAndModifyUI() {
+        fetch('/getAuthorizationUserInfo')
+            .then(response => response.json())
+            .then(userInfo => {
+                const allowedRoles = ["Main admin", "Local admin", "Administration"];
+                const addNewsButton = document.getElementById('add-news-btn');
+
+                if (addNewsButton && !allowedRoles.includes(userInfo.role)) {
+                    addNewsButton.remove();
+                } else {
+                    addNewsButton.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при получении информации о пользователе:', error);
+            });
     }
 
-    function displayData() {
-        // Школа
-        document.getElementById('school-name').textContent = schoolData.name;
-        document.getElementById('official-name').textContent = schoolData.officialName;
-        document.getElementById('school-address').textContent = schoolData.address;
-        document.getElementById('school-email').textContent = schoolData.email;
-        document.getElementById('school-phone').textContent = schoolData.phoneNumber;
+    // Загрузка данных при открытии страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        checkUserRoleAndModifyUI();
 
-        if (schoolData.pathImage) {
-            document.getElementById('school-photo').src = schoolData.pathImage;
+        if (!schoolId) {
+            alert('ID школы не указан в URL');
+            return;
         }
 
-        // Директор
-        document.getElementById('director-name').textContent = `${directorData.lastName} ${directorData.firstName} ${directorData.patronymic}`;
-        document.getElementById('director-email').textContent = directorData.email;
-        document.getElementById('director-phone').textContent = directorData.phoneNumber;
+        loadSchoolData();
+        loadDirectorData();
+        loadNewsData();
 
-        if (directorData.pathImage) {
-            document.getElementById('director-photo').src = directorData.pathImage;
-        }
-
-        // Новости
-        const newsList = document.getElementById('news-list');
-        newsList.innerHTML = '';
-
-        newsData.forEach(news => {
-            const newsItem = document.createElement('div');
-            newsItem.className = 'news-item';
-
-            const authorName = `${news.lastName} ${news.firstName.charAt(0)}.${news.patronymic.charAt(0)}.`;
-
-            newsItem.innerHTML = `
-                <div class="news-title">${news.title}</div>
-                <div class="news-meta">
-                    <span class="news-author">${authorName}</span>
-                    <span class="news-date">${formatDate(news.dateTime)}</span>
-                </div>
-            `;
-
-            newsList.appendChild(newsItem);
+        schoolBtn.addEventListener('click', () => {
+            window.location.href = `schoolPage?id=${schoolId}`;
         });
+
+        adminBtn.addEventListener('click', () => {
+            window.location.href = `schoolAdministrators?id=${schoolId}`;
+        });
+
+        teachersBtn.addEventListener('click', () => {
+            window.location.href = `schoolTeachers?id=${schoolId}`;
+        });
+
+        classesBtn.addEventListener('click', () => {
+            window.location.href = `schoolClasses?id=${schoolId}`;
+        });
+
+        const addNewsBtn = document.getElementById('add-news-btn');
+        if (addNewsBtn) {
+            addNewsBtn.addEventListener('click', () => {
+                document.getElementById('news-title-input').value = '';
+                document.getElementById('news-content-input').value = '';
+                addNewsModal.style.display = 'flex';
+            });
+        }
+    });
+
+    // Загрузка информации о школе
+    async function loadSchoolData() {
+        try {
+            const response = await fetch(`/findSchoolById?id=${schoolId}`);
+            if (!response.ok) throw new Error('Ошибка загрузки данных школы');
+
+            const school = await response.json();
+
+            document.getElementById('school-name').textContent = school.name;
+            document.getElementById('official-name').textContent = school.name;
+            document.getElementById('school-address').textContent = school.address;
+            document.getElementById('school-email').textContent = school.email || 'Не указано';
+            document.getElementById('school-phone').textContent = school.phoneNumber || 'Не указано';
+
+            if (school.pathImage) {
+                schoolPhoto.src = school.pathImage + '?v=1';
+            } else {
+                schoolPhoto.src = DEFAULT_SCHOOL_IMAGE;
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки данных школы:', error);
+            alert('Не удалось загрузить данные школы');
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', displayData);
+    // Загрузка информации о директоре
+    async function loadDirectorData() {
+        try {
+            const response = await fetch(`/findDirectorByEducationId?educationId=${schoolId}`);
+
+            if (response.status === 204 || !response.ok) {
+                // Директор не найден, скрываем блок
+                directorContainer.style.display = 'none';
+                return;
+            }
+
+            const director = await response.json();
+
+            if (!director) {
+                directorContainer.style.display = 'none';
+                return;
+            }
+
+            const fullName = `${director.lastName} ${director.firstName} ${director.patronymic || ''}`.trim();
+
+            document.getElementById('director-name').textContent = fullName;
+            document.getElementById('director-email').textContent = director.email || 'Не указано';
+            document.getElementById('director-phone').textContent = director.phoneNumber || 'Не указано';
+
+            if (director.pathImage) {
+                directorPhoto.src = director.pathImage + '?v=1';
+            } else {
+                directorPhoto.src = DEFAULT_DIRECTOR_IMAGE;
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки данных директора:', error);
+            directorContainer.style.display = 'none';
+        }
+    }
+
+// Загрузка новостей
+async function loadNewsData() {
+    try {
+        const response = await fetch(`/findNewsByEducationId?id=${schoolId}`);
+        if (!response.ok) throw new Error('Ошибка загрузки новостей');
+
+        const newsList = await response.json();
+        displayNews(newsList);
+    } catch (error) {
+        console.error('Ошибка загрузки новостей:', error);
+        document.getElementById('news-list').innerHTML = '<div class="news-item">Не удалось загрузить новости</div>';
+    }
+}
+
+// Отображение новостей
+function displayNews(newsList) {
+    const newsListContainer = document.getElementById('news-list');
+
+    if (newsList.length === 0) {
+        newsListContainer.innerHTML = '<div class="news-item">Новостей пока нет</div>';
+        return;
+    }
+
+    newsListContainer.innerHTML = '';
+
+    newsList.forEach(news => {
+        const newsItem = document.createElement('div');
+        newsItem.className = 'news-item';
+        newsItem.dataset.id = news.id;
+
+        const authorName = `${news.lastName} ${news.firstName.charAt(0)}.${news.patronymic ? news.patronymic.charAt(0) + '.' : ''}`;
+        const newsDate = formatDate(news.dateTime);
+
+        newsItem.innerHTML = `
+            <div class="news-title">${news.title}</div>
+            <div class="news-meta">
+                <span class="news-author">${authorName}</span>
+                <span class="news-date">${newsDate}</span>
+            </div>
+        `;
+
+        newsItem.addEventListener('click', () => openNewsModal(news));
+        newsListContainer.appendChild(newsItem);
+    });
+}
+
+// Открытие модального окна новости
+function openNewsModal(news) {
+    currentNewsId = news.id;
+
+    const authorName = `${news.lastName} ${news.firstName.charAt(0)}.${news.patronymic ? news.patronymic.charAt(0) + '.' : ''}`;
+    const newsDate = formatDate(news.dateTime);
+
+    document.getElementById('modal-news-title').textContent = news.title;
+    document.getElementById('modal-news-meta').innerHTML = `
+        <span class="news-author">${authorName}</span>
+        <span class="news-date">${newsDate}</span>
+    `;
+    document.getElementById('modal-news-content').textContent = news.content;
+
+    // Показываем или скрываем кнопку удаления в зависимости от прав
+    deleteNewsBtn.style.display = 'block'; // В реальном приложении проверяли бы права пользователя
+
+    newsModal.style.display = 'flex';
+}
+
+// Удаление новости
+deleteNewsBtn.addEventListener('click', async () => {
+    if (!currentNewsId) return;
+
+    try {
+        const response = await fetch(`/deleteNewsById?id=${currentNewsId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Ошибка удаления новости');
+
+        // Закрываем модальное окно и обновляем список новостей
+        newsModal.style.display = 'none';
+        loadNewsData();
+    } catch (error) {
+        console.error('Ошибка удаления новости:', error);
+        alert('Не удалось удалить новость');
+    }
+});
+
+// Добавление новой новости
+submitNewsBtn.addEventListener('click', async () => {
+    const title = document.getElementById('news-title-input').value.trim();
+    const content = document.getElementById('news-content-input').value.trim();
+
+    if (!title || !content) {
+        alert('Заполните все поля');
+        return;
+    }
+
+    try {
+        const now = new Date();
+        const newsData = {
+            educationalInstitutionId: parseInt(schoolId),
+            title: title,
+            content: content,
+            dateTime: now.toISOString()
+        };
+
+        const response = await fetch('/addNews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newsData)
+        });
+
+        if (!response.ok) throw new Error('Ошибка добавления новости');
+
+        // Закрываем модальное окно и обновляем список новостей
+        addNewsModal.style.display = 'none';
+        loadNewsData();
+    } catch (error) {
+        console.error('Ошибка добавления новости:', error);
+        alert('Не удалось добавить новость');
+    }
+});
+
+// Закрытие модальных окон
+closeNewsModalBtn.addEventListener('click', () => {
+    newsModal.style.display = 'none';
+});
+
+cancelAddNewsBtn.addEventListener('click', () => {
+    addNewsModal.style.display = 'none';
+});
+
+// Закрытие по клику вне модального окна
+window.addEventListener('click', (event) => {
+    if (event.target === newsModal) {
+        newsModal.style.display = 'none';
+    }
+    if (event.target === addNewsModal) {
+        addNewsModal.style.display = 'none';
+    }
+});
+
+// Форматирование даты
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+}
+
+function uploadPhoto() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('id', schoolId);
+
+            fetch('/addImageEducational', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке изображения');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Фото успешно загружено', data.message);
+                loadSchoolData();
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert(error.message);
+            });
+        }
+    });
+    fileInput.click();
+}
 </script>
 </body>
 </html>
